@@ -76,25 +76,25 @@ bool LogicAND(bool A, bool B)
     
     if(A && B) {
         cout << "A = " << A << ", " << "B = " << B << endl;
-        // do some actions
+        // take some actions
         result = true;
     }
     
-    //at this point either !A, or !B, or !A && !B
+    // at this point either !A, or !B, or !A && !B
     // filter out what you need
     if(!A && !B) {    // A and B are false
         cout << "Both A and B are Fasle: A = " << A << ", " << "B = " << B << endl;
-        // do some actions
+        // take some actions
         result = false;
     }
     else if(!A) {       // A is Fasle
         cout << "A is Fasle: A = " << A << ", " << "B = " << B << endl;
-        // do some actions
+        // take some actions
         result = false;
     }
     else if(!B){        // B is Fasle
         cout << "Both B is Fasle: A = " << A << ", " << "B = " << B << endl;
-        // do some actions
+        // take some actions
         result = false;
     }
     

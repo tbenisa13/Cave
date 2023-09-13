@@ -26,7 +26,38 @@ using std::tuple;
 enum BIG_LITTLE_INDIAN {BIG_INDIAN = 0, LITTLE_INDIAN = 1};
 
 // String
-void StringPractice(void)
+void StringPractice(void) {
+{
+    string str ("There are two needles in this haystack with needles.");
+    string str2 ("needle");
+
+    // different member versions of find in the same order as above:
+    size_t found = str.find(str2);
+    if( found != std::string::npos ) {
+        std::cout << "first 'needle' found at: " << found << '\n';
+    }
+
+    found = str.find( "needles are small", found+1, 6 );
+    if( found != std::string::npos ) {
+        std::cout << "second 'needle' found at: " << found << '\n';
+    }
+
+    found = str.find("haystack");
+    if( found!=std::string::npos ) {
+        std::cout << "'haystack' also found at: " << found << '\n';
+    }
+
+    found = str.find('.');
+    if( found != std::string::npos ) {
+        std::cout << "Period found at: " << found << '\n';
+    }
+
+    // let's replace the first needle:
+    str.replace( str.find(str2), str2.length(), "preposition" );
+    
+    std::cout << str << '\n';
+
+}
 {
     string s("String Data");
     char *p = s.data();
@@ -36,7 +67,7 @@ void StringPractice(void)
     const char *pc = s.c_str();
     // *pc = 'X'; Can't do this. it is a constant
     cout << pc << endl; //[0] << pc[1];
-   
+    
     char t = s.back();              cout << t << endl;
     char d = s.basic_string::at(0); cout << d << endl;
     char d1 = s.at(0);              cout << d1 << endl;
@@ -47,8 +78,9 @@ void StringPractice(void)
     s.append(" VBN");
     string ss = s.assign("TTTT");
     s.swap(ss);
-
+    
     cout << endl;
+}
 }
 
 // map
@@ -59,9 +91,9 @@ void MapPractice(void)
     map<int, int> map1;
     map<int, int>::iterator mapIter;
     
-    map1[3] = 2;
-    map1[5] = 4;
-    map1[7] = 6;
+    map1[5] = 2;
+    map1[3] = 4;
+    map1[-1] = 6;
     mapIter  = map1.find(71);
     if(mapIter != map1.end()){
         int t = mapIter->second;    // should check mapIter before using it to access second

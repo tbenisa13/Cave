@@ -43,10 +43,36 @@ void Test(double* d) {
 void VectorPractice(void)
 {
     {
-        vector<vector<int>> mat(2, vector<int>(3));         // [2][3]
-        vector<vector<int>>   vv1 = { vector<int>(2) };     // [1][2]
-        vector<vector<int>>   vv2 = { vector<int>(2,4) };   // [1][2]
+        // !!!: √√√
+        vector v1 {3}; // one element with the value 3.0
+        vector<int> v2(3); // three elements each with the (default) value 0.0
     }
+    {
+        // 2D vectors<int>: static decleration
+        vector<vector<int>> matrix1 (2, vector<int>(3));        // [2][3]: default initialization = 0
+        vector<vector<int>> matrix2 = { vector<int>(2) };       // [1][2]: default initialization = 0
+        vector<vector<int>> matrix3 = { vector<int>(2, 99) };   // [1][2]: initialized to 4
+        // jagged 2D array using vector<>: [2][X] = { {0, 0} , {77, 77, 77} }
+        vector<vector<int>> matrix4 = { vector<int>(2), vector<int>(3, 77) };
+        // jagged 2D array using vector<>: [2][X] = { {66, 66} , {77, 77, 77} }
+        vector<vector<int>> matrix5 = { vector<int>(2) = {66,66}, vector<int>(3, 77) };
+        matrix2[0][0];
+    }
+    {
+        vector<string> svec(10);                // size = 10 and string = "", on the stack
+        vector<string> svec1(10, "defualt");    // size = 10 and string = "defualt", on the stack
+        vector<string> *pvec1 = new vector<string>(10); // size = 10 strings, on the heap
+
+        vector<string> *pvec2 = new vector<string>[10];    // ok, size = 10 strings, on the heap
+
+        vector<string> *pv1 = &svec;
+        vector<string> *pv2 = pvec1;
+        delete pvec1;
+       // delete [] pvec2;
+        //delete pv1;   // can not delete a pointer varaiable created on the stack
+        //delete pv2;
+    }
+
     {
         // NOTE: v1 and v2 point to the same vector
         vector<int> *v1 = new vector<int>({1,2,3});
@@ -170,7 +196,7 @@ void VectorPractice(void)
 
 void printVector(vector<int>& nums)
 {
-    int size = static_cast<int>(nums.size());
+    long unsigned int size = nums.size();
     cout << "[";
     for( int i = 0; i < size; ++i ) {
         if( i < size-1 ) {
@@ -183,30 +209,12 @@ void printVector(vector<int>& nums)
     cout << "]";
     cout  << endl;
 }
-
-//template <class T> inline int MAX_TMPL(T a, T b) {return a >= b ? a : b;}
-template <class T> void printVectorX( vector<T>& nums )
-{
-   int size = static_cast<T>(nums.size());
-    cout << "[";
-    for( int i = 0; i < size; ++i ) {
-        if( i < size-1 ) {
-            cout << nums[i] << ", ";
-        }
-        else {
-            cout << nums[i];
-        }
-    }
-    cout << "]";
-    cout  << endl;
-}
-
 
 // Overloaded function, using ostream out
 void printVector(ostream& out, vector<int>& nums)
 {
     out << "";
-    int size = static_cast<int>(nums.size());
+    long unsigned int size = nums.size();
     cout << "[";
     for( int i = 0; i < size; ++i ) {
         if( i < size-1 ) {
@@ -233,7 +241,7 @@ void printVector(ostream& out, vector<int>& nums)
             for(itr1 = itr->begin(); itr1 != itr->end(); itr1++) {
                 cout << *itr1;
                 if(--size)
-                    cout << ",";
+                    cout << ", ";
             }
             cout << "]";
         }
@@ -281,4 +289,11 @@ void simpleDictionary( void )
             cout << words[i] << "\n";
         }
     }
+}
+
+
+
+
+template <class myType> myType GetMax (myType a, myType b) {
+    return (a>b?a:b);
 }

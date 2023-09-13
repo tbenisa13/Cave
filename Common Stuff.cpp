@@ -19,8 +19,16 @@ using std::endl;
 using std::istream;
 using std::ostream;
 
+using std::string;
+using std::cout;
+using std::vector;
+using std::map;
+//using std::set;
+
+
+
 // Easy
-int deleteValue(vector<int>& array, int value)
+int CommonStuff::deleteValue(vector<int>& array, int value)
 {
     //if(nums.empty())
       //  return 0;
@@ -41,7 +49,7 @@ int deleteValue(vector<int>& array, int value)
 
 // N number of houses to rob. you can not rob adjacent houses.
 // K amount of money in each house
-int maximizeMoney_robbingHouses(int houses , int amount)
+int CommonStuff::maximizeMoney_robbingHouses(int houses , int amount)
 {
     // houses % 2, tells you if number of houses is even or odd
     // you always can robb houses/2. plus, if houses is odd you can do one more robbrey
@@ -50,7 +58,7 @@ int maximizeMoney_robbingHouses(int houses , int amount)
 }
 
 // O(2N). traversing string twice
-char GetMaxOccuringChar_1(char* str)
+char CommonStuff::GetMaxOccuringChar_1(char* str)
 {
     // Create array to keep the count of individual characters and initialize the array to 0
     int count[256] = { 0 };
@@ -75,7 +83,7 @@ char GetMaxOccuringChar_1(char* str)
 }
 
 // !!!: better than above function. O(N)
-char GetMaxOccuringChar_2(char* str)
+char CommonStuff::GetMaxOccuringChar_2(char* str)
 {
     // Create array to keep the count of individual characters and initialize the array to 0
     int count[256] = { 0 };
@@ -98,7 +106,7 @@ char GetMaxOccuringChar_2(char* str)
 
 //  Given a sorted array containing only numbers 0 and 1, the task is to find the transition point efficiently. The transition point is the point where “0” ends and “1” begins.
 //  A transition point is the index of the first ‘1’ appearing in the array.
-int transitionPoint_SortedArray_1( vector<int> a ) {
+int CommonStuff::transitionPoint_SortedArray_1( vector<int> a ) {
     size_t size = a.size();
     int i = 0;
     bool one = true;   // important to start with 1
@@ -128,7 +136,7 @@ int transitionPoint_SortedArray_1( vector<int> a ) {
 /* Given an array of sorted numbers containing only 0s and 1s, find the transition point.
    A transition point is the index of the first ‘1’ appearing in the array*/
 // !!!: taken advantage of SORTED array. O(log n)
-int transitionPoint_SortedArray_2( vector<int> array )
+int CommonStuff::transitionPoint_SortedArray_2( vector<int> array )
 {
     int size = static_cast<int>(array.size());
     int left  = 0;
@@ -171,7 +179,7 @@ int transitionPoint_SortedArray_2( vector<int> array )
      1 1 1 1 1 1 1 1
  */
 // brillent
-void create_pattern_1( int ROWS, int COLMUNS )
+void CommonStuff::create_pattern_1( int ROWS, int COLMUNS )
 {
     for( int row = 1; row <= ROWS; row++ ) {
       for( int col = 1; col <= COLMUNS; col++ ) {
@@ -197,7 +205,7 @@ void create_pattern_1( int ROWS, int COLMUNS )
      1 0 0 0 0 0 0 1
      1 1 1 1 1 1 1 1
  */
-void create_pattern_2 (int rows, int cols)
+void CommonStuff::create_pattern_2 (int rows, int cols)
 {
     string pattern1;    // all ones row: "111111", printed at fisrt and last rows
     for( int i=0; i<cols-1; ++i ) {
@@ -223,7 +231,7 @@ void create_pattern_2 (int rows, int cols)
 }
 
 // rows must be equal to columns
-void create_pattern_Diagonally (int rows, int cols)
+void CommonStuff::create_pattern_Diagonally (int rows, int cols)
 {
     for (int row = 0; row < rows; row++) {
       for (int col = 0; col < cols; col++) {          // If element is in first/last row or first/last column
@@ -240,7 +248,7 @@ void create_pattern_Diagonally (int rows, int cols)
 
 }
 
-void create_pattern_Diagonally_Recursuvilly (int rows, int cols)
+void CommonStuff::create_pattern_Diagonally_Recursuvilly (int rows, int cols)
 {
     if(rows == 0) {
         return;
@@ -263,7 +271,7 @@ void create_pattern_Diagonally_Recursuvilly (int rows, int cols)
 }
 
 
-int getLastKthElement(list<int> list, int kthToLast)
+int CommonStuff::getLastKthElement(list<int> list, int kthToLast)
 {
     if( kthToLast >= list.size() ) {
         cout << "\nThis an error" << endl;
@@ -292,7 +300,7 @@ int getLastKthElement(list<int> list, int kthToLast)
     The time complexity of above recursive solution is exponential. There are many overlapping subproblems
  */
 // better than numberOfPaths_recursively2(). no helper function
-long long  numberOfPaths_recursively1(int row, int col)
+long long  CommonStuff::numberOfPaths_recursively1(int row, int col)
 {
     static int counter = 0;
     // If either given row number is first or given column number is first
@@ -319,7 +327,7 @@ long long  numberOfPaths_recursively1(int row, int col)
 static int ROWS;
 static int COLS;
 // Very similar to numberOfPathsRecursive1()
-long long numberOfPaths_recursively2(int row, int col)
+long long CommonStuff::numberOfPaths_recursively2(int row, int col)
 {
     ROWS = row;
     COLS = col;
@@ -327,7 +335,7 @@ long long numberOfPaths_recursively2(int row, int col)
 }
 
 // It is similar to post order traversal for BST
-long long numberOfPathsMysolution(int row, int col)
+long long CommonStuff::numberOfPathsMysolution(int row, int col)
 {
     static int counter = 0; // for troubleshooting only
 
@@ -349,7 +357,7 @@ long long numberOfPathsMysolution(int row, int col)
 // !!!: Recursive + Dynamic Programming solution. Not practical to ask user to supply paths[4][4]. Should have a helper function for user and have helperFunction(row, col) call numberOfPathsRecursiveX()
 // !!!: The following implementation is based on the (Top-Down) approach. (DFS)
 // Returns count of possible paths to reach cell at row number m and column number n from the topmost leftmost cell (cell at 1, 1)
-int numberOfPathsRecursiveX(int row, int col, int paths[4][4])
+int CommonStuff::numberOfPathsRecursiveX(int row, int col, int paths[4][4])
 {
     if(row == 1 || col == 1)
         return paths[row][col] = 1;
@@ -370,7 +378,7 @@ int numberOfPathsRecursiveX(int row, int col, int paths[4][4])
    !!!: Like other typical Dynamic Programming(DP) problems, recomputations of same subproblems can be avoided by
    !!!: constructing a temporary array count[][] in (BOTTOM UP) manner using the above recursive formula
  */
-int numberOfPaths_iteratively1(int ROWS, int COLS)
+int CommonStuff::numberOfPaths_iteratively1(int ROWS, int COLS)
 {
     int counter = 0;
 
@@ -404,7 +412,7 @@ int numberOfPaths_iteratively1(int ROWS, int COLS)
    !!!: Above solution is more intuitive but we can also reduce the space by O(n); where n is column size.*/
 // Returns count of possible paths to reach cell at row number m and column number n from
 // the topmost leftmost cell (cell at 1, 1)
-int numberOfPaths_iteratively2(int ROWS, int COLS)
+int CommonStuff::numberOfPaths_iteratively2(int ROWS, int COLS)
 {
     // Create a 1D array to store results of subproblems
     vector<int> path(COLS, 0); //int path[COLS] = { 0 }; Doesn't work: Variable-sized object may not be initialized
@@ -438,7 +446,7 @@ int numberOfPaths_iteratively2(int ROWS, int COLS)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///
-int trappingWater(vector<int>& height)
+int CommonStuff::trappingWater(vector<int>& height)
 {
     if(height.empty())
         return 0;
@@ -463,7 +471,7 @@ int trappingWater(vector<int>& height)
     return ans;
 }
 
-void extractDigits(unsigned int num)
+void CommonStuff::extractDigits(unsigned int num)
 {
     //char pointer declaration
     char temp[5];
@@ -479,3 +487,217 @@ void extractDigits(unsigned int num)
     printf("\n");
 }
 
+// function check whether a number is prime or not
+bool CommonStuff::isPrime( int n )
+{
+    // Corner case
+    if (n <= 1)
+        return false;
+ 
+    // Check from 2 to square root of n
+    double root = sqrt(n);
+    for (int i = 2; i <= root; i++)
+        if (n % i == 0) {
+            return false;
+        }
+ 
+    return true;
+}
+
+
+/* Exit Point in a Matrix
+ Problem statement:
+ 
+ Given a matrix with 0's and 1's, one enters the matrix at cell (0, 0) in left to right direction. Whenever one encounters a 0 he retains in the same direction, if one encounters a 1 he has to change direction to the right of current direction and change that 1 value to 0. Write a programming out from which index he will leave the matrix at the end. (Indexing starts from 0).
+
+ Input: An mxn matrix with each element 0 or 1
+
+ Output: Exit cell index pair (i, j) where is the row no & j is the column no
+
+ Example & discussion
+
+ Let's consider a 3x3 matrix of each element 0/1.
+ matrix: 0 1 1
+         0 0 0
+         1 0 1
+ 
+ Given that:
+ Starting position is (0, 0).
+ Starting moving direction is left to right (rightwards).
+ Whenever current element value is 0, it retains its direction.
+ Whenever current element value is 1, it changes direction to right of current moving directions.
+ Moving directions can be of four types
+ Leftwards
+ Rightwards
+ Downwards
+ Upwards
+ Whenever current element value is 0, moving directions becomes like
+ Leftwards → leftwards
+ Rightwards → rightwards
+ Upwards → upwards
+ Downwards → downwards
+ Whenever current element value is 1, moving directions becomes like
+ Leftwards → upwards (changing to right direction)
+ Rightwards → downwards (changing to right direction)
+ Upwards → rightwards (changing to right direction)
+ Downwards → leftwards (changing to right direction)
+ Current element value: 1 → 0*/
+
+// Works good
+vector<int> CommonStuff::Find_ExitPoint_In_Matrix(vector<vector<int>> matrrix /* 2D array*/) {
+    vector<int> result(2, -1);  // -1 indicates no exit from matrix exists (thsis should never happens)
+    
+    enum movingdir {MovingRight, MovingLeft, MovingUp, MovingDown};
+    movingdir direction = MovingRight;
+    
+    int row=0, col=0;   // Used to traverse through matrrix
+    int left = 0, right  = static_cast<int>(matrrix[0].size()) - 1; // Number of cols - 1
+    int top  = 0, bottom = static_cast<int>(matrrix.size()) - 1;    // Number of rows - 1
+    
+    // determine row & col for next move
+    while(row >= top && row <= bottom && col >= left && col <= right) {
+        // 0 - Going straight
+        // Determine next row & col
+        // Notice: We don't need to determine previous Direction here, since we are staying in the same direction.
+        if(matrrix[row][col] == 0) {
+            switch (direction) {
+                case MovingRight:
+                    col++;
+                    break;
+                case MovingLeft:
+                    col--;
+                    break;
+                case MovingUp:
+                    row--;
+                    break;
+                case MovingDown:
+                    row++;
+                    break;
+                default:
+                    break;
+            }
+         }
+        
+        // 1 - Turning right
+        // Determine next row & col
+        // Notice: We do need to determine previous Direction here, since We are turning right.
+        else if(matrrix[row][col] == 1) {
+            switch (direction) {
+                case MovingRight: row++;
+                                  direction = MovingDown;
+                                  break;
+                case MovingLeft:  row--;
+                                  direction = MovingUp;
+                                  break;
+                case MovingUp:    col++;
+                                  direction = MovingRight;
+                                  break;
+                case MovingDown:  col--;
+                                  direction = MovingLeft;
+                                  break;
+                default:
+                                  break;
+            }
+        }
+    }
+    
+    if(row < top) {
+        result[0] = top; // Exit point: row
+        result[1] = col; // Exit point: col
+    }
+    else if(row >= bottom) {
+        result[0] = bottom;
+        result[1] = col;
+    }
+    else if(col < left) {
+        result[0] = row;
+        result[1] = left;
+
+    }
+    else if(col >= right) {
+        result[0] = row;
+        result[1] = right;
+    }
+    //result[0] = ((row < top)   || (row >= bottom))? --row : row ;
+    //result[1] = ((col < left)  || (col >= right))? --col : col ;
+    
+    return result;
+}
+
+
+
+/*
+ Input: n = 19
+ Output: true
+ Explanation:
+ 1*1 + 9*9 = 82
+ 8*8 + 2*2 = 68
+ 6*6 + 8*8 = 100
+ 1*1 + 0*0 + 0*0 = 1
+ */
+/*
+ Input: n = 18
+ Output: false
+ Explanation:
+ 1*1 + 8*8 = 65
+ 5*5 + 6*6 = 61
+ 6*6 + 1*1 = 37
+ 3*3 + 7*7 = 58
+ 5*5 + 8*8 = 89
+ ..............
+ */
+bool CommonStuff::isHappy(int n) {
+    int whole = n;
+
+    while(whole) {
+        int sum = 0;
+        while(whole) {
+            int remainder = whole%10;
+            sum += remainder * remainder;
+            whole /= 10;
+        }
+        if(sum == 1) {
+            return true;
+        }
+        if(sum == 4) {  // or 89, 145
+            return false;
+        }
+        whole = sum;
+    }
+
+    return false;
+}
+
+
+// NVIDIA interview question:
+// Given the following set of strings, write a function that stores this information.
+// Taher: I think i solved this problem
+map<string, int> CommonStuff::StoreElectronicsInfo( string str_array[], int len )
+{
+    // "/Electronics/Computers/Graphics Cards"
+    map<string, int> dict;
+    string word;
+    for(int i=0; i < len; i++) {
+        // Travarse each string in array
+        for(int j=0; j < str_array[i].size(); j++) {
+            // Add chars to word string
+            word += str_array[i][j];
+            // Check for '/' and end of string
+            if( str_array[i][j] == '/' || j == str_array[i].size() - 1 ) {
+                // First '/'
+                if(word.size() == 1) {
+                    dict[word]++;   // Add '/' word and increment word count in map
+                }
+                else if(word.back() == '/') {
+                    word.resize(word.size() - 1); // Remove last '/' from word, before adding it to map
+                }
+                dict[word]++;   // Increment string count (minues last '/') to map
+                word += '/';    // Add '/' back to word
+                //cout << word << " = " << dict[word] << endl;
+           }
+        }
+        word = "";  // Erase word
+    }
+    
+    return dict;
+}

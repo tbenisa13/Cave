@@ -36,7 +36,7 @@ int XNOR(int n1, int n2)
 }
 
 // XOR a number n: ???: Useless
-int computeXOR1(int n)
+int BitManipulations::computeXOR1(int n)
 {
     int i = 1;
     int res = 0;
@@ -54,7 +54,7 @@ int computeXOR1(int n)
 }
 
 // Method to calculate xor
-int computeXOR2(int n)
+int BitManipulations::BitManipulations::computeXOR2(int n)
 {
     // If n is a multiple of 4
     if (n % 4 == 0)
@@ -72,23 +72,23 @@ int computeXOR2(int n)
     return 0;
 }
 
-int Compute_Sign_of_Integer_1(int number)
+int BitManipulations::Compute_Sign_of_Integer_1(int number)
 {
     int sign = (number > 0) - (number < 0); // check the sign of the number
     return sign;
 }
 
-int Compute_Sign_of_Integer_2(int number)
+int BitManipulations::Compute_Sign_of_Integer_2(int number)
 {
     return number >> 31 & 1;
 }
 
-bool CheckOppositeSign(int a, int b)
+bool BitManipulations::CheckOppositeSign(int a, int b)
 {
     return ((a ^ b) < 0); // 1 if a and b have opposite signs;
 }
 
-int Update_Bits_1(int n, int m, int startBit, int endBit)
+int BitManipulations::Update_Bits_1(int n, int m, int startBit, int endBit)
 {
     unsigned int mask0 = ~0;    // 0xFFFFFFFF
     int mask1 = ~0;             // -1
@@ -113,7 +113,7 @@ int Update_Bits_1(int n, int m, int startBit, int endBit)
 }
 
 // !!!: 09/12/2020: this worked the first time I tried it. I am really surprised but proud of getting it right first time
-int Update_Bits_2(int n, int m, int beginPos, int endPos)
+int BitManipulations::Update_Bits_2(int n, int m, int beginPos, int endPos)
 {
     int right =  (1 << beginPos) - 1;       // beginPos = 4
     int left  = ~((1 << (endPos + 1)) - 1);  // endPos = 6
@@ -123,7 +123,7 @@ int Update_Bits_2(int n, int m, int beginPos, int endPos)
 }
 
 // from = 3, to = 4 inclusive
-unsigned int getBits1(unsigned int number, int fromBit, int toBit) {
+unsigned int BitManipulations::getBits1(unsigned int number, int fromBit, int toBit) {
     unsigned int mask = ~(~0 << (toBit - fromBit + 1)); // 00000011
     
     return (number >> fromBit) & mask;
@@ -131,7 +131,7 @@ unsigned int getBits1(unsigned int number, int fromBit, int toBit) {
 
 // from Ritchi book: p=4, n=3. n is index from 1, that is why n-1 below
 // Needs work
-unsigned int getBits2(unsigned int number, int fromBit, int toBit) {
+unsigned int BitManipulations::getBits2(unsigned int number, int fromBit, int toBit) {
     //unsigned int c = ~(~0 << toBit);  c = 0b00000000000000000000000001111111, toBit=7    //return d & c;
     return (number >> (fromBit - toBit + 1)) & ~(~0 << toBit);    // !!!: ???
 }
@@ -139,7 +139,7 @@ unsigned int getBits2(unsigned int number, int fromBit, int toBit) {
 // Given a number, the task is to set all odd bits of a number. Positions of bits are counted from
 // LSB (least significant bit) to MSB (Most significant bit). !!!: Position of LSB is considered as 1.
 // Works, but SetOddBits(n) is better: simpler and faster
-unsigned int SetOddBits_geek(unsigned int number)
+unsigned int BitManipulations::SetOddBits_geek(unsigned int number)
 {
     int count = 0;
  
@@ -161,18 +161,18 @@ unsigned int SetOddBits_geek(unsigned int number)
 }
 
 // does not work
-unsigned int SetOddBits_mine(unsigned int n)
+unsigned int BitManipulations::SetOddBits_mine(unsigned int n)
 {
     return n | 0x55555555;  // oddmask = 0x55555555: 0101
 }
 
 // does not work
-unsigned int setEvenBits_mine(unsigned int n)
+unsigned int BitManipulations::setEvenBits_mine(unsigned int n)
 {
     return n | 0xAAAAAAAA;  // evenmask = 0xAAAAAAAA: 1010
 }
 
-int CountSetBits(int n)
+int BitManipulations::CountSetBits(int n)
 {
     //int r = n;
     int count = 0;
@@ -188,7 +188,7 @@ int CountSetBits(int n)
     return count;
 }
 
-unsigned char Clear_Bits_From_MSB_To_ithBit(unsigned char number, int pos)
+unsigned char BitManipulations::Clear_Bits_From_MSB_To_ithBit(unsigned char number, int pos)
 {
     return 0xFF >> (8 - pos);    // nice. great idea
 }
@@ -197,7 +197,7 @@ unsigned char Clear_Bits_From_MSB_To_ithBit(unsigned char number, int pos)
 // From internet: Implementation to print numbers in the range 1 to n having bits in alternate
 // pattern function to print numbers in the range (1 to n) having bits in alternate pattern
 // My work: this works for both 10 0r 01
-vector<int> generateAlternateBits1(int n)
+vector<int> BitManipulations::generateAlternateBits1(int n)
 {
     // n = 110010 :
                 // r = 101010 = 42
@@ -223,7 +223,7 @@ vector<int> generateAlternateBits1(int n)
 }
 
 // Too complicated
-void generateAlternateBits2(int n)
+void BitManipulations::generateAlternateBits2(int n)
 {
     // first number having bits in alternate pattern
     int curr_num = 1;
@@ -258,7 +258,7 @@ void generateAlternateBits2(int n)
 
 // Implement a function that checks if given number contains 2 or more consecutive 1s.
 // If it does, the function should return 1. Otherwise, it should return 0.
-int inspect_bits(unsigned int number)
+int BitManipulations::inspect_bits(unsigned int number)
 {
     int one_bit_count = 0;
     
@@ -282,7 +282,7 @@ int inspect_bits(unsigned int number)
 }
 
 /*  Big-endian systems store the most significant byte of a word at the smallest memory address and the least significant byte at the largest. A little-endian system, in contrast, stores the least-significant byte at the smallest address.  */
-bool BigIndianLittleIndian(void)
+bool BitManipulations::BigIndianLittleIndian(void)
 {
     //              D C B A
     int testInt = 0x44434241;
@@ -299,7 +299,7 @@ bool BigIndianLittleIndian(void)
 }
 
 //Function to change the endianess
-uint32_t ChangeEndianness_1(uint32_t u32Value)
+uint32_t BitManipulations::ChangeEndianness_1(uint32_t u32Value)
 {
     uint32_t u32Result = 0;
     u32Result |= (u32Value & 0x000000FF) << 24;
@@ -311,7 +311,7 @@ uint32_t ChangeEndianness_1(uint32_t u32Value)
 }
 
 //Function to change the endianess. Slower than version 1
-uint32_t ChangeEndianness_2(uint32_t u32Value)
+uint32_t BitManipulations::ChangeEndianness_2(uint32_t u32Value)
 {
     char* p1 = (char* )(&u32Value);
     char* p2 = p1 + 3;  // sizeof(uint32_t) = 4;
@@ -333,13 +333,13 @@ Examples:
     Output : 00000001           Output : 00001000
  */
 // Surprised and impressed it worked first time
-byte Swap_EvenOdd_Bits_Byte(byte Byte)
+byte BitManipulations::Swap_EvenOdd_Bits_Byte(byte Byte)
 {
     //  Odd bits mask = 0xAA     Even bits mask = 0x55
     return (Byte & byte(0xAA)) >> 1 | (Byte & byte(0x55)) << 1;
 }
 
-unsigned int Swap_EvenOdd_Bits_Integer(unsigned int n)
+unsigned int BitManipulations::Swap_EvenOdd_Bits_Integer(unsigned int n)
 {
     //           Odd bits mask             Even bits mask
     return (n & 0xAAAAAAAA) >> 1 | (n & 0x55555555) << 1;
@@ -347,12 +347,12 @@ unsigned int Swap_EvenOdd_Bits_Integer(unsigned int n)
 
 // 00111001
 // 11000110
-unsigned int Swap_2Bits_Nibble(unsigned int number) {
+unsigned int BitManipulations::Swap_2Bits_Nibble(unsigned int number) {
     number = (((number & 0xcccccccc) >> 2) | ((number & 0x33333333) << 2));
     return number;
 }
 
-unsigned char Swap_Nibbles_In_Byte(unsigned char c) {
+unsigned char BitManipulations::Swap_Nibbles_In_Byte(unsigned char c) {
     // !!!: Notice it is easier to swap nibbles in a byte
     return static_cast<unsigned char>((c >> 4) | (c << 4));
     /*c = c >> 4 | c << 4;  // Warning: Implicit conversion loses integer precision: 'int' to 'unsigned char'
@@ -360,18 +360,18 @@ unsigned char Swap_Nibbles_In_Byte(unsigned char c) {
 
 }
 
-unsigned int Swap_Nibbles_In_Integer(unsigned int n) {
+unsigned int BitManipulations::Swap_Nibbles_In_Integer(unsigned int n) {
     unsigned int oddNibble  = n & 0xF0F0F0F0;
     unsigned int evenNibble = n & 0x0F0F0F0F;
     return (oddNibble >> 4) | (evenNibble << 4);
 }
 
-unsigned int Swap_Bytes_In_Integer(unsigned int number) {
+unsigned int BitManipulations::Swap_Bytes_In_Integer(unsigned int number) {
     number = ((number & 0xFF00FF00) >> 8) | ((number & 0x00FF00FF) << 8);
     return number;
 }
 
-unsigned int Swap_Halfword_In_Integer(unsigned int number) {
+unsigned int BitManipulations::Swap_Halfword_In_Integer(unsigned int number) {
     number = number >> 16 | number << 16;
     return number;
 }
@@ -381,7 +381,7 @@ unsigned int Swap_Halfword_In_Integer(unsigned int number) {
 //  Given a number x and two positions (from the right side) in the binary representation of x,
 //  write a function that swaps n bits at given two positions and returns the result.
 //  It is also given that the two sets of bits do not overlap.
-int SwapRangeOfBits(unsigned int number, unsigned int pos1, unsigned int pos2, unsigned int range) {
+int BitManipulations::SwapRangeOfBits(unsigned int number, unsigned int pos1, unsigned int pos2, unsigned int range) {
     int result = 0;
     unsigned int mask1 = 0;
     unsigned int mask2 = 0;
@@ -401,7 +401,7 @@ int SwapRangeOfBits(unsigned int number, unsigned int pos1, unsigned int pos2, u
 
 // Submitted Leetcode
 // Runtime 0 ms Beats 100% Memory 5.7 MB MB Beats 99.4%
-bool Does_Interger_Have_Alternating_Bits_1(unsigned int number) {
+bool BitManipulations::Does_Interger_Have_Alternating_Bits_1(unsigned int number) {
     bool one_has_been_seen = false;
     bool zero_has_been_seen  = false;
 
@@ -436,8 +436,8 @@ bool Does_Interger_Have_Alternating_Bits_1(unsigned int number) {
     return true;
 }
 
-// !!!: does not work for 4, 8, 16...
-bool Does_Interger_Have_Alternating_Bits_2(unsigned int n)
+// !!!: does not work for 4, 8, 16...? not so sure about this
+bool BitManipulations::Does_Interger_Have_Alternating_Bits_2( unsigned int n )
 {
     unsigned int i = n & 0x55555555;
     unsigned int j = n & 0xAAAAAAAA;
@@ -449,7 +449,7 @@ bool Does_Interger_Have_Alternating_Bits_2(unsigned int n)
 }
 
 
-unsigned char swap2Bits(unsigned char data, int bit1, int bit2)
+unsigned char BitManipulations::swap2Bits(unsigned char data, int bit1, int bit2)
 {
     unsigned char result = 0;
 
@@ -467,7 +467,7 @@ unsigned char swap2Bits(unsigned char data, int bit1, int bit2)
     return result;
 }
 
-unsigned char swap2BitsMySolution(unsigned char data, unsigned char bit1, unsigned char bit2)
+unsigned char BitManipulations::swap2BitsMySolution(unsigned char data, unsigned char bit1, unsigned char bit2)
 {
     unsigned char result = 0;
 
@@ -484,7 +484,7 @@ unsigned char swap2BitsMySolution(unsigned char data, unsigned char bit1, unsign
     return result;
 }
 
-bool PowerOfTwo(unsigned int n)
+bool BitManipulations::PowerOfTwo(unsigned int n)
 {
     while ((n % 2) == 0)    // while n is even
         if ((n /= 2) == 1)  // if n/2 equals 1
@@ -493,7 +493,7 @@ bool PowerOfTwo(unsigned int n)
     return 0;
 }
 
-long multiplyWithShift(short x, short y)
+long BitManipulations::multiplyWithShift(short x, short y)
 {
     long res = 0;
     int counter = 0;
@@ -512,7 +512,7 @@ long multiplyWithShift(short x, short y)
 // you could return int instead of double. can not use int because of corner case when
 // dividend and/or divisor are equal to INT_MIN = -2147483648. in this case, you must return
 // 2147483648 which is outside the range of int (-2147483648...2147483647)
-long int DivideWithoutUsingDivision(int dividend, int divisor)
+long int BitManipulations::DivideWithoutUsingDivision_1(int dividend, int divisor)
 {
     // sorry, you can not divide by 0
     if( divisor == 0 ) {
@@ -565,8 +565,19 @@ long int DivideWithoutUsingDivision(int dividend, int divisor)
     return div * sign;
 }
 
+// does not work for: a = INT_MIN, b = -1
+int BitManipulations::DivideWithoutUsingDivision_2(int a, int b) {
+    int count = 0;
+    int sum = b;
+    while (sum <= a) {
+        sum += b;
+        count++;
+    }
+    return count;
+}
+
 // 16.0 in Interview book. Good work by ME
-int printDuplicatesInBigDataSet(unsigned int* a, int size)
+int BitManipulations::printDuplicatesInBigDataSet(unsigned int* a, int size)
 {
     // I have 4KB of memory = 4Kbyte * 1024 bytes/Kbyte * 8 bits/byte = 32768 bits.
     // For numbers (1...32000), N = 32000. Each bit represents a number:
@@ -600,7 +611,7 @@ int printDuplicatesInBigDataSet(unsigned int* a, int size)
     return count;
 }
 
-void OnesLeftZerosRight(int* array, int size)
+void BitManipulations::OnesLeftZerosRight(int* array, int size)
 {
     int lastSwap = 0;
     for(int i=0; i < size; i++)
@@ -623,7 +634,7 @@ void OnesLeftZerosRight(int* array, int size)
     }
 }
 
-unsigned int ReverseBits1( unsigned int number )
+unsigned int BitManipulations::ReverseBits1( unsigned int number )
 {
     int result = 0; // Must be initialized to zero
 
@@ -637,7 +648,7 @@ unsigned int ReverseBits1( unsigned int number )
    return result;
 }
 
-void ReverseBits2(unsigned int& n)
+void BitManipulations::ReverseBits2(unsigned int& n)
 {
     if( n == 0 || n == INT_MAX )
        return;
@@ -654,7 +665,7 @@ void ReverseBits2(unsigned int& n)
 }
 
 // !!!: Best in my opnion
-unsigned int ReverseBits3( unsigned int n )
+unsigned int BitManipulations::ReverseBits3( unsigned int n )
 {
     unsigned int result = 0;
     unsigned int size = WORD_BIT;
@@ -671,7 +682,7 @@ unsigned int ReverseBits3( unsigned int n )
 }
 
 // rotate bits left
-int RotateBitsLeft_1(int n, int shiftleft)
+int BitManipulations::RotateBitsLeft_1(int n, int shiftleft)
 {
     int result = 0;
     int INT_SIZE = WORD_BIT;
@@ -689,7 +700,7 @@ int RotateBitsLeft_1(int n, int shiftleft)
 }
 
 // Is clearer than RotateBitsLeft_1()
-void RotateBitsLeft_2( int& n, int shiftleft )
+void BitManipulations::RotateBitsLeft_2( int& n, int shiftleft )
 {
     int result = 0;    // OR int result = n;
     
@@ -703,12 +714,12 @@ void RotateBitsLeft_2( int& n, int shiftleft )
 }
 
 // !!!: Even faster than previous versions √√√√√
-void rotateBitsLeft_3(unsigned int& n, int rotateleft)
+void BitManipulations::rotateBitsLeft_3(unsigned int& n, int rotateleft)
 {
     n = (n >> (WORD_BIT - rotateleft)) | (n << rotateleft);
 }
 
-void SwapNumbers_NotUsingtemp( int& x, int& y )
+void BitManipulations::SwapNumbers_NotUsingtemp( int& x, int& y )
 {
     int t = x ^ y;
     x = t ^ x;      // x = x ^ y ^ x = y.   x^x=0 and 0^y=y;
@@ -718,7 +729,7 @@ void SwapNumbers_NotUsingtemp( int& x, int& y )
 // count trailing zero bits for a number.
 // if number is 1101000, then c will be 3
 // my solution. it works
-int trailingZeros_1( int number )
+int BitManipulations::trailingZeros_1( int number )
 {
     int count = 0;
     int i = 0;
@@ -737,7 +748,7 @@ int trailingZeros_1( int number )
 }
 
 // eficient version, but harder to understand
-int trailingZeros_2( int number)
+int BitManipulations::trailingZeros_2( int number)
 {
     //                n = 01101000 (base 2), then count will be 3
     //            n - 1 = 01100111
@@ -764,7 +775,7 @@ int trailingZeros_2( int number)
  }
 
 // my solution.
-int leadingZeros_1( int number )
+int BitManipulations::leadingZeros_1( int number )
 {
      int last_bit_mask = 1 << (WORD_BIT - 1);
      int zero_count = 0;
@@ -781,48 +792,126 @@ int leadingZeros_1( int number )
      return zero_count;
 }
 
-int is_number_odd_or_even( int number )
+int BitManipulations::is_number_odd_or_even( int number )
 {
     return  number & 1;     // odd == 1 and even == 0
 }
 
-int is_char_lower_or_upper( char character )
+int BitManipulations::is_char_lower_or_upper( char character )
 {
     return (97 <= character && character <= 122) ? 0 : 1;
 }
 
 
-// !!!: This is real cool. I am impressed by myself
+// !!!: This is real cool. I am impressed with myself
 /*  Given a binary string, write an algorithm to find THE NUMBER of patterns of form 1[0]1 where [0] represents any number of zeroes (minimum requirement is one 0) there should not be any other character except 0 in the [0] sequence.*/
-int PatternCount_1(string str)
+int BitManipulations::CountNegativePulses(string str)
 {
     int pattern_count = 0;
-    bool one_have_been_seen = false;
-    bool inword = false;
+    enum { LOW, HIGH };
+    bool prev_level = LOW;
+    bool high_to_low_transition = false;
     
-    for( char c: str ) {
-        if(c == '1') {
-            if( inword ) {
-                pattern_count++;    // found pattren
-                inword = false;     // reset inword
+    for( char curr_level: str ) {
+        if( curr_level == '1' ) {
+            if( high_to_low_transition ) {
+                pattern_count++;                    // found pattern
+                high_to_low_transition = false;     // reset high to low to LO
             }
-            one_have_been_seen = true;
+            
+            prev_level = HIGH;
         }
         
-        // look for transition from 1 to 0
-        if( c == '0' && one_have_been_seen ) {
-            inword = true;          // else if(oneseen){ would also work. if(oneseen){ would also work.
-        }                           // else if(c == '0' && oneseen){ would also work.
+        // look for the a transition from HIGH to LOW
+        if( prev_level == HIGH && curr_level == '0' && !high_to_low_transition) {
+            high_to_low_transition = true;      // else if(oneseen){ would also work. if(oneseen){ would also work.
+        }                                       // else if(c == '0' && oneseen){ would also work.
     }
     
     return pattern_count;
 }
 
+int BitManipulations::CountPositivePulses( string str )
+{
+    int pulse_count = 0;
+    enum { LOW = '0', HIGH = '1' };
+    
+    int prev_level = HIGH;
+    bool low_high_transition = false;
+    
+    for( char curr_level : str ) {
+        if( curr_level == LOW ) {
+            if( low_high_transition ) {
+                pulse_count++;                    // found pattern
+                low_high_transition = false;     // reset high to low to LO
+            }
+            
+            prev_level = LOW;
+        }
+        
+        // look for the a transition from HIGH to LOW
+        if( prev_level == LOW && curr_level == HIGH && !low_high_transition) {
+            low_high_transition = true;      // else if(oneseen){ would also work. if(oneseen){ would also work.
+        }                                       // else if(c == '0' && oneseen){ would also work.
+    }
+    
+    return pulse_count;
+}
+
+vector<int> BitManipulations::PulsesEdges( string str )
+{
+    vector<int> result(2);
+    int neg_edges = 0;
+    int pos_edges = 0;
+    int prev_level = str[0];
+    
+    // count lows and highs
+    for( int level=1; level < str.size(); level++ ) {
+        if( str[level] == '0' ) {
+            if( prev_level == '1' ) {
+                // high to low transition ;
+                neg_edges++;
+            }
+            prev_level = '0';
+        }
+            
+        if( str[level] == '1' ) {
+            if( prev_level == '0') {
+                // low to high transition ;
+                pos_edges++;
+            }
+            prev_level = '1';
+        }
+    }
+    
+    // return negative and positive edges
+    result[0] = neg_edges;
+    result[1] = pos_edges;
+    return      result;
+}
+
+// -_- = one valley
+// _-_ = one pulse
+void BitManipulations::DrawPattern( string str )
+{
+    for( char curr_level: str ) {
+        if( curr_level == '1' ) {
+            cout << '-';
+        }
+        if( curr_level == '0' ) {
+            cout << '_';
+        }                                       // else if(c == '0' && oneseen){ would also work.
+    }
+    cout << endl;
+}
+
+// !!!: ////////////////   Longest Substring Of 1s After Removing One Element   ////////////////
+// !!!: VERY IMPORTANT: in all these functions, pay attention to the passed parameter: array, string or integer
 /*
  Medium. Longest Subarray of 1's After Deleting One Element (0 or 1).
  Given a BINARY array nums, you should delete one element from it. Return the size of the
  longest non-empty subarray containing only 1's in the resulting array. Return 0 if there is no such subarray.
-
+ Handle edge cases: If all elements in the array are 1, return the length of the array minus 1. If all elements are 0, return 0, as there will be no contiguous 1's after deletion.
  Example 1:
 Input: nums = [1,1,0,1]
  Output: 3
@@ -851,46 +940,51 @@ Input: nums = [1,1,0,1]
 /* Leetcode Runtime: 36 ms, faster than 66.77% of C++ online submissions for Longest Subarray of 1's After Deleting One Element.
    Memory Usage: 36.5 MB, less than 39.37% of C++ online submissions.*/
 // !!!: √√√. passing a string
-int longestSubstringOf1s_afterRemoving_1bit( string str )
+int BitManipulations::longestSubstringOf1s_afterRemoving_1bit_1( string str )
 {
-    int currCount = 0;      // current  1s sum
-    int prevCount = 0;      // previous 1s sum
+    int curr_onesCount = 0;      // current  1s sum
+    int prev_onesCount = 0;      // previous 1s sum
     int maxCount  = 0;      // maximum  1s sum
 
     int i = 0;
     for( char c : str ) {
         // handle '1'
         if( c == '1' ) {
-          currCount++;
+          curr_onesCount++;
         }
 
         // handle '0' or end of string
         if( c == '0' || i == str.length() - 1 ) { // c == '0' || end of string
             // 1. determine max sum based on current and previous sums
-            if( (currCount + prevCount) > maxCount ) {
-                maxCount = currCount + prevCount;
+            if( (curr_onesCount + prev_onesCount) > maxCount ) {
+                maxCount = prev_onesCount + curr_onesCount;
             }
 
             // 2. save current sum, and reset it to 0
-            prevCount = currCount;
+            prev_onesCount = curr_onesCount;  // !!!: for 2 adjacent 0s, prev count becomes = 0;
             
-            currCount = 0;
+            curr_onesCount = 0;
         }
 
         i++;
+    }
+
+    // 1) corner case: string is all 1s. after removing 1 bit from it, we get max count - 1
+    if( maxCount == str.size() ) {
+        return maxCount - 1;
     }
 
     return maxCount;
  }
 
 // using zero flag as extra variable
-int longestSubstringOf1s_afterRemoving_1bit_2( string str )
+int BitManipulations::longestSubstringOf1s_afterRemoving_1bit_2( string str )
 {
     int prevCount = 0;      // left count of 1s
     int currCount = 0;      // right count of 1s
     int maxCount  = 0;      // maximum count of 1s
     
-    bool prevZero = false;  // using zero flag as extra variable
+    bool prevZero = false;  // !!!: good idea, using zero flag as extra variable for efficincy √√√
 
     int i = 0;
     for( char c : str ) {
@@ -901,11 +995,12 @@ int longestSubstringOf1s_afterRemoving_1bit_2( string str )
             prevZero = false;
         }
 
-        // handle '0' or end of string
+        // handle '0' and end of string
         if( c == '0' || i == str.length() - 1 ) { // c == '0' || end of string
         
+            // 1) only at first 0, we determine max sum based on current and previous sums
             if( !prevZero ) {
-                // 1. only at first 0, determine max sum based on current and previous sums
+                // do this only if you have only a one 0
                 if( (prevCount + currCount) > maxCount ) {
                      maxCount = prevCount + currCount;
                 }
@@ -922,18 +1017,25 @@ int longestSubstringOf1s_afterRemoving_1bit_2( string str )
          i++;
     }
 
+    // 1) corner case: string is all 1s. after removing 1 bit, we get max count - 1
+    if( maxCount == str.size() ) {
+        return maxCount - 1;
+    }
+
     return maxCount;
  }
 
-
-int longestSubsequenceOf1s_afterFlipping_util( int integer )
+// !!!: ////////////////  Longest Subsequence Of 1s After Flipping 1 Bit   ////////////////
+// !!!: ////////////////
+// taking advantage of my longestSubstringOf1s_afterRemoving_1bit() function
+int BitManipulations::longestSubsequenceOf1s_afterFlipping_1bit_util( int integer )
 {
     string str = DecimalToBinary_mine( integer );
      
-    return longestSubstringOf1s_afterRemoving_1bit( str ) + 1;
+    return BitManipulations::longestSubstringOf1s_afterRemoving_1bit_1( str ) + 1;
 }
 
-/*  Flip Bit to Win: You have an integer and you can flip exactly one bit from a 0 to a 1. Write code to
+/*  Flip Bit to Win: You have an integer and you can flip exactly one bit. Write code to
     find the length of the longest sequence of 1 s you could create.
     EXAMPLE
     Input: 1775 (or: 11011101111)
@@ -944,39 +1046,38 @@ int longestSubsequenceOf1s_afterFlipping_util( int integer )
 // Therefore, we can just walk through the integer doing this, tracking the current 1s sequence length and the
 // previous 1s sequence length. When we see a zero, update previousLength:
 // my function, passing integer. !!!: works √√
-int longestSubsequenceOf1s_afterFlipping_1bit( int integer )
+int BitManipulations::longestSubsequenceOf1s_afterFlipping_1bit( int integer )
 {
-    // if all 1s, this is already the longest sequence
+    // 1) if all 1s, this is already the longest sequence
     if( ~integer == 0 ) {
         // yes, return max bits for integer
-        return sizeof( integer ) * 8;
+        return sizeof(integer) * 8 - 1;
     }
     
     int currCount = 0;
     int prevCount = 0;
     int maxCount  = 0;
 
-    // must check all bits
+    // 2) must check all bits
     int i = 0;  // to keep track of last bit
     while( i < 32 ) {
-        // 0000000111011011,      0000011011101111
-        // current bit is 1
+        // 0000000111011011, 6     0000011011101111, 8
+        // 2.1) current bit is 1: increment current count
         if( (integer & 1) == 1 ) {
             ++currCount;
         }
         
-        // current bit is 0
+        // 2.2) current bit is 0 or reached last bit:
+        //      add prev and current counts and save it as max count, if it is > max count.
         if( (integer & 1) == 0 || i == 31) {
             
             if( (prevCount + currCount) > maxCount ) {
                 maxCount = prevCount + currCount;
-               //cout << endl;
             }
 
             prevCount = currCount;
             
-            // start a new count
-            currCount = 0;
+            currCount = 0;      // start a new count
         }
 
         integer >>= 1;
@@ -985,7 +1086,6 @@ int longestSubsequenceOf1s_afterFlipping_1bit( int integer )
     
     return maxCount + 1;
      
-
      /*
         // does not work, becauase we are not cheking all 32 bits. must must check all 32 bits
      // if all 1s, this is already the longest sequence
@@ -1023,19 +1123,18 @@ int longestSubsequenceOf1s_afterFlipping_1bit( int integer )
     */
 }
 
-// From Cracking the Interview Code.
-// !!!: √√√. best in performance
+// From Cracking the Interview Code. !!!: best in performance √√√.
 // similar to: "int longestSubsequenceOf1s_AfterFlipping_0_to_1( int integer )".
-int flipBit_to_Win( int integer )
+int BitManipulations::flipBit_to_Win( int integer )
 {
     // if all 1s, this is already the longest sequence
     if(~integer == 0) {
-        return sizeof( integer ) * 8;
+        return sizeof( integer ) * 8 - 1;
     }
     
     int currCount = 0;
     int prevCount = 0;
-    int maxCount  = 1;   // ae can always have a sequence of at least a 1
+    int maxCount  = 1;   // integer can always have a sequence of at least a 1
     
     while( integer != 0 ) {
         if( (integer & 1) == 1 ) {
@@ -1043,8 +1142,8 @@ int flipBit_to_Win( int integer )
         }
         else if( (integer & 1) == 0 ) {
             // current bit is 0
-            // update to 0 (if next bit is 0), or currCount (if next bit 1)
-            if( (integer & 2) == 0 ) {
+            // update prev count to 0 (if next bit is 0), or to curr count (if next bit 0)
+            if( (integer & 2) == 0 ) {  // corner case: 2 adjacent 0s
                 prevCount = 0;
             }
             else {
@@ -1069,8 +1168,12 @@ int flipBit_to_Win( int integer )
 
 }
 
+// !!!: ////////////////   ////////////////
+// !!!: ////////////////
+
+
 // Unnecessary complicated. O(N2). See version 2
-int findEqualLengths_of_Zeros_Ones_1( vector<int> &nums )
+int BitManipulations::EqualLengths_of_Zeros_Ones_1( vector<int> &nums )
 {
     int maxcount = 0;
 
@@ -1098,7 +1201,7 @@ int findEqualLengths_of_Zeros_Ones_1( vector<int> &nums )
 }
 
 // Much simpler than version 1. O(N)
-int findEqualLengths_of_Zeros_Ones_2( vector<int> &nums )
+int BitManipulations::findEqualLengths_of_Zeros_Ones_2( vector<int> &nums )
 {
     int zerocount = 0;
     int onecount = 0;
@@ -1116,7 +1219,36 @@ int findEqualLengths_of_Zeros_Ones_2( vector<int> &nums )
     return std::min(zerocount, onecount) * 2;
 }
 
+int BitManipulations::evenbittogglenumber(int n)
+{
+    int res = 0, count = 0;
 
+    for( int temp = n; temp > 0; temp >>= 1 ) {
+        if( count % 2 == 1 ) {
+            res |= (1 << count);
+        }
+        count++;
+    }
+
+    return n ^ res;
+}
+
+// Given a positive integer n, find count of positive integers i such that 0 <= i <= n and n+i = n^i.
+// program to print count of values such that n+i = n^i.
+// Function to count number of values less than equal to n that satisfy the given condition
+int BitManipulations::Equal_Sum_and_XOR (int n)
+{
+    int countV = 0;
+
+    // Traverse all numbers from 0 to n and increment result only when given condition is satisfied.
+    for( int i=0; i <= n; i++ ) {
+        if( (n + i ) == (n ^ i) ) {
+            countV++;
+        }
+    }
+
+    return countV;
+}
 
 
 // XOR a number n

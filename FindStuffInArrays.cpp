@@ -7,6 +7,7 @@
 //
 
 #include "FindStuffInArrays.hpp"
+#include <queue>
 
 using std::string;
 using std::cin;
@@ -21,6 +22,9 @@ using std::istream;
 using std::ostream;
 using std::max;
 using std::to_string;
+using std::priority_queue;
+using std::pair;
+
 
 // Inefficient algorthim. Does not take advatage of sorted array
 int findMin_inSortedRotatedArray_1(vector<int> a)
@@ -123,39 +127,39 @@ int findNumber_inSortedRotatedArray_1(vector<int> a, int number)
     // {5, 6, 7, 8, 9, 0, 1, 2, 4 };
     int left  = 0;
     int right = static_cast<int>(a.size()) - 1;
-    int mid_index   = 0;
+    int mid   = 0;
 
     // 4, 5, 6, 7, 1, 2, 3
     // 2, 3, 4, 5, 6, 7, 1
     while( left <= right ) {
-        mid_index = (left + right) / 2;
+        mid = (left + right) / 2;
         
         // bail out, number was found
-        if(a[mid_index] == number) {
-            return mid_index;
+        if(a[mid] == number) {
+            return mid;
         }
         
         // 2. Find sorted and non-sorted halfs of array (subarrays)
-        if( a[mid_index] > a[left] ) {
+        if( a[mid] > a[left] ) {
             // Left subarray is sorted
-            if( number >= a[left] && number <= a[mid_index-1] ) {
+            if( number >= a[left] && number <= a[mid-1] ) {
                 // target is in left subarray
-                right = mid_index - 1;
+                right = mid - 1;
             }
             else {
                 // target is in right subarray
-                left = mid_index + 1;
+                left = mid + 1;
             }
         }
         else {
             // right subarray is sorted
-            if( number >= a[mid_index+1] && number <= a[right] ) {
+            if( number >= a[mid+1] && number <= a[right] ) {
                 // target is in right subarray
-                left = mid_index + 1;
+                left = mid + 1;
             }
             else {
                 // target is in left subarray
-                right = mid_index - 1;
+                right = mid - 1;
             }
         }
     }
@@ -206,12 +210,12 @@ int findMissingNumber_inIncrementalUnsortedArray(vector<int>& array) {
     int actualsum = 0;
     
     for( int i=0; i < array.size(); i++ ) {
-        actualsum += array[i];      // array sum
+        actualsum += array[i];      // array's sum
         if(array[i] < min) {
-            min = array[i];         // array min
+            min = array[i];         // array's min
         }
         if(array[i] > max) {
-            max = array[i];         // array max
+            max = array[i];         // array's max
         }
     }
     
@@ -219,10 +223,10 @@ int findMissingNumber_inIncrementalUnsortedArray(vector<int>& array) {
         return 0;
     }
 
-    int expectedsum = (max * (max+1)) / 2;  // 0,1,2,3,4,5,6,7,8,9
+    int expectedsum = (max * (max+1)) / 2;  // 0,1,2,3,4,5,6,7,8,9 = (9 * 10) / 2 = 45
     if( expectedsum == actualsum ) {
         // No missing number, return max+1, or return -1
-        return max + 1;
+        return max + 1;     // return 10, or -1
     }
     
     return expectedsum - actualsum;
@@ -239,12 +243,12 @@ int Find_MissingNumber_In_Incremental_SortedArray(vector<int> a)
     while( left <= right ) {
         
         int mid = (left+right)/2;
-        // FIRST, check if we reached left-end of array (mid == 0 && a[mid] != 1).
-        // This is the case where a[mid] = a[0] = 2. return missing number: a[mid]-1 = 1
+        // 1) handle corner case FIRST, check if we reached left-end of array and that element is not 1: (mid == 0 && a[mid] != 1).
+        // this is the case where a[mid] = a[0] = 2. return missing number: a[mid]-1 = 1
         if( mid == 0 && a[mid] != 1)
             return a[mid] - 1;  // or just return 1
         
-        // look at adjacent left to see if it is grater than middle number by 1
+        // 2) look at adjacent left to see if it is grater than middle number by 1
         if((a[mid] - a[mid-1]) > 1 ) {
             return a[mid] - 1;    // Found missing number, return it
         }
@@ -272,15 +276,14 @@ int Find_MissingNumber_In_Incremental_SortedArray(vector<int> a)
 
 /*  Runtime: 528 ms, faster than 5.02% of C++ online submissions for First Missing Positive.
  Memory Usage: 138.8 MB, less than 5.18% of C++ online submissions for First Missing Positive.*/
-// O(N)
-int Find_FirstMissingPositive_In_UnsortedArray_1(vector<int>& a) {
-    set<int> Set(a.begin(), a.end());
-    set<int>::iterator itr = Set.begin();
-    int min = *itr;
-    set<int>::iterator rit = Set.end();
-    --rit;
-    int max = *rit;
-
+// O(N). Uses set as an extra space
+int firstMissingPositive_inUnsortedArray_1(vector<int>& a) {
+    // sorted set of positive and negative numbers
+    set<int> sorted_set(a.begin(), a.end());
+    set<int>::iterator itr = sorted_set.begin();
+    int min = *itr;     // first number is min number in set
+    itr = sorted_set.end();
+    int max = *--itr;   // first number is min number in set
        
     if(min > 1) {
         return 1;   // [7,8,9,12,11]. min = 7, ret 1
@@ -288,19 +291,18 @@ int Find_FirstMissingPositive_In_UnsortedArray_1(vector<int>& a) {
 
     // Missing number between 1 & maxNumber.
     for( int i = min + 1; i < max; i++ ) {
-        if( i > 0) {    // Exclude negative numbers
-            if( Set.find(i) == Set.end() ) {
+        if( i > 0 && sorted_set.find(i) == sorted_set.end() ) {    // Execlude negative numbers
                 return i;   // Smallest number, between 1 & max, not in set. Return that number
-            }               // [3,4,-1,1] => [3,4,1]. min = 1, ret 2
+                            // [3,4,-1,1] => [3,4,1]. min = 1, ret 2
         }
     }
     
     // Missing number Not found before min number, and Not found between min & max
-    return max + 1;     // [4,1,3,2] ret 5
+    return max + 1;     // [4,1,3,2] ret 5, or better return -1
 }
 
 // Less code from Leet. Does not use extra space, but O(N^2 + N) => O(N^2)
-int Find_FirstMissingPositive_In_UnsortedArray_2(vector<int>& a)
+int firstMissingPositive_inUnsortedArray_2( vector<int>& a )
 {
     for( int i=0; i < a.size(); i++ ) {
         if( a[i] == i+1 ) {
@@ -323,29 +325,28 @@ int Find_FirstMissingPositive_In_UnsortedArray_2(vector<int>& a)
 }
 
 // Suposedly fastest from Leet. Uses set as an extra space
-int Find_FirstMissingPositive_In_UnsortedArray_3(vector<int>& a) {
-    // FIRST DROP ALL THE NEGATIVES
-    // SECOND FIND MAX AND MIN
-    for( auto it = a.begin(); it != a.end(); ) {
+int firstMissingPositive_inUnsortedArray_3(vector<int>& array) {
+    // FIRST DROP ALL THE NEGATIVES and SECOND FIND MAX AND MIN
+    for( auto it = array.begin(); it != array.end(); ) {
         if (*it <= 0) {
-            it = a.erase(it);
+            it = array.erase(it);
         } else {
             it++;
         }
     }
     
-    unsigned long size = a.size();
+    unsigned long size = array.size();
     
     set<int> here;
     for( int i = 0; i < size; i++ ) {
-        here.insert(a.at(i));
+        here.insert(array.at(i));
     }
     
     // !!!: This is more clear approch from Lettcode, but it is less efficient because r=1....
     // It should use min & max to find missing positive number.
     int r = 1;
-    while(true) {
-        if ( here.find(r) == here.end() ) {
+    while( true ) {
+        if( here.find(r) == here.end() ) {
             return r;
         }
         else {
@@ -403,15 +404,19 @@ int Search_Binary_2(int arr[], int N, int value) {
 // !!!: //////////////////      First Non Repeating Lette in Stream     //////////////////
 char Find_FirstNonRepeatingChar(string str)
 {
+    // str[i], count
     map<char, int> charCountMap;
     
     // Count of char in string
-    for(char letter : str)
-        charCountMap[letter]++;
+    for(char character : str) {
+        charCountMap[character]++;
+    }
     
-    for(char c : str)
-        if( charCountMap[c] == 1)
-            return c;       // first non-repeating char
+    for(char character : str) {
+        if( charCountMap[character] == 1) {
+            return character;       // first non-repeating char
+        }
+    }
     
     return '\0';    // special character for c not found
 }
@@ -484,7 +489,9 @@ vector<int> Find_First2NonRepeatingNumbers_2(vector<int> numbers)
    You can return the answer in any order.*/
 /* Runtime: 12 ms, faster than 77.95% of C++ online submissions for Two Sum.
    Memory Usage: 12.3 MB, less than 7.66% of C++ online submissions for Two Sum.*/
-vector<int> findOnePair_withGiven_Sum( vector<int>& array, int sum )
+// !!!: Time Complexity: O(n) Space Complexity: O(n)
+// !!!: using extra space, "map<k, v>" to avoid sorting the array
+vector<int> onePair_Equal_targetSum( vector<int>& array, int targetSum )
 {
     // indices of 2 numbers that add up to target. If sum not found return idices of -1
     vector<int> result(2, -1);
@@ -492,24 +499,24 @@ vector<int> findOnePair_withGiven_Sum( vector<int>& array, int sum )
     // <key = number, value = number index>
     map<int, int> Map;
     
-    // Put all array values with their indices in map
+    // 1) put all array values with their indices in map
     int index = 0;  // index to 'this number'
     for(int number : array) {
         Map[number] = index++;   // key = number, value = index
     }
     
+    // 2) search for the other number in the map
     for(int index=0; index < array.size(); index++) {
-        int thisNumber  = array[index];         // get this number from input array
-        int otherNumber = sum - thisNumber;     // subtract this number from target sum,
-                                                // to search for the other number in Map
-
+        int thisNumber  = array[index];         // 2.1) get this number from input array.
+        int otherNumber = targetSum - thisNumber;     // 2.2) subtract this number from target sum,
+                                                //      to search for the other number in Map
         // !!!: You may not use the same number twice, means:
         // !!!: search for the condition where, the other number found in Map && it is not this number in input array
         // !!!: Critical thinking: Map[othernum] != i. Remember, Map[othernum] returns index,
         if( Map.find(otherNumber) != Map.end() && Map[otherNumber] != index ) {
             // found the other number in Map
             result[0] = index;              // return index to this number, and
-            result[1] = Map[otherNumber];   // index to the other number in Map
+            result[1] = Map[otherNumber];   // index of the other number in Map
             break;                          // return the indecies pair
         }
     }
@@ -517,11 +524,31 @@ vector<int> findOnePair_withGiven_Sum( vector<int>& array, int sum )
     return result;  // return the indecies pair
 }
 
+// My solution: simpler with O(N) √√√. prints numbers not their indicies
+// !!!: does not work
+bool print_allPairs_Equal_targetSum( const vector<int>& array, int targetSum )
+{
+    int i = 0;
+    bool found_sum = false; // a flag to indicate wether at least one some was found and printed
+
+    for( ; i < array.size()-1; i++ ) {
+        if( find( array.begin() + i+ 1, array.end(), targetSum - array[i] ) != array.end() )
+        {
+            found_sum = true;   //
+            cout << "\t\t  " << targetSum << " = " << array[i] << " + " << targetSum - array[i] << endl;
+           // cout << "[" << array[i] << ", " << array[i+1] << endl;
+            
+        }
+    }
+    
+    return found_sum;
+}
+
 // Print pairs of integers with specific difference.
 // You may assume that each input would have !!!: EXACTLY ONE SOLUTION
 // a2 - a1 = diff
 // find a2 = a1 + diff. look for a2 in the set
-vector<vector<int>> findPairs_withGiven_Difference( const vector<int> a, int diff)
+vector<vector<int>> allPairs_Equal_targetDifference( const vector<int> number, int targeyDiff)
 {
     // {1, 7, 5, 9, 2, 12, 3, -1, 11, -2}
     
@@ -533,13 +560,13 @@ vector<vector<int>> findPairs_withGiven_Difference( const vector<int> a, int dif
     
     // Put all array values with their indices in map
     int index = 0;  // index to 'this number'
-    for(int number : a) {
+    for(int number : number) {
         Map[number] = index++;   // key = number, value = index
     }
 
-    for(int index=0; index < a.size(); index++) {
-        int thisNumber  = a[index];
-        int otherNumber = diff + thisNumber;   // to find the other number, subtract number from target sum
+    for(int index=0; index < number.size(); index++) {
+        int thisNumber  = number[index];
+        int otherNumber = targeyDiff + thisNumber;   // to find the other number, add diff to this number
 
         // !!!: You may not use the same element twice -> other number found in map && it is not this number
         // !!!: Critical thinking: Map[othernum] != i. Remember, Map[othernum] returns index,
@@ -557,24 +584,26 @@ vector<vector<int>> findPairs_withGiven_Difference( const vector<int> a, int dif
     return result;
 }
 
-// My function
-// !!!: O(n-1 + n-2 ... 1) = 21 for n=7
-vector<int> findOnePair_withSum_closestToZero(vector<int> numbers)
+// !!!: My function: we are not sorting array first
+// !!!: O(n-1 + n-2 ... 1) = arithmetic series = (n*(n-1))/2 = (7*6)/2 = 42/2 = 21 , for n=7.
+// !!!: Time Complexity : almost O(n^2), and Space Complexity: O(1)
+vector<int> onePair_Closest_toZero_1(vector<int> numbers)
 {
     int min_sum = INT_MAX;  // !!!: Note INT_MAX
     int left = 0, right = 0;
-    int size = static_cast<int>(numbers.size());
+    size_t size = numbers.size();
     //int count = 0;  // For testing only
 
     vector<int> pair(2);
     for( left = 0; left < size-1; left++ ) {
         for( right = left+1; right < size; right++ ) {
-            int sum = abs(numbers[left] + numbers[right]);
+            // !!!: Note: abs(), as we are only interested in the "minimist distance to zero", wether negative or positive
+            int sum = abs( numbers[left] + numbers[right] );
             if( sum < min_sum ) {
                 min_sum = sum;
                 pair[0] = numbers[left];
                 pair[1] = numbers[right];
-                printf("\t\t\tMin pair sum = %d \t--> [%d, %d][%d, %d]\n", min_sum, left, right, numbers[left], numbers[right]);
+                printf("\t\t\tMin pair sum = %d \t--> [%d, %d][%d, %d]\n", (numbers[left] + numbers[right]), left, right, numbers[left], numbers[right]);
             }
             //count++;
          }
@@ -585,7 +614,255 @@ vector<int> findOnePair_withSum_closestToZero(vector<int> numbers)
     return pair;
 }
 
-/*  Given a sorted integer array arr, two integers k and x, return the k closest integers to x in the array.
+/*  https://tutorialhorizon.com/algorithms/find-two-elements-whose-sum-is-closest-to-zero/
+    Sorting approach:
+    1. Sort the array.
+    2. This will bring all the negative elements to the front and positive elements at the end of the array.
+    3. Track 2 numbers, one positive number close to 0, let’s call it as positiveClose and one negative number
+        close to 0, let’s call it as negativeClose. take 2 pointers, one from the beginning of the array and
+        another one from the end of the array. say pointers are i and j.
+    4. Add A[i] + A[j], if sum > 0 then reduce j, j-- and if sum < 0 then increase i ++.
+    5. If sum > 0 compare it with positiveClose, if positiveClose>sum, do positiveClose = sum.
+    6. If sum < 0 compare it with negativeClose, if negativeClose<sum, do negativeClose = sum.
+    7. Repeat steps 5, 6, 7 till i<j.
+    8. Return the minimum of absolute values of positiveClose and negativeClose, this will be the answer.
+    9. At any point, if sum = 0 then return 0 since this will be the closest to the 0 possible.
+    10. We can easily modify the code given below to track the two indexes as well for which the closest sum is possible.
+    
+   !!!: Time Complexity: O(nlogn) Space Complexity: O(n) by using merge sort.  */
+// !!!: sorting the array and not using extra space, "map<k, v>"
+vector<int> onePair_Closest_toZero_2( vector<int> numbers )
+{
+    //int count = 0;  // For testing only
+    vector<int> pair(2);
+    if( numbers.size() <= 2 ) {
+        return numbers;
+    }
+
+    // 1) !!!: sort numbers first :!!!
+    sort( numbers.begin(), numbers.end() );
+
+    int left = 0, right = static_cast<int>(numbers.size() - 1);
+    int positiveClose = INT_MAX;
+    int negativeClose = INT_MIN;
+    // !!!: we need to keep track of the left & right indices as we need them later
+    int prev_left  = left;
+    int prev_right = right;
+    
+    while( left < right ) {
+        int sum = numbers[left] + numbers[right];
+        // check if sum is greater than 0
+        if( sum > 0 ) {
+            // check if positiveClose needs to be updated.
+            if( sum < positiveClose ) {
+                prev_left = left;       // !!!: keep track of left index
+                prev_right = right;     // !!!: keep track of right index
+                positiveClose = sum;    // !!!: at this sum
+            }
+            // decrement right, in order to reduce the difference, close to 0
+            right--;
+        }
+        else if( sum < 0 ) {
+            // check if negative needs to be updated
+            if( sum > negativeClose ) {
+                prev_left = left;       // !!!: keep track of left index
+                prev_right = right;     // !!!: keep track of right index
+                negativeClose = sum;    // !!!: at this sum
+            }
+            // increment i, in order to reduce the difference, close to 0
+            left++;
+        }
+        else {
+            // means sum is Zero, that is the closest to zero we can get, return 0
+            pair[0] = numbers[left];
+            pair[1] = numbers[right];
+            return pair;
+        }
+    }
+    
+    //printf("My findMinSumPair(): BigO(count) = %d \n", count);
+    // target (zero) sum not found, return closest 2 numbers to Zero
+    pair[0] = numbers[prev_left];
+    pair[1] = numbers[prev_right];
+    
+    return pair;
+}
+
+// from: https://tutorialhorizon.com/algorithms/find-two-elements-whose-sum-is-closest-to-zero/
+// retuns sum as int
+int onePair_Closest_toZero_3(vector<int> numbers)
+{
+     // 1) sort numbers first
+    sort( numbers.begin(), numbers.end() );
+
+    int left = 0;
+    int right = static_cast<int>(numbers.size() - 1);
+    int positiveClose = INT_MAX;
+    int negativeClose = INT_MIN;
+    
+    while( left < right ) {
+        // 2) add 2 numbers, 1 from left and 1 from right
+        int sum = numbers[left] + numbers[right];
+        // check if sum is greater than 0
+        if( sum == 0) {
+            // means sum is 0, that is the closest to zero we can get, return 0
+            return sum; // or, return 0
+        }
+        else if( sum > 0 ) {
+            // check if positiveClose needs to be updated
+            if( sum < positiveClose ) {
+                positiveClose = sum;
+            }
+            // decrement right, in order to reduce the difference, close to 0
+            right--;
+        }
+        else {  // ekse if( sum < 0 ) {
+            // check if negative needs to be updated
+            if( negativeClose < sum ) {
+                negativeClose = sum;
+            }
+            // increment i, in order to reduce the difference, close to 0
+            left++;
+        }
+    }
+    
+    //printf("My findMinSumPair(): BigO(count) = %d \n", count);
+        
+    // check the least absolute value in postiveClose and negativeClose
+    /*  !!!: Note: I thought the output is 2147483648,at least ,it should be positive value.
+        but When compile and run the code ,the output is :-2147483648.  */
+    if( negativeClose == INT_MIN ) {
+        return positiveClose;
+    }
+    if( positiveClose == INT_MAX ) {
+        return negativeClose;
+    }
+
+    return std::min( abs(positiveClose), abs(negativeClose) );
+}
+
+// Objective: Given an array of integers, find the sum of any three elements which is closest to zero.
+// The array may contain positive and negative elements.
+// Time Complexity: O(N2)
+/* 1) Sort the given array in ascending order.
+   2) Initialize sum = 0, positiveClose = INTEGER_MAXIMUM, negativeClose = INTEGER_MINIMUM.
+   3) Use two loops.
+   4) Fix the element using the outer loop. Call it first
+        1. sum = first element.
+        2. Inside the inner loop, take two pointers, second and third.
+           second at the next element to the first element and third at the last element in the array.
+           Do sum = sum + second + third
+        3. Now if sum = 0, return 0.
+        4. Else if sum > 0 , do positiveClose = minimum(positiveClose, sum)
+        5. Else do negativeClose = maximum(negativeClose, sum)
+   5) If abs(negativeClose)<positiveClose return negativeClose else return positiveClose.
+ !!!: WOW, a greate algorithem. still O(N^2)
+*/
+int find_3Sum_Closest_toZero(vector<int> a)
+{
+    int positiveClose = INT_MAX;
+    int negativeClose = INT_MIN;
+
+    int size = static_cast<int>(a.size());
+    if( size < 3 ) {
+         cout << "Invalid input";
+         return positiveClose;
+    }
+
+    // 1) first, sort the array in ascending order
+    sort(a.begin(), a.end());
+
+    for( int i = 0; i < size ; i++ ) {
+        //int n = a[i];
+        int j = i+1;
+        int k = size-1;
+
+        while( j < k ) {
+            //cout << "sum = " << sum << ": " << a[i] << ", " << a[j] << ", " << a[k] << endl;
+            int sum = a[i] + a[j] + a[k];
+            
+            if( sum == 0 ) {
+                return 0;
+            }
+            else if( sum > 0 ) {
+                positiveClose = std::min(sum, positiveClose);
+                k--;
+            }
+            else {
+                negativeClose = std::max(sum, negativeClose);
+                j++;
+            }
+        }
+    }
+    
+    if( negativeClose == INT_MIN ) {
+        return positiveClose;
+    }
+    if( positiveClose == INT_MAX ) {
+        return negativeClose;
+    }
+
+    return std::min( abs(positiveClose), abs(negativeClose) );
+
+    /*if( abs(negativeClose) < positiveClose ) {
+        return negativeClose;
+    }
+    return positiveClose;*/
+     
+ }
+
+/* threeSum()
+     Medium Difficulty
+     Given an integer array nums, return all the triplets "[nums[i], nums[j], nums[k]]" such that "i!=j, i!=k, and j!=k",
+     and nums[i] + nums[j] + nums[k] == 0.
+
+     Notice that the solution set must not contain duplicate triplets.
+
+     Example 1:
+     Input: nums = [-1,0,1,2,-1,-4]
+     Output: [[-1,-1,2],[-1,0,1]]
+     
+     Example 2:
+     Input: nums = []
+     Output: []
+     
+     Example 3:
+     Input: nums = [0]
+     Output: []
+
+     Constraints:
+     0 <= nums.length <= 3000
+     -105 <= nums[i] <= 105
+*/
+vector<vector<int>> find_3Sum_Equal_toZero(vector<int>& nums) {
+    // !!!: nums = {-1, 0, 1, 2, -1, -4} => [-1, 0, 1] [-1, 2, -1]
+    int sum = 0;
+    size_t size = nums.size();
+    //vector<vector<int>> result(3, vector<int>(3, 0)); // Not good practice, size shouldn't br hardcoded
+    vector<vector<int>>   matrix; // Not good practice, size shouldn't br hardcoded
+    int row = 0;
+    
+    int i = 0, j =0, k = 0;
+    for( i = 0; i < size-1; i++ ) {
+        for(j = i + 1; j < size-1; j++) {
+            sum = nums[i] + nums[j];
+            for( k = j+1; k < size; k++) {
+                int totalsum = sum + nums[k];
+                if(totalsum == 0) {
+                    matrix.resize(row+1);   // Add new a row
+                    matrix[row].push_back(nums[i]);
+                    matrix[row].push_back(nums[j]);
+                    matrix[row].push_back(nums[k]);
+                    row++;
+                }
+            }
+        }
+    }
+    
+    return matrix;
+}
+
+/*  Given a UNSORTED integer array arr, two integers k and x, return the k closest integers to x in the array.
     The result should also be sorted in ascending order.
 
     !!!: An integer a is closer to x than an integer b if:
@@ -599,33 +876,36 @@ vector<int> findOnePair_withSum_closestToZero(vector<int> numbers)
     Example 2:
     Input: arr = [1,2,3,4,5], k = 4, x = -1
     Output: [1,2,3,4]
- 
-    8: 1,5, 8, 10,13,14 => 10, 5, 13, 14 => 5,8,10,13,14
-    8: 2,5, 8, 10,13,14 => 10, 5, 13, 2
- */
-/* Runtime: 64 ms, faster than 34.04% of C++ online submissions for Find K Closest Elements.
- Memory Usage: 37.9 MB, less than 5.09% of C++ online submissions for Find K Closest Elements.*/
-// !!!: Has issue with {0, 1, 1, 1, 2, 3, 6, 7, 8, 9}, K=0, target= 7. Should return 7, instead it returns None.
+*/
+/*  Runtime: 64 ms, faster than 34.04% of C++ online submissions for Find K Closest Elements.
+    Memory Usage: 37.9 MB, less than 5.09% of C++ online submissions for Find K Closest Elements.
+*/
+// !!!: Has issue with {0, 1, 1, 1, 2, 3, 6, 7, 8, 9}, K=0, target= 7. Correctly returns None, not 7.
 // Algorithm: Usingg extra space, map<,>. too complicated
 // !!!: TOO COMPLICATED
-vector<int> findClosest_kNumbers_toTarget1 (const vector<int>& array, int Kelements, int target)
+vector<int> kClosest_toTarget_1( vector<int> numbers, int k, int target )
 {
     vector<int> closestKelements;
+
     // Zero OR negative elements requested OR. Ignor it, just return empty result vector
-    unsigned long size = array.size();
-    if(Kelements <=0 || Kelements > size) {
-        return closestKelements;
+    unsigned long size = numbers.size();
+    if(k <=0 || k > size) {
+        cout << "\t Kelements = " << k  << " Can't be Zero, or Greater or Less than " << size << endl;
+        return       vector<int> ()  ;    // Return empty closestKelements vector
     }
 
+    // 1) first, sort the array in ascending order
+    sort( numbers.begin(), numbers.end() );
+
     // Bail out eralier, if Target is not in array. No need to sort firstKelements and lastKelements as they alrady sorted
-    if(target < array[0]) {
+    if( target < numbers[0] ) {
         // Target not in array and less than min element, therefore, retuen fist K elements in array
-        vector<int> firstKelements(array.begin(), array.begin()+Kelements);
+        vector<int> firstKelements(numbers.begin(), numbers.begin()+k);
         return firstKelements;
     }
-    else if(target > array[size-1]) {
+    else if( target > numbers[size-1] ) {
         // Target not in array and greater than max element, therefore, retuen last K elements in array
-        vector<int> lastKelements(array.end()-Kelements, array.end());
+        vector<int> lastKelements(numbers.end()-k, numbers.end());
         return lastKelements;
     }
 
@@ -634,16 +914,16 @@ vector<int> findClosest_kNumbers_toTarget1 (const vector<int>& array, int Keleme
     map<int         , int      > map1;
     // 1. Put all elements of array in map
     for(int i=0; i<size; i++) {
-        map1[array[i]] = i;
+        map1[numbers[i]] = i;
     }
     
     // 2. Find index of Target to start looking left and right from its index, and Set left and right indecies accordingly
     int left = 0, right = 0;
     // Is Target in map?
-    if(map1.find(target) == map1.end()) {
+    if( map1.find(target) == map1.end() ) {
         // Target NOT in map, therefore, NOT in array. Create left and right indecies accordingly
         int idx = 0;
-        while(array[idx++] < target) { /* HEER: Take advantage of binary seach */};
+        while(numbers[idx++] < target) { /* HEER: Take advantage of binary seach */};
         idx--;
         left  = idx - 1;    // !!!: Key Point
         right = idx;
@@ -653,204 +933,300 @@ vector<int> findClosest_kNumbers_toTarget1 (const vector<int>& array, int Keleme
         left  = map1[target] - 1;
         right = map1[target] + 1;
         closestKelements.push_back(target);    // This is a requirement
-        Kelements--;
+        k--;
     }
 
-    // Look for closest elements to target
-    while((left >=0 || right<size) && Kelements>0) {
-        if(left >=0 && right<size) {
-            int a = abs(array[left] - target);
-            int b = abs(array[right] - target);
-            if(a<=b) {
-                closestKelements.push_back(array[left--]);
+    // Look for closest K elements to target
+    while( (left >= 0 || right < size) && k>0 ) {
+        if( left >=0 && right < size ) {
+            if( abs(numbers[left] - target) <= abs(numbers[right] - target) ) {
+                closestKelements.push_back(numbers[left--]);
             }
             else {
-                closestKelements.push_back(array[right++]);
+                closestKelements.push_back(numbers[right++]);
             }
         }
         else if(left < 0) {
             // Copy remaining elements from right to end of arr
-            closestKelements.push_back(array[right++]);
+            closestKelements.push_back(numbers[right++]);
         }
         else { // right > size
             // Copy remaining elements from left to start of arr
-            closestKelements.push_back(array[left--]);
+            closestKelements.push_back(numbers[left--]);
         }
         
-        Kelements--;
+        k--;
     }
 
     sort(closestKelements.begin(), closestKelements.end());
     return closestKelements;
 }
 
-// !!!: Much beter than closestElementsToTarget1(). 1) No extra space used. 2) Using Binay Search to find targer first. Still too complicated
-vector<int> Find_ClosestElementsToTarget2(const vector<int>& array, int Kelements, int target)
+// !!!: my implementation: completed 08/06/2023 √√√√√√√√√. BRELIENT
+// !!!: Much beter than closestElementsToTarget1(). 1) No extra space used. 2) Using Binay Search to find targer first.
+vector<int> kClosest_toTarget_2( vector<int> numbers, int k, int target)
 {
-    vector<int> closestKelements;   // Start with empty closestKelements vector
-    if(Kelements <= 0 || Kelements > array.size()) {
-        return closestKelements;    // Return empty closestKelements vector
+    if( k <= 0 || k > numbers.size() ) {
+        cout << "\t Kelements = " << k  << " Can't be Zero, or Greater or Less than " << numbers.size() << endl;
+        return       vector<int> ()  ;    // Return empty closestKelements vector
     }
 
-    // !!!: 1) Binary Search for target
+    vector<int> closestKelements;   // Start with empty closest Kelements vector
+
     int left = 0;
-    int right = static_cast<int>(array.size() - 1);
+    int right = static_cast<int>(numbers.size() - 1);
     int mid = 0;
-    while( left <= right )
+
+    // 1) first, sort the array in ascending order
+    sort( numbers.begin(), numbers.end() );
+
+    // !!!: 1) Binary Search for target, or closest to target
+    while( left <= right )   // !!!: Notice: 'left < righy' Not 'left <= right'
     {
         mid = (left + right) / 2;
-        if(array[mid] == target)
-            break; // target Found
+        if( numbers[mid] == target )
+            break; // target Found in array
         
-        if(array[mid] > target)
+        if(numbers[mid] > target)
             right = mid - 1;
         else
             left  = mid + 1;
-    };
+    }
+
+    // has target been found in array?
+    if( numbers[mid] != target ) {
+        // target not found in array, pick the smallest of left and right distance to target
+        // and assign its index to mid
+        if( abs(numbers[left]  - target) < abs(numbers[right] - target) ) {
+            mid = left;
+        }
+        else if( abs(numbers[right] - target) < abs(numbers[left]  - target) ) {
+            mid = right;
+        }
+        else {// !!!: do i need the else statment???
+            // left_dist_to_target == right_dist_to_target = mid
+            // mid = left;
+        }
+    }
     
-    // Figure out the center for finding closest K elements around center
-    // !!!: Coming out of while loop: either left > right, or targets is Found
-    int center = 0;
-    if(left > right) {  // left and right cross over
-        // target not Found, center around closest to target, right or left, prefer right
-        if(right < 0) {
-            center = left;  // right can be -1. Choose left as center, it is gurantedd to be positive at this point.
+    // target or closest to target is at mid
+    closestKelements.push_back( numbers[mid] );
+    int count = 1;
+
+    int size = right;
+    left = mid - 1; right = mid + 1;
+    while( count < k ) {
+        if( left >= 0 && right <= size ) {
+            if( abs(numbers[left]  - target) <= abs(numbers[right] - target) ) {
+                closestKelements.push_back( numbers[left--] );
+            }
+            else if( abs(numbers[left]  - target) > abs(numbers[right] - target) ) {
+                closestKelements.push_back( numbers[right++] );
+            }
+        }
+        else if( left < 0 ) {
+            // reached left end, add the number at right to kelements array.
+            closestKelements.push_back( numbers[right++] );
+        }
+        else {  // else if( right > size ) {
+            closestKelements.push_back( numbers[left--] );
+        }
+        
+        count++;
+     }
+    
+    sort( closestKelements.begin(), closestKelements.end() );
+    
+    return closestKelements;
+}
+
+// returns the indecies to kelements in numbers[]
+// !!!: My Solution: Best in my opinion √√√√√. O(N) using multimap<,>
+vector<int> kClosest_toTarget_3( vector<int> numbers, int k, int target )
+{
+    unsigned long size = numbers.size();
+    if( k <= 0 || k > numbers.size() ) {
+        cout << "\t Kelements = " << k  << " Can't be Zero, or Greater or Less than " << size << endl;
+        return vector<int> ()  ;    // Return empty closestKelements vector
+    }
+    
+    // 1) map absulte distance to target at a location
+    std::multimap<int, int> distance_map;
+            
+    for( int index=0; index < size; ++index ) {
+        distance_map.insert( std::make_pair( abs( numbers[index] - target), index ) );
+    }
+    
+    int index = 0;
+    vector<int> closestKelements( k );
+    std::multimap<int, int>::iterator itr = distance_map.begin();
+    while( index < k && itr != distance_map.end() ) {
+        //closestKelements[index] = itr->second;                // returns index to a number in numbers
+        closestKelements[index++] = numbers[itr++->second];     // returns values of at numbers[index]
+    }
+    
+    sort( closestKelements.begin(), closestKelements.end() );
+    return closestKelements;
+}
+
+/*  Find K closest Element using Heap: https://www.geeksforgeeks.org/find-k-closest-numbers-in-an-unsorted-array/
+    An efficient approach is to use a max heap data structure of size K.
+    Find the absolute difference of the array elements with X and push them in the heap.
+    If at any position the heap gets filled then only push elements when it has an absolute
+    difference less than the first element of the max heap.   */
+vector<int> kClosest_toTarget_4( vector<int> numbers, int target, int k )
+{
+    size_t size = numbers.size();
+    // Make a max heap of difference with first k elements.
+    //              pair<diff, location>
+    priority_queue< pair<int , int> > pq;
+    
+    // !!!: build max heap with pairs: key = k number-to-target difference, and value = index:
+    for( int index = 0; index < k; index++ ) {
+        pq.push( { abs(numbers[index] - target), index } );
+    }
+
+    // Now process remaining elements.
+    for (int i = k; i < size; i++) {
+        
+        int diff = abs(numbers[i] - target);
+
+        // If difference with current element is more than root, then ignore it.
+        if (diff > pq.top().first)
+            continue;
+
+        // Else remove root and insert
+        pq.pop();
+        pq.push( { diff, i } );
+    }
+
+    // Print contents of heap.
+    vector<int> closestKelements;
+    while( pq.empty() == false ) {
+        closestKelements.push_back( numbers[pq.top().second] );
+        pq.pop();
+    }
+    
+    sort( closestKelements.begin(), closestKelements.end() );
+    return closestKelements;
+}
+
+// https://www.techiedelight.com/find-k-closest-elements-to-given-value-array/
+//  Function to find the `k` closest elements to `target` in a SORTED integer vector `input`
+/*  Given a SORTED integer array, find the k closest elements to target in the array where k and target
+    are given positive integers. The target may or may not be present in the input array. If target is less
+    than or equal to the first element in the input array, return first k elements. Similarly, if target is
+    more than or equal to the last element in the input array, return the last k elements. The returned
+    elements should be in the same order as present in the input array. */
+// !!!: Works for SORTED arrays ONLY.
+vector<int> kClosest_toTarget_5(vector<int> const &input, int target, int k)
+{
+    // find the insertion point using the binary search algorithm: 
+    int i = lower_bound(input.begin(), input.end(), target) - input.begin();
+ 
+    int left = i - 1;
+    int right = i;
+ 
+    // run `k` times
+    while (k-- > 0)
+    {
+        // compare the elements on both sides of the insertion point `i`
+        // to get the first `k` closest elements
+        if (left < 0 || (right < input.size() &&
+                abs(input[left] - target) > abs(input[right] - target))) {
+            right++;
         }
         else {
-            center = right; // right is positive, choose right as center
+            left--;
         }
     }
-    else {
-        center = mid;       // target Found, center around target
+ 
+    // return `k` closest elements
+    return vector<int>(input.begin() + left + 1, input.begin() + right);
+}
+
+
+// !!!: //////////////      Find a Subarray with a Given Sum      /////////////////////
+//
+/* https://practice.geeksforgeeks.org/problems/subarray-with-given-sum-1587115621/1?page=1&curated[]=1&sortBy=submissions
+   Given an UNSORTED array A of size N that contains only "NON-NEGATIVE" integers, find a continuous sub-array
+   which adds to a given number S. The task is to complete the function subarraySum() which takes arr, N and S
+   as input parameters and returns a list containing the STARTING and ENDING positions of the First such
+   occurring subarray from the left where sum equals to S. The two indexes in the list should be according
+   to 1-BASED indexing. !!!: If no such subarray is found, return an array consisting only one element that is -1
+ */
+// !!!: Briliant Algoritm by me √√√
+vector<int> subarraySum(vector<int> array, long long targetsum)
+{
+    vector<int> result;  // return an array containing start and end idicies for max sum
+
+    int size = (int )array.size();
+    if(size == 0 || targetsum < 1) {
+        result.push_back(-1);
+        return result;
     }
     
-    left  = center - 1;
-    right = center + 1;
-    // First, check if target to center is closer than target to right
-    if( abs(target - array[center]) <= abs(target - array[right]) ) {
-        closestKelements.push_back(abs(array[center]));
-    }
-    else {
-        closestKelements.push_back(abs(array[right]));
-    }
+    int left  = 0;
+    int right = 0;
+    int sum   = 0;
 
-    for(int i=0; i < Kelements-1; i++) {
+    while( right < size ) {
+        // 1) sum less than target sum
+        if( sum < targetsum ) {
+            sum += array[right];    // add to sum at right
+            right++;
+        }
         
-        if(left >= 0 && right < array.size()) {
-            //int leftDiff = abs(target - array[left--]);
-            if( abs(target - array[left]) <= abs(target - array[right])) {
-                closestKelements.push_back(array[left--]);
-            }
-            else {
-                closestKelements.push_back(array[right++]);
-            }
+        // 2) sum greater than target sum
+        if( sum > targetsum ) {
+            sum -= array[left];     // subtract from sum at left
+            left++;
         }
-        else if(left < 0) {
-            closestKelements.push_back(array[right++]);
+        
+        // 3) sum equal to target sum
+        // target sum is found, bail out and return. if this was first in the loop, while loop would be while(end <= size)
+        if( sum == targetsum ) {
+            result.push_back(left);         // start
+            result.push_back(right - 1);    // end
+            return result;
         }
-        else if(right >= array.size()) {
-            closestKelements.push_back(array[left--]);
-        }
-
     }
-    
-    sort(closestKelements.begin(), closestKelements.end());
-    return closestKelements;
+     
+    // If no such subarray is found, return an array consisting only one element that is -1.
+    result.push_back(-1);
+    return result;
 }
 
-// !!!: under construction
-vector<int> Find_ClosestElementsToTarget3(const vector<int>& a, int Kelements, int target)
-{
-    vector<int> closestKelements(Kelements);
 
-    // Zero OR negative elements requested OR. Ignor it, just return empty result vector
-    unsigned long size = a.size();
-    if(Kelements <=0 || Kelements > size) {
-        return closestKelements;
-    }
-
-    // intialising and sorting of map during creation
-    //map<distance, number>
-    map<int, int, std::less<int>> distance;
-    
-    for(int number : a) {
-        distance[abs(number - target)] = number;
-    }
-    
-    cout << endl << "\t\t\tDebug: " << endl;
-    for (map<int, int>::iterator it = distance.begin(); it != distance.end(); it++) {
-        cout << "\t\t\t" << it->first << " => " << it->second << endl;
-    }
-    
-    map<int, int>::iterator it = distance.begin();
-    for(int i=0; i<Kelements; i++, it++ ) {
-        closestKelements[i] = it->second;
-    }
-    
-    return closestKelements;
-}
-
-// does not work
-vector<int> Find_ClosestElementsToTarget_4 (vector<int>& array, int Kelements, int target)
-{
-    vector<int> closestKelements(Kelements);
-    // Zero OR negative elements requested OR. Ignor it, just return empty result vector
-    unsigned long size = array.size();
-    if(Kelements <=0 || Kelements > size) {
-        return closestKelements;
-    }
-    
-    set<int> s;//(array.begin(), array.end());
-   // s.insert(target);
-    
-    for( int i: array ) {
-        int x = (i - target);
-        s.insert(x);
-    }
-    
-    int i = 0;
-    set<int>::iterator itr = s.begin();
-    while( itr != s.end() && Kelements > 0 ) {
-        closestKelements[i++] = *itr;
-        --Kelements;
-        ++itr;
-    }
-    
-    return closestKelements;
-}
 
 /*  Given an integer array nums (0-indexed) and two integers: target and start,
     find an index i such that nums[i] == target and abs(i - start) is minimized.
-    Note that abs(x) is the absolute value of x.
-    Return abs(i - start).
-    It is guaranteed that target exists in nums.*/
-int Find_MinDistance(vector<int>& numbers, int target, int start) {
+    Return abs(i - start). It is guaranteed that target exists in nums.*/
+int Find_MinDistance_toTarget_fromStart(vector<int>& numbers, int target, int start) {
+    unsigned long int size = numbers.size();
     int left = 0;
     int right = 0;
-    unsigned long int size = numbers.size();
+
+    // 1) look left from start to find target
+    for( left=start; left >= 0 && numbers[left] != target; left-- ) {}
+    // At this point, ethir left < 0, Or numbers[left] == target, Or Both
     
-    // Look left from start to find target
-    for(left=start; left >= 0 && numbers[left] != target; left--) {}
-    // At this point, left<0, Or numbers[left] == target, Or Both
-    
-    // Look right from start to find target
-    for(right=start; right < size && numbers[right] != target; right++) {}
+    // 2) look right from start to find target
+    for( right=start; right < size && numbers[right] != target; right++ ) {}
     // At this point, right>=size, Or numbers[right] == target, Or Both
 
     // !!!: You do not need this code, if it is guaranteed that target is in numbers[]
-    if(left<0 && right>=size) {
+    if( left < 0 && right >= size ) {
         // No target Found. left and right are out of bound
         return -1;
     }
     
     // From here on, at least one target should be Found
-    if(left >= 0 && right < size) {
+    if( left >= 0 && right < size ) {
         // Found 2 targets on left and right from start, return closer distance to target
-        int leftDistance  = abs(left  - start);
-        int rightDistance = abs(right - start);
-        return (leftDistance < rightDistance)? leftDistance: rightDistance;
+        return ( abs(left - start) < abs(right - start) )? abs(left - start): abs(right - start);
     }
-    else if(left < 0) {     // && right<size not need
+    else if(left < 0) {     // && right<size not needed
         // Found 1 target and it is not on left of start, return right distance to target
         return abs(right - start);
     }
@@ -860,41 +1236,48 @@ int Find_MinDistance(vector<int>& numbers, int target, int start) {
     }
 }
 
-/* GforG: Given an array A of n positive numbers. The task is to find the first Equilibium Point in the array.
+/* GforG: Given an array A of n POSITIVE numbers. The task is to find the first Equilibium Point in the array.
  Equilibrium Point in an array is a position such that the sum of elements before it is equal to the sum of elements after it.*/
 
 // Find a point in array where sum left of pint is equal to sum right of point
 // left->........point....<-right
 //     3 2 11 5 5 6 8 12
-int Find_Equal_Sum(vector<int> a)
+int PivoitPoint_1( vector<int> numbers )
 {
-    int len = static_cast<int>( a.size() );
-    int left = 1;                   // left  points to second number in array
-    int right = (len - 1) - 1;      // right points to number before last in array
-    int leftSum = a[0];                // start with sum1 equals first number in array
-    int rightSum = a[len -1];           // start with sum2 equals last  number in array
+    int len = static_cast<int>( numbers.size() );
+    int left = 1;                         // left  points to second number in array
+    int right = (len - 1) - 1;            // right points to number before last in array
+    int leftSum = numbers[0];             // start with sum1 equals first number in array
+    int rightSum = numbers[len -1];       // start with sum2 equals last  number in array
 
-    while (left <= right)
-    {
-        if (leftSum < rightSum)
-            leftSum += a[left++];
-        else
-            rightSum += a[right--];
+    // 1) add numbers from left to right in leftsum, add numbers from right to left in rightsum.
+    while( left < right ) {
+        if( leftSum < rightSum ) {
+            leftSum += numbers[left++];   // leftsum < rightsum, add left number to leftsum
+        }
+        else {
+            rightSum += numbers[right--]; // rightsum < leftsum, add right number to rightsum
+        }
     }
     
-    if( abs( leftSum - rightSum) == 0 ) {
-        cout << " Found Equal-Sum of " << leftSum << " Occured at left = " << right << " and right = " << left;
+    // 2) at this point, both left and right SHOULD be equal: left = right.
+    // !!!: NOT necessarly true! corner case {5, 5}, left = 1, right = 0
+    if( leftSum == rightSum ) {     // && left == right
+        cout << "\tFound Equal_Sum of " << leftSum << " at pivot point: left = right " << left << endl;
+        return left;    // or, return right
     }
     else {
         //cout << "Equal_Sum found at location " << left;
-        cout << " Missing number is " << abs(leftSum - rightSum) << " occurs at location " << ((left < right)? left: right) << ", it should be added to " << (leftSum < rightSum ? "left" : "right") << " sub-array ";
+        cout << "\t\tCouldn't find Equal-Sum. \n" << "\t\tTo make Equal-Sum of " << ((leftSum < right)? leftSum : rightSum) << ", insert " << abs(leftSum - rightSum);
+        
+        cout << " in the " << (leftSum < rightSum ? "left" : "right") << " sub-array " << "at pivot point " << ((leftSum < rightSum)? left : right+1) << endl;
+        
+        return -1;
     }
-
-    return abs(leftSum - rightSum);
 }
 
 // works for positive numbers but not negative numbers
-int findEquilibriumPoint_1(vector<int> array)
+int PivoitPoint_2(vector<int> array)
 {
     int len = static_cast<int>( array.size() );
     if(len < 3)
@@ -928,77 +1311,72 @@ int findEquilibriumPoint_1(vector<int> array)
         }
      }
 
-    /*int result = sum1 == sum2 && left == right;
-    if( result ) {
-        return left;
-    }
-    else {
-        return  -1;;
-    }*/
-    
-    cout << "No Equal-Sum was Found: leftSum = " << leftSum << " and rightSum = " << rightSum << ", at"
-         << "\n                   leftLocation = " << left <<  "  and rightLocation = " << right ;
+    cout << "\t\tleftSum  = " << leftSum  << " at " << "leftLocation  = " << left << ", and\n"
+         << "\t\trightSum = " << rightSum <<  " at rightLocation = " << right ;
 
-
-    return (leftSum == rightSum && left == right)? left : -1;     // both left and right would work, since left = right at this point???
+    //&& left == right
+    return (leftSum == rightSum )? left : -1;     // both left and right would work, since left = right at this point???
 }
 
-// works for positive and negative numbers
-int findEquilibriumPoint_2( vector<int> array )
+// works for positive and negative numbers. similar to version 1
+int PivoitPoint_3( vector<int> array )
 {
     int len = static_cast<int>( array.size() );
-    int left = 1;                   // left  points to second number in array
-    int right = (len - 1) - 1;      // right points to number before last in array
-    int leftSum = array[0];                // start with sum1 equals first number in array
-    int rightSum = array[len -1];           // start with sum2 equals last  number in array
+    int left = 1;                               // left  points to second number in array
+    int right = (len - 1) - 1;                  // right points to number before last in array
+    int leftSum = array[0];                     // start with sum1 equals first number in array
+    int rightSum = array[len -1];               // start with sum2 equals last  number in array
 
     while( left < right ) {
-        
         // !!!: order of following statements execution is very important!!!
-        if( abs(leftSum) < abs(rightSum) ) {    // !!!: notice: abs()
+        if( abs(leftSum) < abs(rightSum) ) {    // !!!: NOTICE: abs()
                 leftSum += array[left++];
         }
         else {
             rightSum += array[right--];
         }
-
-        if( leftSum == rightSum && right == left ) {
-            cout << "\n\nFound Equal-Sum of " << leftSum << " at location " << left;
-            return left;
-        }
     }
 
-    cout << "\n\nNo Equal-Sum was Found: leftSum = " << leftSum << " and rightSum = " << rightSum << ", at"
-         << "\n                   leftLocation = " << left <<  " and rightLocation = " << right ;
-
+    if( leftSum == rightSum ) { // && right == left
+        cout << "\t\tleftSum  = " << leftSum  << " at " << "leftLocation  = " << left << ", and\n"
+             << "\t\trightSum = " << rightSum <<  " at rightLocation = " << right ;
+        return left;
+    }
+    
+    cout << "\t\tCould not Find equal sum";
     return -1;
 }
 
 // not tested
 // Optimized method to find the equilibrium index of an array
 #include <numeric>
-void findEquilibriumIndex_Optomized(int A[], int n)
+void findEquilibriumIndex_Optomized (vector<int> array )
 {
+    int size = static_cast<int>(array.size());
     // `total` stores the sum of all the array elements
-    int total = std::accumulate(A, A + n, 0);
- 
+    //int total = std::accumulate(A, A + n, 0);
+    int total = std::accumulate( array.begin(), array.end(), 0);
+
     // `right` stores the sum of elements of subarray `A[i+1…n)`
-    int right = 0;
+    int right_sum = 0;
  
     // traverse the array from right to left
-    for (int i = n - 1; i >= 0; i--)
+    for (int right = size-1; right >= 0; right--)
     {
         /* `i` is an equilibrium index if the sum of elements of subarray `A[0…i-1]`
            is equal to the sum of elements of the subarray `A[i+1…n)` i.e.
            `(A[0] + A[1] + … + A[i-1])` = `(A[i+1] + A[i+2] + … + A[n-1])` */
  
         // sum of elements of the left subarray `A[0…i-1]` is `total - (A[i] + right)`
-        if (right == total - (A[i] + right)) {
-            cout << "Equilibrium Index found " << i << endl;
+        int left_sum = total - (array[right] + right_sum);
+        if( right_sum == left_sum ) {
+            cout << "   Result: Equilibrium Index found " << right << endl;
+            cout << "\t\tleftSum  = " << left_sum  << " at " << "leftLocation  = " << right << ", and\n"
+                 << "\t\trightSum = " << right_sum <<  " at rightLocation = " << right ;
         }
  
         // new right is `A[i] + (A[i+1] + A[i+2] + … + A[n-1])`
-        right += A[i];
+        right_sum += array[right];
     }
 }
 
@@ -1557,56 +1935,6 @@ bool IsArrayaContiguous_DuplicatesAllowed2(vector<int> array)
     return orderedSet.size() == maxNumber - minNumber + 1;
 }
 
-// !!!: //////////////      Find a Subarray with a Given Sum      /////////////////////
-//
-/* https://practice.geeksforgeeks.org/problems/subarray-with-given-sum-1587115621/1?page=1&curated[]=1&sortBy=submissions
-   Given an unsorted array A of size N that contains only "NON-NEGATIVE" integers, find a continuous sub-array
-   which adds to a given number S. The task is to complete the function subarraySum() which takes arr, N and S
-   as input parameters and returns a list containing the STARTING and ENDING positions of the First such
-   occurring subarray from the left where sum equals to S. The two indexes in the list should be according
-   to 1-BASED indexing. !!!: If no such subarray is found, return an array consisting only one element that is -1
- */
-// !!!: Briliant Algoritm by me √√√
-vector<int> targetSum_Subarray(vector<int> array, long long targetsum)
-{
-    vector<int> result;  // return an array containing start and end idicies for max sum
-
-    int size = (int )array.size();
-    if(size == 0 || targetsum < 1) {
-        result.push_back(-1);
-        return result;
-    }
-    
-    int start = 0;
-    int end = 0;
-    int sum = 0;
-
-    while( end < size ) {
-        // 1) sum less than target sum
-        if( sum < targetsum ) {
-            sum += array[end];
-            end++;
-        }
-        
-        // 2) sum greater than target sum
-        if(sum > targetsum) {
-            sum -= array[start];
-            start++;
-        }
-        
-        // 3) sum equal to target sum
-        // target sum is found, bail out and return. if this was first in the loop, while loop would be while(end <= size)
-        if(sum == targetsum) {
-            result.push_back(start);     // start
-            result.push_back(end - 1);   // end
-            return result;
-        }
-    }
-     
-    // If no such subarray is found, return an array consisting only one element that is -1.
-    result.push_back(-1);
-    return result;
-}
 
 // !!!: //////////////      Find Longest Consecutive Numbers      /////////////////////
 //
@@ -1622,7 +1950,7 @@ vector<int> findLongest_consecutiveNumbers( vector<int> array )
     int longestEnd   = 0;
     int longestCount = 0;
 
-    // take advantage of set<int>. It is SORTED set initalized with array, vector<int> nums
+    // 1) sort array. take advantage of set<int>. It is SORTED set initalized with array, vector<int>
     set<int>                 setIntegers(array.begin(), array.end());
     set<int>::iterator curr_itr = setIntegers.begin();
     int prev = *curr_itr;    // first element in set
@@ -1630,12 +1958,13 @@ vector<int> findLongest_consecutiveNumbers( vector<int> array )
     
     set<int>::iterator longestEnd_itr;
 
-    // Search the sorted set for consecutive numbers
-    while( curr_itr != setIntegers.end() ) {    // start with second element in set
+    // 2) search the sorted set for consecutive numbers
+    //    start with second element in set
+    while( curr_itr != setIntegers.end() ) {
         // are numbers consecutive, at this point?
         if( *curr_itr == prev+1 ) {
-            // yes, consecutive numbers
-            count++;    // increase counter
+            // 2.1) yes, consecutive numbers:
+            count++;    // increase count
             end++;      // increase end
             //cout << "prev = " << prev << "\tcurr = " << *curr_itr <<  "\tCount = " <<  count << endl;
         }
@@ -1721,23 +2050,22 @@ int maxSum_subArray_geeks( const vector<int> array )
 // !!!: based on findSubArray_with_maxSum_geeks(vector<int> array) above
 vector<int> maxSum_subArray_mine( vector<int> array )
 {
+    size_t size = array.size();
     //"""Find a contiguous subarray with the largest sum."""
     vector<int> result(3);  // result to retuen max_sum, curr_start, curr_end
     
-    int maximum_sum   = INT_MIN;
-    int current_sum = 0;
+    int maximum_sum = INT_MIN;
+    int current_sum = 0;    //
 
     // start indexes
-    int next_start = 0;      // next_start
+    int next_start = 0;     // next_start
     int curr_start = 0;     // current_start
-    
-    // end index
-    int curr_end = 0;
+    int curr_end   = 0;     // end index
     
     // order is important:
-    for( int i = 0; i < array.size(); i++ ) {
+    for( int left=0; left < size; left++ ) {
         // 1) first, find current sum: prev sum + curr number
-        current_sum = current_sum + array[i];
+        current_sum += array[left];
 
         // 2) if, current sum > max sum:
         if( current_sum > maximum_sum ) {
@@ -1746,7 +2074,7 @@ vector<int> maxSum_subArray_mine( vector<int> array )
             
             // 2.2) keep the 'prev start' pointing to the 'current start'
             curr_start = next_start;
-            curr_end    = i;
+            curr_end    = left;
         }
         
         // 3) if, current sum is '0' or negative, discard it and start a new sum:
@@ -1755,7 +2083,7 @@ vector<int> maxSum_subArray_mine( vector<int> array )
             current_sum = 0;
             
             // 3.2) make 'current start' points to the 'next loop-counter': 'i' + 1
-            next_start = i + 1;
+            next_start = left + 1;
         }
         
     }
@@ -1872,10 +2200,10 @@ int minIncrements_to_uniqueArray_geek( vector<int>& array )
 // !!!: NOTICE the difference.
 // A subset (sequence, combination) is a subset that can be derived from another subset by 0 or more elements,
 // without changing the order of the remaining elements.
-// For N = 4, there are 15 (2^N -1) subset.
+// For N = 4, there are 15 (2^N -1) subsets ~ 2^N.
 
-// A subarray is a contiguous part of array. An array that is inside another array. Here there are N*(N+1)/2 non-empty
-// subarrays/substrings, for N=4: 4*5/2 = 10.
+// A subarray is a contiguous part of array. An array that is inside another array. Here there are N*(N+1)/2 ~= (N^2)
+// non-empty subarrays/substrings, for N=4: 4+3+2+1 = 4*5/2 = 10.
 
 // Subsets:    (1), (2), (3), (4), (1,2), (1,3), (1,4), (2,3), (2,4), (3,4), (1,2,3), (1,2,4), (1,3,4), (2,3,4), (1,2,3,4) = 15.
 // Subarrays : (1), (2), (3), (4), (1,2),               (2,3),        (3,4), (1,2,3),          (2,3,4),          (1,2,3,4) = 10
@@ -1890,7 +2218,7 @@ int minIncrements_to_uniqueArray_geek( vector<int>& array )
  We can run two nested loops, the outer loop picks starting element and inner
  loop considers all elements on right of the picked elements as ending element of subarray.*/
 // Prints all subarrays in arr[0..n-1]
-void printAllSubarrays_1( vector<int> array )
+void printSubarrays_1( vector<int> array )
 {
     // My implenentaion. O(N^2)
     int count = 0;  // Used for Debuging
@@ -1922,7 +2250,7 @@ void printAllSubarrays_1( vector<int> array )
 }
 
 // !!!: √√√. Much better, faster O(N^2)
-void printAllSubarrays_2( vector<int> array )
+void printSubarrays_2( vector<int> array )
 {
     size_t length = array.size();
     for( int i=0; i < length; i++ ) {
@@ -1935,11 +2263,11 @@ void printAllSubarrays_2( vector<int> array )
     }
 }
 
-// !!!: Subsets (sequences or combinations). When generating subset, Oorder of elements is not imported. Geeksforgeeks
+// !!!: Subsets (sequences or combinations). When generating subset, order of elements is not imported. Geeksforgeeks
 // Code to generate all possible subsets. Time Complexity O(N * 2^N) = 4 * 2^4 = 64 Proximit iterations.
 // Pfoof from code: Exact iterations = maxCount * size = ((2^N) - 1) * N = 15 * 4     = 60 Exact iterations
 // (1), (2), (3), (4), (1,2), (1,3), (1,4), (2,3), (2,4), (3,4), (1,2,3), (1,2,4), (1,3,4), (2,3,4), (1,2,3,4) = 15.
-void PrintSubsets( vector<int> set )
+void printSubsets( vector<int> set )
 {
     /* !!!: Number of subsets is (2^n -1)*/
     int set_size = (int )set.size();
@@ -1964,8 +2292,8 @@ void PrintSubsets( vector<int> set )
     // cout << "Possible Total Iterations in the 2 Nested Loops = " << set_size * subsetCount << endl;
 }
 
-// Returns size of new array. !!!: May be should take advantage of sorted array
-int Remove_Duplicates_From_SoretedArray(vector<int>& numbers)
+// Returns size of new array. !!!: May be should take advantage of sorted array. O(N)
+int removeDuplicates_fromSoretedArray( vector<int>& numbers )
 {
     int writeIndex = 1;
     int prevnumber = numbers[0];    // first-number
@@ -1982,7 +2310,8 @@ int Remove_Duplicates_From_SoretedArray(vector<int>& numbers)
 }
 
 // !!!: Works beautifully good. Matrix Must have Rows = Cols: NxN
-void Rotate_Matrix_90DegCC(vector<vector<int>>& matrix)
+// !!!: it has advantage over Carcking Coding Interview implementation: it does not use offset
+void rotateMatrix_90DegCW( vector<vector<int>>& matrix )
 {
     int ROWS = (int )matrix.size(), COLS = ROWS;
 
@@ -2023,7 +2352,7 @@ void Rotate_Matrix_90DegCC(vector<vector<int>>& matrix)
     }
 }
 
-void Rotate_MatrixLeft(int** a, int M, int N, int k)
+void rotateMatrix_Left(int** a, int M, int N, int k)
 {
     if (k > N) return;
 
@@ -2067,25 +2396,23 @@ void Rotate_MatrixLeft(int** a, int M, int N, int k)
 
 
 // !!!: Interesting. O(N) using vector<int> as extra space
-void Rotate_Array_Right_1(vector<int>& a, int rotation)
+void rotateArray_Right_1(vector<int>& array, int rotation)
 {
     // 1. Copy array to vector<int>
-    vector<int> originAlarray(a.begin(), a.end()) ;
+    vector<int> orig_Array(array.begin(), array.end()) ;
     
-    for(int originalPos = 0; originalPos < a.size();  originalPos++)
-    {
-        cout << "\tnumber index = " << (originalPos + rotation) % a.size() << endl;
-        
-        // Detetmine new position after rotation
-        int newPos = (originalPos + rotation) % a.size();
+    for(int orig_Pos = 0; orig_Pos < array.size(); orig_Pos++ ) {
+        // formula to map a new position after rotation
+        int newPos = (orig_Pos + rotation) % array.size();
+        cout << "\tindex = " << orig_Pos << " maps to " << newPos << endl;
 
         // Copy original number to new location
-        a[newPos] = originAlarray[originalPos];
+        array[newPos] = orig_Array[orig_Pos];
     }
 }
 
 // !!!: Does not work quite well
-void Rotate_Array_Right_2(vector<int>& numbers, int rotation)
+void rotateArray_Right_2(vector<int>& numbers, int rotation)
 {
     size_t N = numbers.size();
     int i    = 0;
@@ -2117,7 +2444,7 @@ void Rotate_Array_Right_2(vector<int>& numbers, int rotation)
     We get [2, 3, 4, 5, 6, 7, 1] after first rotation and [ 3, 4, 5, 6, 7, 1, 2] after second rotation.  */
 // Time Complexity: O(N*d), Where N is the length of the given array and d is the rotation number.
 // Auxiliary Space: O(1) and O(N^2)
-void Rotate_Array_Right_3(vector<int>& a, int rotations)
+void rotateArray_Right_3(vector<int>& a, int rotations)
 {
     int N = static_cast<int>(a.size());
 
@@ -2130,53 +2457,6 @@ void Rotate_Array_Right_3(vector<int>& a, int rotations)
         }
         a[N - 1] = last;
         p++;
-    }
-}
-
-
-// !!!: Interview questioin from Meta: Write some pseudo code to raise a number to a power.
-int Raise_Number_To_Power_Recursive(unsigned int number, unsigned int power)
-{
-    if(power==0)    // the ONLY reason we need this statement is to check, if power = 0 in the first function call.
-        return 1;   // we will never get here after the first function call
-    
-    if(power==1)
-        return number;
-    
-    return Raise_Number_To_Power_Recursive(number, power-1) * number;
-}
-
-// My solution. Non-recursive
-int Raise_Number_To_Power_Iterative(unsigned int number, unsigned int power)
-{
-    if(power == 0)
-        return 1;
-    
-    if(power == 1)
-        return number;
-    
-    int result = number;
-    while(--power > 0) {
-        result *= number;
-    }
-    
-    return result;
-}
-
-// recursive
-int Raise_Number_To_Power3(unsigned int number, unsigned int power) {
-    if( power == 1) {
-        return number;
-    }
-    // Even numbers
-    else if (power % 2 == 0) {
-        // square( power (x, n/2));
-        int x = Raise_Number_To_Power3(number, power/2);
-        return x * x;
-    }
-    // Odd numbers
-    else {
-        return Raise_Number_To_Power3(number, power - 1) * number;
     }
 }
 
@@ -2533,7 +2813,7 @@ string ZeroOneTwo4(string s)
    Output: 6 1 5 2 4 3
 */
 // No EXTRA SPACE
-void Rearrange_Array_Max_Min_Alternatively_1(vector<int>& a)
+void Rearrange_Array_Max_Min_Alternatively_1( vector<int>& a )
 {
     // {1,2,3,4,5,6}
     int left  = 0;
@@ -2621,20 +2901,20 @@ vector<int> Rearrange_Array_Pos_Neg_Alternatively(vector<int>& array)
     // {3,1,-2,-5,2,-4}
     int size = static_cast<int>(array.size());
     vector<int> result_array(size);
-    int positive = 0;   // The rearranged array begins with a positive integer
-    int negative = 1;
+    int pos_index = 0;   // The rearranged array begins with a positive integer
+    int neg_index = 1;
     
     int i = 0;
     while( i < size ) {
         
         if(array[i] > 0) {
-            result_array[positive] = array[i];
-            positive += 2;
+            result_array[pos_index] = array[i];
+            pos_index += 2;
         }
         
         if(array[i] < 0) {
-            result_array[negative] = array[i];
-            negative += 2;
+            result_array[neg_index] = array[i];
+            neg_index += 2;
         }
         
         ++i;
@@ -2799,68 +3079,11 @@ int leastCommonNumber(vector<int>& arr1, vector<int>& arr2, vector<int>& arr3)
   return -1;
 }
 
-// Objective: Given an array of integers, find the sum of any three elements which is closest to zero.
-// The array may contain positive and negative elements.
-// Time Complexity: O(N2)
-/* 1) Sort the given array in ascending order.
-   2) Initialize sum = 0, positiveClose = INTEGER_MAXIMUM, negativeClose = INTEGER_MINIMUM.
-   3) Use two loops.
-   4) Fix the element using the outer loop. Call it first
-        1. sum = first element.
-        2. Inside the inner loop, take two pointers, second and third.
-           second at the next element to the first element and third at the last element in the array.
-           Do sum = sum + second + third
-        3. Now if sum = 0, return 0.
-        4. Else if sum > 0 , do positiveClose = minimum(positiveClose, sum)
-        5. Else do negativeClose = maximum(negativeClose, sum)
-   5) If abs(negativeClose)<positiveClose return negativeClose else return positiveClose.
-*/
-int findSumClosestToZero(vector<int> a)
-{
-    int minSumPositive = INT_MAX;
-    int minSumNegative = INT_MIN;
-
-    int size = static_cast<int>(a.size());
-    if( size < 3 ) {
-         cout << "Invalid input";
-         return minSumPositive;
-    }
-
-    //sort the array in ascending order
-    sort(a.begin(), a.end());
-    printVector(cout << " Sorted Input: ", a);
-
-    for( int i = 0; i < size ; i++ ) {
-        int n = a[i];
-        int j = i+1;
-        int k = size-1;
-
-        while( j < k ) {
-            int sum = n + a[j] + a[k];
-            cout << "sum = " << sum << ": " << a[i] << ", " << a[j] << ", " << a[k] << endl;
-            if( sum == 0 ) {
-                return 0;
-            }
-            else if( sum > 0 ) {
-                minSumPositive = std::min(sum, minSumPositive);
-                k--;
-            }
-            else {
-                minSumNegative = std::max(sum, minSumNegative);
-                j++;
-            }
-        }
-    }
-    
-    if( abs(minSumNegative) < minSumPositive ) {
-        return minSumNegative;
-    }
-    
-    return minSumPositive;
-     
- }
  
-/*  Given an array of numbers, you need to find out whether an array can be converted to a non-decreasing array,
+
+// !!!: ///////     Nondecreasing Array     //////////
+/*  !!!: https://tutorialhorizon.com/algorithms/convert-to-non-decreasing-array-with-one-change/
+    Given an array of numbers, you need to find out whether an array can be converted to a non-decreasing array,
     where you are allowed to modify the maximum one element in the array.
  
     Non-decreasing array: Array is called a non-decreasing array when you traverse the array from left to right,
@@ -2881,164 +3104,150 @@ int findSumClosestToZero(vector<int> a)
         Input: [1, 1, 1, 1]
         Output: true
         No Change required  */
-bool Convert_to_Nondecreasing_Array_with_one_change_1( vector<int> array)
+bool Convert_toNondecreasing_Array_1change_1( vector<int> array)
 {
     int size = static_cast<int>(array.size());
     if( size < 3 ) {
         return false;
     }
     
-    // {10, 5, 2}
-    // {4, 5, 2, 1} true
-    // a[i-1] <= a[i] <= a[i+1]
-    bool array_modified_once = false;
-
+    bool change = false;
     for( int i=1; i < size-1; i++ ) {
-        
+
+        // {7, 6, 5, 1}
         if( array[i-1] > array[i] && array[i] > array[i+1] ) {
             // can't modify one number to make NonDecreasing array
             return false;
         }
         
-        /*if( a[i-1] <= a[i] && a[i] <= a[i+1] ) {
-            // the three numbers compared are NonDecreasing
-            continue;
-        }*/
-
-        // {6, 5, 7, 1}
+        // {6, 5, 7, 1} -> {6, 6, 7, 1}
         if( array[i-1] > array[i] && array[i] <= array[i+1] ) {
+            if( change == true ) {
+                return false;
+            }
             array[i] = array[i-1]; // OR: a[i] = a[i+1];
-            if( array_modified_once == true ) {
-                return false;
-            }
-            array_modified_once = true;
         }
 
-        // {4, 5, 1, 7}
+        // {4, 5, 1, 7} -> {4, 5, 5, 7}
         if( array[i-1] <= array[i] && array[i] > array[i+1] ) {
-            array[i+1] = array[i];  // Only choice
-            if( array_modified_once == true ) {
+            if( change == true ) {
                 return false;
             }
-            array_modified_once = true;
-        }
-
+            array[i+1] = array[i];  // Only choice
+         }
+        
+        change = true;
     }
     
     return true;
 }
 
-// from ytube
+// from ytube. good algorithem
 int Convert_to_Nondecreasing_Array_with_one_change_2( vector<int> array )
 {
     int size = static_cast<int>(array.size());
+    int change = 0;
+    
+    for( int i=1; i < size && change < 2; i++ ) {
+        if( array[i] < array[i-1] ) {
+            if( i == 1 || array[i-2] <= array[i] ) {
+                array[i-1] = array[i];
+             }
+            else {
+                array[i] = array[i-1];
+            }
+            change++;
+        }
+    }
+    
+    return change <= 1;
+}
+
+/*  Given an array nums with n integers, your task is to check if it could become non-decreasing by modifying at most one element. */
+bool Convert_to_Nondecreasing_Array_with_one_change_3(vector<int>& array)
+{
+    for( int i = 1, err = 0; i < array.size(); i++ ) {
+        if( array[i] < array[i-1] ) {
+            if( err++ || (i > 1 && i < array.size() - 1 && array[i-2] > array[i] && array[i+1] < array[i-1]) ) {
+                return false;
+            }
+        }
+    }
+    
+    return true;
+}
+
+// !!!: this is almost the same as: Convert_to_Nondecreasing_Array_with_one_change_2( )
+int totalSteps_toMake_NonDecreasing_Array( vector<int>& array )
+{
+    size_t size = array.size();
     int count = 0;
     
     for( int i=1; i < size; i++ ) {
+        // only when current number is < previous number, do:
         if( array[i] < array[i-1] ) {
-            if( i==1 || array[i-2] <= array[i] ) {
+            if( i == 1 || array[i] >= array[i-2] ) {
                 array[i-1] = array[i];
-                count++;
             }
             else {
+                // array[i] < array[i-2]
                 array[i] = array[i-1];
-                count++;
             }
+            count++;
         }
+        // else do nothing
     }
     
-    return count <= 1;
+    return count;
 }
-
-/* You are given a 0-indexed integer array nums. In one step,
-   remove all elements nums[i] where nums[i - 1] > nums[i] for all 0 < i < nums.length.
  
- Return the number of steps performed until nums becomes a non-decreasing array.
+/*  You are given a 0-indexed integer array nums. In one step,
+    remove all elements nums[i] where nums[i - 1] > nums[i] for all 0 < i < nums.length.
+    Return the number of steps performed until nums becomes a non-decreasing array.
 
- Example 1:
-
- Input: nums = [5,3,4,4,7,3,6,11,8,5,11]
- Output: 3
- Explanation: The following are the steps performed:
- - Step 1: [5,3,4,4,7,3,6,11,8,5,11] becomes [5,4,4,7,6,11,11]
- - Step 2: [5,4,4,7,6,11,11] becomes [5,4,7,11,11]
- - Step 3: [5,4,7,11,11] becomes [5,7,11,11]
- [5,7,11,11] is a non-decreasing array. Therefore, we return 3.
- Example 2:
-
- Input: nums = [4,5,7,7,13]
- Output: 0
- Explanation: nums is already a non-decreasing array. Therefore, we return 0
- */
-int totalSteps_to_Make_NonDecreasing_Array_1( vector<int>& a)
+    Example 1:
+            Input: nums = [5,3,4,4,7,3,6,11,8,5,11]
+            Output: 3
+            Explanation: The following are the steps performed:
+            - Step 1: [5,3,4,4,7,3,6,11,8,5,11] becomes [5,4,4,7,6,11,11]
+            - Step 2: [5,4,4,7,6,11,11] becomes [5,4,7,11,11]
+            - Step 3: [5,4,7,11,11] becomes [5,7,11,11]
+            [5,7,11,11] is a non-decreasing array. Therefore, we return 3.
+    Example 2:
+            Input: nums = [4,5,7,7,13]
+            Output: 0
+            Explanation: nums is already a non-decreasing array. Therefore, we return 0
+*/
+int totalSteps_toMake_nonDecreasing_Array2( vector<int>& array)
 {
-    int size = static_cast<int>(a.size());
-    int small = 0;
-    int i=1;
-    int j = 1;
-    int steps = 0;
-    
-    // {5, 3, 4, 4, 7, 3, 6, 11, 8, 5, 11} -> {5,7,11,11}
-    while(  i < size) {
-        
-        if( a[i] > a[small] ) {
-           // i++;
-            //continue;
-        }
-        
-        while( i < size && a[i] < a[small] ) {
-            i++;
-        }
-        if( i == size ) {
-            return steps;
-        }
-        else if( a[i] < a[small] ) {
-            a[small+1] = a[i];
-            small++;
-            i++;
-            steps++;
-        }
-    }
-    
-    return steps;
-}
-
-int totalSteps_to_Make_NonDecreasing_Array_2 ( vector<int>& a)
-{
- // {5, 3, 4, 4, 7, 3, 6, 11, 8, 5, 11} -> {5,7,11,11}
-    int size = static_cast<int>(a.size());
-    int write_index = 1;
-    int small = 0;
-    int steps = 0;
-
-    for( int i=1;  i< size; i++) {
-              
-        if( a[i] >= a[small] ) {
-            small++;
-            if( i != small ) {
-                a[small] = a[i];
-                steps++;
-            }
-        }
-        //else
-            //steps--;
-
-
-    }
- 
-    return steps;
-}
- 
-int countOdds_1(int low, int high) {
+    size_t size = array.size();
     int count = 0;
     
-    while( low <= high ) {
-        if( low & 1 ) {
+    for( int i=1, write_index=1; i < size; i++ ) {
+        // only when current number is < previous number, do:
+        if( array[i] > array[i-1] ) {
+            array[write_index++] = array[i];
+            count++;
+        }
+    }
+    
+    return count;
+}
+
+// find odds numbers between low and high numbers
+// this algoritherm clearly makes more sense
+int CountOdds_1(int low_number, int high_number) {
+    int count = 0;
+    
+    while( low_number <= high_number ) {
+        if( low_number & 1 ) {
+            // odd number, skip over 1 position to get to the  next odd number
+            low_number += 2;
             ++count;
-            low += 2;
         }
         else {
-            ++low;
+            // even number, just increment position to get to the next odd number
+            ++low_number;
         }
     }
     
@@ -3046,34 +3255,19 @@ int countOdds_1(int low, int high) {
  }
 
 // Faster than version 1. pay attention to low && high
-int countOdds_2(int low, int high) {
-    
-    // at benging, the following 4 conditons exist for low and high:
+int countOdds_2(int low_number, int high_number)
+{
+    // the following 4 conditons exist for low and high numbers:
     // 1) both even, 2) both odd, 3) low=odd && high=even, 4) low=even && high=odd
-    
-    if( ((low & 1) == 0) && ((high & 1) == 0) ) {
+    if( ((low_number & 1) == 0) && ((high_number & 1) == 0) ) {
         // 1) only when, both low and high are even, use this formaula
-         return (high - low) / 2 ;
+         return (high_number - low_number) / 2 ;
      }
      
-    // the following 3 remaining conditons exist at this point use this formaula
-    //2) both odd, 3) low=odd && high=even, 4) low=even && high=odd
-    return (high - low) / 2 + 1;
+    // the following 3 remaining conditons exist, use this formaula
+    // 2) both odd 3) low=odd && high=even 4) low=even && high=odd
+    return (high_number - low_number) / 2 + 1;
 }
-
-// does not work YET
-int countOdds_3(int low, int high) {
-    
-    // at benging, the following 4 conditons exist for low and high:
-    if( ( ((low & high) & 1) == 0) ) {
-        //2) both odd, 3) low=odd && high=even, 4) low=even && high=odd
-        return (high - low) / 2;
-    }
-    
-
-    // 1) both low and high are even, use this formaula
-    return (high - low) / 2 + 1;
- }
 
 /*  from ---> https://tutorialhorizon.com/algorithms/check-if-number-is-divisible-by-its-digits/
  Check if Number is divisible by its digits
@@ -3091,23 +3285,21 @@ int countOdds_3(int low, int high) {
 //        here, if number = 0 and since number is divisable by its 0 digit (number=0)/(digit=0),
 //        i am returing true, prabaly not good assumption!!!
 //        if 0 is inside number, retun false
-bool isDivisible_byItsDigits( int num )
+bool isDivisible_byItsDigits( int number )
 {
-    int temp = num;
-    while( temp > 0 ) {
+    while( number > 0 ) {
         // 1) find current digit
-        int digit = temp % 10;
+        int digit = number % 10;
         
-        // 2) is number divisable by digit?:
-        //    make sure you don't divide number by 0 digit
-        if( digit == 0 || num % digit != 0 ) {
+        // 2) is number divisable by digit? make sure you don't divide number by 0 digit
+        if( digit == 0 || (number % digit) != 0 ) {
             // 2.2) No - A) there is a 0 digit in number. since, you can't divide by 0, therefore return false, or
             //           B) number is not divisable by digit
             return false;
         }
         
         // 2.3) Yes - do nothing, just continue through the loop until number is zero
-        temp /= 10;
+        number /= 10;
     }
     
     // 3) after prev loop: Yes - number is divisable by all of its digits
@@ -3179,67 +3371,299 @@ int monotoneIncreasingDigits( int number )
  In school a student gets rewarded if he has an attendance record without being absent for more than once or being late for 3 times continuously.
 
  Given a student's attendance record represented by a string. The record only contains the following three characters:
+     'A' : Absent.
+     'L' : Late.
+     'O' : On-Time.
+     Check whether the student qualifies for the reward.
 
- 'A' : Absent.
- 'L' : Late.
- 'O' : On-Time.
- Check whether the student qualifies for the reward.
+ Examples:
+     Record: "OLLAOOOLLO"
+     Output: False
+     Explanation: The student does not qualify for a reward because !!!: "LLA" means he was late 3 times in a row.
 
- Example:
-
- Record: "OLLAOOOLLO"
- Output: False
- Explanation: The student does not qualify for a reward because "LLA" means he was late 3 times in a row.
-
- Record: "OLLOAOLLO"
- Output: True
+     Record: "OLLOAOLLO"
+     Output: True
  */
-bool checkattendanceRecords(string str)
+bool checkAttendance( string attendance )
 {
-    int AbsentCount = 0;
-    int LateCount   = 0;
+    int absent_days           = 0;
+    int late_consecutive_days = 0;
 
-    for( char c : str) {
-        
-        if( c == 'L') {
+    enum { OnTime='O', Late='L', Absent='A' };
+    
+    for( char day : attendance) {
+
+        if( day == Late ) {
             // increment Late count and take action
-            LateCount++;
-            if( LateCount == 3 ) {
+            late_consecutive_days++;
+            if( late_consecutive_days == 3 ) {
                 // Action: no rewards, since student was late 3 times in a row,
                 cout << "\n\tSorry no rewards is given to Student, because: \n";
                 cout << "\tStudent was Late 3 consecutive days";
                 return false;
             }
          }
-        
-         if( c == 'O' ) {
+
+        if( day == OnTime ) {
             // Action: no action is needed, since student was on time
             // we just need to reset the "3 consecutive Late days" rule. therefore, we reset Late count to 0
-            LateCount = 0;
+            late_consecutive_days = 0;
         }
         
-        if( c == 'A' ) {
+        if( day == Absent ) {
             // increment Late count and take action
-            AbsentCount++;
-            if( LateCount == 2 || AbsentCount > 1 ) {
+            absent_days++;
+            if( late_consecutive_days == 2 || absent_days > 1 ) {
                 // Action:
                 cout << "\n\tSorry no rewards is given to Student, because: \n";
-                if( AbsentCount > 1 ) {
-                    cout << "\tStudent was absent more than once";
-                }
-                else {
-                    cout << "\tStudent was Late 2 consecutive days and one consecutive Absent.\n";
-                }
-                
+                if( absent_days > 1 ) cout << "\tStudent was absent more than once";
+                else                  cout << "\tStudent was Late 2 consecutive days and one consecutive Absent.\n";
+            
                 return false;
             }
             
             // we need to reset the "3 consecutive Late days" rule. therefore, we reset Late count to 0
-            LateCount = 0;
+            late_consecutive_days = 0;
         }
-
     }
     
-    cout << "\n\tPlease give student an Reward, because of GOOD attendance\n";
+    cout << "\n\tPlease give student a REWARD, because of GOOD attendance\n";
     return true;
 }
+
+// algorithem: find max number of seats between tow persons and divide it by 2.
+//             this should give you max distance from closest person
+// !!!: does not work quite well for corner cases
+int maxDist_toClosestPerson( vector<int> seats ) {
+    size_t seats_size = seats.size();
+    size_t last_seat  = seats.size() - 1;
+    
+    int empty_seats = 0;
+    int max_empty_seats = 0;
+    
+    int last_empty_seats = 0;
+
+    enum { Empty, Occupied };
+    
+    int cur_seat = 0;
+    while( cur_seat < seats_size ) {
+        // 1. count empty seats
+        if( seats[cur_seat] == Empty ) {
+            empty_seats++;
+        }
+       
+        // 2. check max empty seats when current seat is occupied, or current seat is last seat
+        if( seats[cur_seat] == Occupied || cur_seat == last_seat ) {
+            if( empty_seats > max_empty_seats ) {
+                max_empty_seats = empty_seats;
+            }
+            
+            // !!!: pay attention to corner case, where first or last seats are empty.
+            //      keep track of last empty seats as we need it later.
+            if( cur_seat == last_seat ) {
+                last_empty_seats = max_empty_seats;
+            }
+
+            empty_seats = 0;
+        }
+
+        ++cur_seat;
+    }
+    
+    // !!!: corner case: last seat is empty, return last empty seats
+    if( seats[last_seat] == Empty && last_empty_seats == max_empty_seats ) {
+        return last_empty_seats;
+    }
+    else {  // general case:
+        return max_empty_seats/2 + ( (max_empty_seats % 2 == 1)? 1: 0 );
+    }
+}
+
+// https://leetcode.com/problems/maximize-distance-to-closest-person/submissions/
+// Runtime Details 11ms Beats 75.48%of users with C++. O(N)
+// Memory Details 16.99MB Beats 76.22%of users with C++
+int maxDist_toClosestPerson_2( vector<int> seats ) {
+    size_t number_of_seats = seats.size();
+    size_t last_seat  = number_of_seats - 1;
+    
+    int empty_seats = 0;
+    int first_empty_seats = 0;
+    int midle_empty_seats = 0;
+    int last_empty_seats = 0;
+
+    enum { Empty, Occupied };
+    
+    // !!!: pay attention to corner case, where First seats are empty. keep track of last empty seats as we need it later.
+    // 1) count the FIRST empty seats and store it for later use
+    int cur_seat = 0;
+    while( cur_seat < number_of_seats && seats[cur_seat] == Empty ) {
+        cur_seat++;
+    }
+    first_empty_seats = cur_seat;
+
+    empty_seats = 0;
+    int prev_occupied =0, curr_occupied = 0;
+    // 2) count max middle empty seats
+    while( cur_seat < number_of_seats ) {
+        // 2.1) count empty seats
+        if( seats[cur_seat] == Empty ) {
+            empty_seats++;
+        }
+       
+        // 2.2) check max empty seats when current seat is occupied
+        if( seats[cur_seat] == Occupied  ) {
+            if( empty_seats >= midle_empty_seats ) {
+                curr_occupied = prev_occupied;
+                prev_occupied = cur_seat;
+                cout << "prev occupied = " << curr_occupied << ", curr occupied = " << prev_occupied << endl;
+                midle_empty_seats = empty_seats;
+            }
+            empty_seats = 0;
+        }
+        ++cur_seat;
+    }
+
+    // !!!: pay attention to corner case, where Last seat is empty. keep track of Last empty seats as we need it later.
+    if( seats[last_seat] == Empty ) {
+        last_empty_seats = empty_seats;
+    }
+
+    // if max empty middle seats is odd, add 1
+    midle_empty_seats = midle_empty_seats/2 + ( (midle_empty_seats % 2 == 1)? 1: 0 );
+    
+    if( first_empty_seats >= midle_empty_seats && first_empty_seats >= last_empty_seats ) {
+        cout << "Sit in the First seat";
+        return first_empty_seats;
+    }
+    if( last_empty_seats >= midle_empty_seats && last_empty_seats >= first_empty_seats ) {
+        cout << "Sit in the LAST seat";
+        return last_empty_seats;
+    }
+    cout << "Sit in a middle seat. between seat " << curr_occupied << " and seat " << prev_occupied
+         << ", at seat number = " <<  curr_occupied + midle_empty_seats ;
+    return midle_empty_seats;
+}
+
+
+bool Find_Number_In_SortedMatrix(int a[][3], int ROWS, int COLS, int target)
+{
+    int row = 0;;
+    int col = COLS - 1;
+
+    while( row < ROWS && col >= 0 ) {
+        if (target == a[row][col])
+            return true;
+        if (target > a[row][col])
+            row++;
+        else    // target < a[row][col]
+            col--;
+    }
+
+    return false;
+}
+
+void setsOfSum(unsigned int* a, int len, int sum )
+{
+    map<int, int> mapsums;
+    int i = 0, j = 0, count = 0;
+    
+    while( i < len - 1 && count < sum/2)
+    {
+        if( a[i] < sum && mapsums.find(a[i]) == mapsums.end())
+        {
+            j = i + 1;
+            while( j < len)
+            {
+                 if( mapsums.find(a[i]) == mapsums.end() )
+                   
+                    j++;
+            }
+            
+        }
+        
+    }
+}
+
+int LCSD(int* a, int n)
+{
+    int res = 1;
+    for(int i=0; i < n; i++)
+    {
+        int j = i+1;
+        for(; j < n; j++)
+        {
+            if( (a[j] % a[i]) != 0)
+            {
+                return 1;
+            }
+        }
+        if(j == n)
+            return a[i];
+        
+    }
+    
+    return res;
+};
+
+int myPartition(int* xa, int xlen)
+{
+    int a[] = {1, 5, 3, 0, 4, 2, 6, 7, 9, 8};
+    int len = 10;
+
+    int left = 1;
+    int right = len - 1;
+    int pivot = a[0];
+    
+    while(left < right)
+    {
+        if(a[left] > pivot && a[right] < pivot)
+        {
+            // swap a[i] and a[store]
+            int temp = a[left];
+            a[left] = a[right];
+            a[right] = temp;
+        }
+        
+        if(a[left] < pivot)
+            left++;
+            
+        if(a[right] > pivot)
+            right--;
+    }
+    
+    int temp = a[0];
+    a[0] = a[right];
+    a[right] = temp;
+    
+    return pivot;
+}
+
+
+int Partition(int* a, int len)
+{
+    int left = 0;
+    int right = len - 1;
+    int store = left;
+    
+    for(int i=left; i <right; i++)
+    {
+        if(a[i] <= a[right])
+        {
+            // swap a[i] and a[store]
+            int temp = a[i];
+            a[i] = a[store];
+            a[store] = temp;
+            
+            store++;
+        }
+    }
+
+    // swap a[store] and a[right]
+    int temp = a[store];
+    a[store] = a[right];
+    a[right] = temp;
+
+    return store;
+}
+
+

@@ -13,7 +13,10 @@
 #include <string>
 #include <iostream>
 
-bool LogicOR(bool a, bool b);
-bool LogicAND(bool A, bool B);
+class Logic {
+public:
+    bool LogicOR(bool a, bool b);
+    bool LogicAND(bool A, bool B);
+};
 
 #endif /* Logic_hpp */

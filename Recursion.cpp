@@ -1,12 +1,13 @@
 //
-//  Permutaions.cpp
+//  Recursion.cpp
 //  Practice1
 //
-//  Created by taher benisa on 12/20/20.
-//  Copyright © 2020 taher benisa. All rights reserved.
+//  Created by Taher Benisa on 7/30/23.
+//  Copyright © 2023 taher benisa. All rights reserved.
 //
 
-#include "Permutaions.hpp"
+#include "Recursion.hpp"
+//#include "Permutaions.hpp"
 #include "DataStructures.hpp"
 #include "Vectors.hpp"
 
@@ -20,7 +21,7 @@ using std::istream;
 using std::ostream;
 using std::stack;
 
-int Permutations::Factorial_Recursively(int n) {
+int Recursion::Factorial::Factorial_Recursively(int n) {
     int result = 0 ;
     
     /*if(n == 0){
@@ -37,7 +38,7 @@ int Permutations::Factorial_Recursively(int n) {
     return result;
 }
 
-int Permutations::Factorial(int n) {
+int Recursion::Factorial::Factorial1(int n) {
     int result = n ;
     while(--n > 1) {    // both work: while(--n > 1) and while(n-- > 2)
         result *= n;
@@ -54,7 +55,7 @@ int Permutations::Factorial(int n) {
 
 
 // The Fibonacci sequence is given by 0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, and so on.
-int Permutations::Fibonacci_Recursively(int number)
+int Recursion::Fibonacci::Fibonacci_Recursively(int number)
 {
     /* static int count = 0;
     cout << endl << ++count << "\t"; */
@@ -82,13 +83,13 @@ int Permutations::Fibonacci_Recursively(int number)
     return totalsum;
 }
 
-int Permutations::Fibonacci_Recursively_Memoization_Utl( int n )
+int Recursion::Fibonacci::Fibonacci_Recursively_Memoization_Utl( int n )
 {
     // int memo[n+1] = {0};    // this does not work. errot: Variable-sized object may not be initialized
     int* memo = new int[n+1] {0};
     return Fibonacci_Recursively_Memoization( n, memo);
 }
-int Permutations::Fibonacci_Recursively_Memoization(int number, int memo[] )
+int Recursion::Fibonacci::Fibonacci_Recursively_Memoization(int number, int memo[] )
 {
     /* static int count = 0;
     cout << endl << ++count << "\t"; */
@@ -115,7 +116,7 @@ int Permutations::Fibonacci_Recursively_Memoization(int number, int memo[] )
     return memo[number];
 }
 
-int Permutations::Fibonacci_Iteratively(int number)
+int Recursion::Fibonacci::Fibonacci_Iteratively(int number)
 {
     if( number == 0 || number == 1 ) {
         return number;      // return 0 or 1
@@ -150,7 +151,7 @@ int Permutations::Fibonacci_Iteratively(int number)
 
 // Good job. print all combinations of a phonepad[buttons] strings.
 // !!!: Notice no phone number is required
-void Permutations::Print_AllCombinationsOfPhonePadLetters_Iteratively( void )
+void Recursion::Permutation::Print_AllCombinations_OfPhonePadLetters_Iterative( void )
 {
     // phonepad[buttons] is an array of 8-buttons strings
     int buttons = 8;
@@ -196,7 +197,7 @@ void Permutations::Print_AllCombinationsOfPhonePadLetters_Iteratively( void )
 
 // !!!: Iterative Solution: number must have 7 digits.
 // Print All letter combinations for a 7 digit phone number. !!!: phoneNumber must be 7-digits, otherwise it is meaningless
-void Permutations::print_7digitTelephoneNumber_Iteratively(vector<int> phoneNumber) {
+void Recursion::Permutation::print_7digitTelephoneNumber_Iterative(vector<int> phoneNumber) {
     int buttons = 10;
     string phonepad[buttons];
     // Digits 0 and 1 are left blank
@@ -252,15 +253,15 @@ void Permutations::print_7digitTelephoneNumber_Iteratively(vector<int> phoneNumb
 // !!!: /////////////////////         Combinations        ////////////////////////
 
 // !!!: Number can have any number-of-digits and Digits in keypad can be any length
-void Permutations::keypadCombinations_Recursively1( vector<int> phoneNumber ) {
+void Recursion::Permutation::keypadCombinations_Recursively1( vector<int> phoneNumber ) {
     
     // digitIndex = 0, means row = 0
     int digitIndex = 0;
-    keypadCombinations_Recursively_Utl1( phoneNumber, digitIndex );
+    Recursion::Permutation::keypadCombinations_Recursively_Utl1( phoneNumber, digitIndex );
 }
 
 // !!!: Algortihm is DFS. Less parameters than keypadCombinations_Recursively_Utl2. You do not pass string as parameter, so string must be static and saved before recursion
-void Permutations::keypadCombinations_Recursively_Utl1(vector<int> phoneNumber, int digitIndex /* digit=0 */) {
+void Recursion::Permutation::keypadCombinations_Recursively_Utl1(vector<int> phoneNumber, int digitIndex /* digit=0 */) {
     static int Combinations = 0;  // Used for debugging only
 
     const int buttons = 10;
@@ -318,15 +319,15 @@ void Permutations::keypadCombinations_Recursively_Utl1(vector<int> phoneNumber, 
 // From geeksforgeeks. Function to find all possible combinations by replacing key's digits with characters of the corresponding list
 // !!!: Number can have any number-of-digits. Digits in keypad can be any N length
 // !!!: Alogrithm (DFS): Similr to keypadCombinations_Recursively1(). It takes keypad[] as a second paramter.
-void Permutations::Print_keypadCombinations_Recursively_2(vector<char> keypad[], vector<int> phoneNumber)
+void Recursion::Permutation::Print_keypadCombinations_Recursively_2(vector<char> keypad[], vector<int> phoneNumber)
 {
     // Size of the list corresponding to current digit
     int phoneNumberSize = (int )phoneNumber.size();
-    Print_keypadCombinations_Recursively_2_Utl(keypad, phoneNumber, string(""), 0, phoneNumberSize);
+    Permutation::Print_keypadCombinations_Recursively_2_Utl(keypad, phoneNumber, string(""), 0, phoneNumberSize);
 }
 // !!!: Note: string result And int row parameters can be ommited and defined as static inside recursive function.
 // !!!: See keypadCombinations_Recursively3(vector<int> phoneNumber)
-void Permutations::Print_keypadCombinations_Recursively_2_Utl(vector<char> keypad[], vector<int> phoneNumber, string result, int row/*row=0*/, int ROWS) {
+void Recursion::Permutation::Print_keypadCombinations_Recursively_2_Utl(vector<char> keypad[], vector<int> phoneNumber, string result, int row/*row=0*/, int ROWS) {
     // !!!: digitIndex = row
     // If processed every digit of key, print result
     if (row == ROWS) {
@@ -354,7 +355,7 @@ void Permutations::Print_keypadCombinations_Recursively_2_Utl(vector<char> keypa
 // !!!: Algortihm is (DFS). Less parameters than keypadCombinations_Recursively_Utl2. You do not pass string,
 // !!!: digitIndex (row) and size as parameters, So String and Keypad row must be static and saved before recursion
 // !!!: Number can have any number-of-digits. Digits in keypad can be any N length
-void Permutations::Print_keypadCombinations_Recursively_3(vector<int> phoneNumber) {
+void Recursion::Permutation::Print_keypadCombinations_Recursively_3(vector<int> phoneNumber) {
     static int Combinations = 0;      // Used for debugging only = keypad[i] * keypad[j] * keypad[k] ...
 
     const int buttons = 10;
@@ -401,7 +402,7 @@ void Permutations::Print_keypadCombinations_Recursively_3(vector<int> phoneNumbe
 
 // !!!: Algorithm: Itertive Solution. Breadth First Search (BFS) from Geeks. Digits in keypad can be any length N
 // !!!: Function to return a vector that contains all the generated letter combinations using Queue
-vector<string> Permutations::Print_keypadCombinations_GeeksSolution(vector<int> phoneNumber)
+vector<string> Recursion::Permutation::Print_keypadCombinations_GeeksSolution(vector<int> phoneNumber)
 {
     // To store the generated letter combinations
     vector<string> list;
@@ -459,7 +460,7 @@ vector<string> Permutations::Print_keypadCombinations_GeeksSolution(vector<int> 
 // Algorithm: There are 3^n combinations for n digits phone number. examples: phoneNum[n] = {2,3,4} => 3^3 = 27.
 // !!!: All digits in keypad MUST be N length
 // Use extra space for tracking letters in a digit => letterIndex[PHONE_NUMBER_LENGTH]
-void Permutations::Print_keypadCombinations_MySolution(vector<int> phoneNumber)
+void Recursion::Permutation::Print_keypadCombinations_MySolution(vector<int> phoneNumber)
 {
     int counter = 0;  // Used for debgging
     string keyPad[10] {
@@ -502,7 +503,7 @@ void Permutations::Print_keypadCombinations_MySolution(vector<int> phoneNumber)
 
 
 
-////////////////////////////////////////////////////////         String Permutations        /////////////////////////////////////////////////////////////////
+// !!!: ///////////////////         String Permutations        //////////////////////////////
 ///
 // Function to print permutations of string. This function takes three parameters:
 // 1. String
@@ -535,7 +536,7 @@ void Permutations::Print_keypadCombinations_MySolution(vector<int> phoneNumber)
     The function's behavior is undefined if begin or end represents an index outside
     of the bounds of vector a.
 */
-void Permutations::printPermutation_Recursively2( vector<int>& array, int left, int right )
+void Recursion::Permutation::printPermutation_Recursively2( vector<int>& array, int left, int right )
 {
     if (left == right) {
         // print a permutation
@@ -554,7 +555,7 @@ void Permutations::printPermutation_Recursively2( vector<int>& array, int left, 
 }
 
 // similar to above function. instead of permuting over array of ints, now we permute over a string
-void Permutations::printPermutation_Recursively1( string str, int left, int right ) {
+void Recursion::Permutation::printPermutation_Recursively1( string str, int left, int right ) {
     if(left == right) {
        //cout << "left = " << left << endl;
        cout << "      Print \"" << str << "\"" << endl;
@@ -580,7 +581,7 @@ void Permutations::printPermutation_Recursively1( string str, int left, int righ
 }
 
 // My solution: under construction
-void Permutations::printPermutation_Recursively_mine(string str, int level) {
+void Recursion::Permutation::printPermutation_Recursively_mine(string str, int level) {
     static unsigned long len = str.size();
     static string originalString = str;
     static string str1 = "";
@@ -609,7 +610,7 @@ void Permutations::printPermutation_Recursively_mine(string str, int level) {
 }
 
 // Iterative function to find permutations of a String
-void Permutations::Print_StringPermutation_Iteratively(string str)
+void Recursion::Permutation::Print_StringPermutation_Iteratively(string str)
 {
     size_t size = str.length();
  
@@ -657,10 +658,9 @@ void Permutations::Print_StringPermutation_Iteratively(string str)
 
 
 // From D.S Malik text book
-int Permutations::Find_LargestNumberRecursively(const int a[], int left, int right)
+int Recursion::largestNumber_Recursive1(const int a[], int left, int right)
 {
-    // 5 10 12 8
-    // {5, 10, 12, 8, 9, 2}
+    // {5 10 12 8} {5, 10, 12, 8, 9, 2}
     int max;
     if (left == right) {//size of the sublist is one
         cout << "End of Array" << endl;
@@ -669,12 +669,73 @@ int Permutations::Find_LargestNumberRecursively(const int a[], int left, int rig
     else
     {
         cout << "Left = " << left << endl;
-        max = Find_LargestNumberRecursively(a, left + 1, right);
+        max = largestNumber_Recursive1(a, left + 1, right);
         cout << "Left = " << left << ", Max = " << max << endl;
         if (a[left] >= max)
             return a[left];
         else
             return max;
+    }
+}
+
+// my solution: √√√ this is the same as C++ Programing...by D.S Malik
+int Recursion::largestNumber_Recursive2( int array[], int left, int right )
+{
+    // base case:
+    if( left == right ) {
+        return array[right];    // or array[left]
+    }
+    
+    int thisNumber = array[left];
+    
+    // call function with the next number from left. function returns next number from left
+    int nextNumber = largestNumber_Recursive2( array, left + 1, right );
+    
+    // return the bigger of this number or next number
+    if( thisNumber > nextNumber ) {
+        return thisNumber;
+    }
+    else {
+        return nextNumber;
+    }
+}
+
+// the vector version. advantage: uses 1 less variable. disadvantage: resizing the array
+int Recursion::largestNumber_Recursive3( vector<int> array )
+{
+    string str = "WARNING: Array is Empty!!!";
+    // do not know what to do if array is empty
+    try {
+        if( array.empty() ) {
+            throw str;//Thread 1: signal SIGABRT
+        }
+    }
+    catch(string str) {
+        cout << str;
+        // throw excption to main
+        exit(-1);
+    }
+    
+    size_t right = array.size() - 1;
+    // base case:
+    if( right == 0 ) {   // right gets decremented until it reaches firt element
+        return array[0];    // or, array[right]
+    }
+    
+    // save current number before resizing the array
+    int currNumber = array[right];
+    
+    // remove last element in array by decreasing size array by 1.
+    array.resize( array.size() - 1 );
+    
+    // call previous number
+    int prevNumber = largestNumber_Recursive3( array );
+    
+    if( currNumber > prevNumber ) {
+        return currNumber;
+    }
+    else {
+        return prevNumber;
     }
 }
 
@@ -685,7 +746,7 @@ string str[] = {"abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
 
 
 // I don't about this still not working i think
-int Permutations::CombinationsOf_3_5_10(int n)
+int Recursion::Combinations::CombinationsOf_3_5_10(int n)
 {
     int a[3] = {3, 5, 10};
     int delta = 0;
@@ -742,7 +803,7 @@ int Permutations::CombinationsOf_3_5_10(int n)
 // From: https://algorithms.tutorialhorizon.com/dynamic-programming-coin-change-problem/
 // Objective: Given a set of coins and amount, Write an algorithm to find out how many ways we can make the change of the amount using the coins given.
 // !!!: 40 iterations for 4 coins.
-int Permutations::coinChange_Iterative1(vector<int> coins, const int amount)
+int Recursion::Coins::Change_Iterative1(vector<int> coins, const int amount)
 {
     int iterations = 0;
     int solution[coins.size() + 1][amount+1];// = new int[v.size() + 1][amount + 1];//= new int[v.size() + 1][amount + 1];
@@ -779,7 +840,7 @@ int Permutations::coinChange_Iterative1(vector<int> coins, const int amount)
 }
 
 // From Geeksforgeeks: !!!: Simpler. 40 iterations for 4 coins.
-int Permutations::coinChange_Iterative2( int coins[], int numberOfCoins, int amount )
+int Recursion::Coins::Change_Iterative2( int coins[], int numberOfCoins, int amount )
 {
     int iterations = 0;
     int i, j, x, y;
@@ -816,7 +877,7 @@ int Permutations::coinChange_Iterative2( int coins[], int numberOfCoins, int amo
 }
  
 // From Geeksforgeeks. !!!: The Best. Much Simpler and more Effiecent. 28 iterations for 4 coins.
-int Permutations::coinChange_Iterative3( int coins[], int numberOfCoins, int amount )
+int Recursion::Coins::Change_Iterative3( int coins[], int numberOfCoins, int amount )
 {
     int iterations = 0;
     // table[i] will be storing the number of solutions for value i. We need amount+1 rows as the table is constructed
@@ -842,7 +903,7 @@ int Permutations::coinChange_Iterative3( int coins[], int numberOfCoins, int amo
 }
 
 // !!!: From Geeksforgeeks. Returns the count of ways we can. Sum S[0...M-1] coins to get sum N
-int Permutations::coinChange_Recursive1(int coins[], int numberOfCoins, int amount)
+int Recursion::Coins::Change_Recursive1(int coins[], int numberOfCoins, int amount)
 {
     // this function iterates 25 times for {1, 2, 3}
     //static int count = 1; cout << "count " << count++ << "  \n";
@@ -872,13 +933,13 @@ int Permutations::coinChange_Recursive1(int coins[], int numberOfCoins, int amou
     // Count is sum of solutions (i) including coins[m-1] (ii) excluding coins[m-1]
     // Go DOWN (LEFT)
     cout << " Left  Coin = " << coins[numberOfCoins-1] << ", Amount = " << amount << endl;;
-    int leftCount = coinChange_Recursive1( coins, numberOfCoins - 1, amount );
+    int leftCount = Change_Recursive1( coins, numberOfCoins - 1, amount );
     cout << "leftCount = " << leftCount << endl;
     
     iterations++;
     // Go RIGHT
     cout << " Right Coin = " << coins[numberOfCoins - 1] << ", Amount = " << amount - coins[numberOfCoins - 1] << endl;;
-    int rightCount = coinChange_Recursive1( coins, numberOfCoins, amount - coins[numberOfCoins - 1] );
+    int rightCount = Change_Recursive1( coins, numberOfCoins, amount - coins[numberOfCoins - 1] );
     cout << "rightCount = " << rightCount << endl;
     cout << "leftCount + rightCount = " << leftCount + rightCount;
     cout << endl;
@@ -888,7 +949,7 @@ int Permutations::coinChange_Recursive1(int coins[], int numberOfCoins, int amou
 
 // From: https://algorithms.tutorialhorizon.com/dynamic-programming-coin-change-problem/
 // Must use vector<int v and Must start with i=0.
-int Permutations::coinChange_Recursive2(vector<int> coins, int index, int amount)
+int Recursion::Coins::Change_Recursive2(vector<int> coins, int index, int amount)
 {
     // this function iterates 35 times for {1, 2, 3}. !!!: less efficient than version 1
     //static int count = 1; cout << "count " << count++ << "  \n";
@@ -906,12 +967,12 @@ int Permutations::coinChange_Recursive2(vector<int> coins, int index, int amount
         return 0;
     }
     
-    return coinChange_Recursive2(coins, index, amount - coins[index]) +
-           coinChange_Recursive2(coins, index + 1, amount);
+    return Change_Recursive2(coins, index, amount - coins[index]) +
+           Change_Recursive2(coins, index + 1, amount);
 }
 
 // my solution: under construction
-int Permutations::coinChange_Recursive3( vector<int> coins, int amount )
+int Recursion::Coins::Change_Recursive3( vector<int> coins, int amount )
 {
     // this function iterates 25 times for {1, 2, 3}
     //static int count = 1; cout << "count " << count++ << "  \n";
@@ -927,7 +988,7 @@ int Permutations::coinChange_Recursive3( vector<int> coins, int amount )
     // Means coins over and n>0 so no solution
     int result = 0;
     for( int i=0; i < coins.size(); ++i ) {
-        result += coinChange_Recursive3( coins, amount - coins[i] );
+        result += Change_Recursive3( coins, amount - coins[i] );
     }
     
     return result;
@@ -935,7 +996,7 @@ int Permutations::coinChange_Recursive3( vector<int> coins, int amount )
 
 
 // !!!: ////////////////       Minimum Coin Change     ///////////////////////
-int Permutations::minCoin_Recursive(int coins[], int size, int amount)
+int Recursion::Coins::Minimum_Recursive(int coins[], int size, int amount)
 {
     if( amount == 0 )
         return 0;
@@ -946,7 +1007,7 @@ int Permutations::minCoin_Recursive(int coins[], int size, int amount)
     {
         if( amount >= coins[i] )
         {
-            int currCount = minCoin_Recursive( coins, size, amount - coins[i] );
+            int currCount = Minimum_Recursive( coins, size, amount - coins[i] );
             
             if( currCount != INT_MAX && ((currCount + 1) < minCount) ) {
                 minCount = currCount + 1;
@@ -960,7 +1021,7 @@ int Permutations::minCoin_Recursive(int coins[], int size, int amount)
         return minCount;
 }
 
-int Permutations::minCoin_Iterative( int coin[], int m, int amount )
+int Recursion::Coins::Minimum_Iterative( int coin[], int m, int amount )
 {
     if(amount == 0)
         return 0;
@@ -991,7 +1052,7 @@ int Permutations::minCoin_Iterative( int coin[], int m, int amount )
 }
 
 // !!!: Does not work. wrong answer = 8, for {2, 5, 3, 6}
-long long int Permutations::myCoinChange(vector<int> coins, int amount)
+long long int Recursion::Coins::myChange(vector<int> coins, int amount)
 {
     //          2 5 3 6
     long long int result = 0;
@@ -1179,7 +1240,7 @@ long long int Permutations::myCoinChange(vector<int> coins, int amount)
     *
 */
 // 4 stars ****. In this solution, we have 2 cout statement
-void Permutations::printStars_1(int stars)
+void Recursion::Stars::printStars_Recursive1(int stars)
 {
     static string starString = "";   // !!!: static eliminates passing starString as a parameter
     
@@ -1191,7 +1252,7 @@ void Permutations::printStars_1(int stars)
     // !!!: Done out of order. Should add one star first.
     starString += '*';              // !!!: First , Add one star at a time to starString, on the way down.
     string prevString = starString; // !!!: Second,  Save current, starString, since it is static
-    printStars_1(stars - 1);
+    printStars_Recursive1(stars - 1);
     cout << "\t\t\t" << prevString << endl;     // !!!: Print remaining stars here, on the way up: ***, **, *
 }
 
@@ -1203,20 +1264,20 @@ void Permutations::printStars_1(int stars)
 */
 // !!!: Best, using static starString eliminates passing string as a parameter, therefore, uses LESS parameters.
 // !!!: In this solution, we have just 1 cout statement. Little bit more effiecient.
-void Permutations::printStars_2(int stars)
+void Recursion::Stars::printStars_Recursive2(int stars)
 {
     static string starString = "";      // !!!: static eliminates passing starString as a parameter
     
     if(stars != 0) {
         starString += '*';              // !!!: First , Add one star at a time, on the way down.
         string prevString = starString; // !!!: Second, Save current, starString, since it is static
-        printStars_2(stars - 1);
+        printStars_Recursive2(stars - 1);
         cout << "\t\t\t" << prevString << endl;     // Print all stars here, on the way up, NO STACK: !!!: ****, ***, **, *
     }
 }
 
 // !!!: In this solution, we have just 1 cout statement. Little bit more effiecient.
-void Permutations::printStars_3(int stars)
+void Recursion::Stars::printStars_Recursive3(int stars)
 {
     static string starString = "";
     
@@ -1226,33 +1287,33 @@ void Permutations::printStars_3(int stars)
     
     starString += '*';              // !!!: Add one star at a time, on the way down.
     string prevString = starString; // !!!: Must remeber starString, since it is static
-    printStars_3(stars - 1);
+    printStars_Recursive3(stars - 1);
     cout << "\t\t\t" << prevString << endl;     // !!!: Print remaining stars here, on the way up, NO STACK: ***, **, *
 }
 
 // !!!: Using 1 more parameter
-void Permutations::printStars_4(int stars, string starString)
+void Recursion::Stars::printStars_Recursive4(int stars, string starString)
 {
     if(stars == 0){
         return;                     // !!!: Do not print string at end
     }
     
     starString += '*';             // !!!: Add one star at a time, on the way down, push on stack
-    printStars_4(stars - 1, starString);
+    printStars_Recursive4(stars - 1, starString);
     cout << "\t\t\t" << starString << endl;    // !!!: Print all stars here, on the way up, pop off stack: ****, ***, **, *
 }
 
-void Permutations::printStars_5(int stars, string starString)
+void Recursion::Stars::printStars_Recursive5(int stars, string starString)
 {
     if(stars != 0){
         starString += '*';
-        printStars_4(stars - 1, starString);
+        printStars_Recursive4(stars - 1, starString);
         cout << "\t\t\t" << starString << endl;
     }
 }
 
 
-void Permutations::printStars_6(int stars)
+void Recursion::Stars::printStars_Recursive6(int stars)
 {
     static string starString;
     
@@ -1260,14 +1321,14 @@ void Permutations::printStars_6(int stars)
         starString += '*';                          // !!!: Add one star at a time, on the way down.
         string prevString = starString;             // !!!: Save starString, since it is static
         cout << "\t\t\t" << starString << endl;     // !!!: Print all stars here, on the way down: *, **, ***, ****
-        printStars_6(stars - 1);
+        printStars_Recursive6(stars - 1);
         cout << "\t\t\t" << prevString << endl;     // !!!: Print all stars here, on the way up  : ****, ***, **, *
     }
 }
 
-void Permutations::printStars_7(int stars)
+void Recursion::Stars::printStars_Recursive7(int stars)
 {
-    static string starString = "";           
+    static string starString = "";
     
     if(stars != 0){
         // First, Build and Print stars
@@ -1279,14 +1340,14 @@ void Permutations::printStars_7(int stars)
         
         string prevString = starString;             // !!!: Must remeber starString, since it is static
 
-        printStars_7(stars - 1);
+        printStars_Recursive7(stars - 1);
 
         cout << "\t\t\t" << prevString << endl;     // Print stars here, on the way up, NO STACK: !!!: ****, ***, **, *
         starString.resize(stars-1);                 // Remove one star from string on the way up
     }
 }
 
-void Permutations::printStars_8(int stars, string starString)
+void Recursion::Stars::printStars_Recursive8(int stars, string starString)
 {
     if(stars != 0){
         // First, Build and Print stars
@@ -1297,7 +1358,7 @@ void Permutations::printStars_8(int stars, string starString)
         cout << "\t\t\t" << starString << endl;     // Print stars here, on the way down, NO STACK: !!!: ****, ***, **, *
         
         starString.resize(stars-1);     // Remove one star from string on the way down and Print it
-        printStars_8(stars - 1, starString);
+        printStars_Recursive8(stars - 1, starString);
 
         starString += "*";
         cout << "\t\t\t" << starString << endl;     // Print stars here, on the way up, NO STACK: !!!: ****, ***, **, *
@@ -1310,7 +1371,7 @@ void Permutations::printStars_8(int stars, string starString)
     ****
 */
 // O(ROWS * COLS). since, ROWS = COLS = stars, O(stars^2). O(4^2) = 16
-void Permutations::printStarsNonRecursive_1(int stars)
+void Recursion::Stars::printStars_Iterative1(int stars)
 {
     unsigned int ROWS;
     unsigned int COLS = ROWS = stars;
@@ -1336,7 +1397,7 @@ void Permutations::printStarsNonRecursive_1(int stars)
 
 // similar to the above function printStarsNonRecursive_1()
 // more efficient, since it prints a whole row at once. O(ROWS)
-void Permutations::printStarsNonRecursive_11(int stars)
+void Recursion::Stars::printStars_Iterative11(int stars)
 {
     unsigned int ROWS = stars;
     string str( stars, ' ' ); // "    "
@@ -1349,7 +1410,7 @@ void Permutations::printStarsNonRecursive_11(int stars)
     }
 }
 
-void Permutations::printStarsNonRecursive_2(int stars)
+void Recursion::Stars::printStars_Iterative2(int stars)
 {
     int row = 0, col = 0;
     unsigned int ROWS = stars;
@@ -1376,7 +1437,7 @@ void Permutations::printStarsNonRecursive_2(int stars)
 }
 
 // My solution
-void Permutations::printStarsNonRecursive_3(int stars)
+void Recursion::Stars::printStars_Iterative3(int stars)
 {
     int row = 0, col = 0;
     unsigned int ROWS = stars;
@@ -1398,7 +1459,7 @@ void Permutations::printStarsNonRecursive_3(int stars)
 
 
 // increment n
-int Permutations::increment_recursive(int n)
+int Recursion::increment_recursive(int n)
 {
     if (n == 0) {
         cout << "      n = " << n << " return 1" << endl;
@@ -1414,7 +1475,7 @@ int Permutations::increment_recursive(int n)
 }
 
 // given bin !!!: size = 5, which bin n belons to?
-int Permutations::fiveStep_Jumps( int n )
+int Recursion::fiveStep_Jumps( int n )
 {
     if (n <= 0) {
         cout << "      n = " << n << " return 0" << endl;
@@ -1431,7 +1492,7 @@ int Permutations::fiveStep_Jumps( int n )
 
 // 1-4=4, 5-24=20, 25-124=100, 125-624=500, 625-3124=2500,
 // expandable bin size: size = 4, 20, 100, 500, 2500 .....
-int Permutations::which_bin_recursive_2(int n)
+int Recursion::which_bin_recursive_2(int n)
 {
     if ( n <= 0 )
         return 0;   // try: return 1;
@@ -1440,7 +1501,7 @@ int Permutations::which_bin_recursive_2(int n)
 }
 
 // given bin !!!: size = 5, which bin n belons to?
-int Permutations::which_bin_iterative(int n)
+int Recursion::which_bin_iterative(int n)
 {
     // n%5==0? means no remainder
     int result = n/5 + ( n%5 == 0? 0: 1 );
@@ -1448,7 +1509,7 @@ int Permutations::which_bin_iterative(int n)
 }
 
 // print power of 2s from 1...i<n
-int Permutations::printPowersOf2(int n)
+int Recursion::Power::printPowersOf2(int n)
 {
     if ( n < 1 ) {
         return 0;
@@ -1467,7 +1528,7 @@ int Permutations::printPowersOf2(int n)
 }
 
 // my solution  √√√ß
-bool Permutations::isPowerOf2_recursive( int n )
+bool Recursion::Power::isPowerOf2_recursive( int n )
 {
     // 3 base cases
     if( n <= 0 ) {  // try if( n < 1 )
@@ -1486,7 +1547,7 @@ bool Permutations::isPowerOf2_recursive( int n )
     return isPowerOf2_recursive( n/2 );
 }
 
-bool Permutations::isPowerOf2_iterative( int n )
+bool Recursion::Power::isPowerOf2_iterative( int n )
 {
     if( n < 1 ) {
         return false;
@@ -1506,7 +1567,7 @@ bool Permutations::isPowerOf2_iterative( int n )
 
 
 // The following code computes ab. What is its runtime
-int Permutations::power_recursive( int number, int power ) {
+int Recursion::Power::power_recursive( int number, int power ) {
     if( power < 0 ) {           // try: if( power == 0 ) return 1;
         return 0;               // error
     }
@@ -1521,7 +1582,7 @@ int Permutations::power_recursive( int number, int power ) {
 
 // !!!: Interview questioin from META: Write some pseudo code to raise a number to a power.
 // The following code computes a^b. What is its runtime
-int Permutations::power_recursive1(unsigned int number, unsigned int power)
+int Recursion::Power::power_recursive1(unsigned int number, unsigned int power)
 {
     if( power == 0 )    // the ONLY reason we need this statement is to check, if power = 0 in the first function call.
         return 1;       // we will never get here after the first function call
@@ -1533,7 +1594,7 @@ int Permutations::power_recursive1(unsigned int number, unsigned int power)
 }
 
 // My solution. Non-recursive. number ^ power
-int Permutations::power_Iterative(unsigned int number, unsigned int power)
+int Recursion::Power::power_Iterative(unsigned int number, unsigned int power)
 {
     if(power == 0)
         return 1;
@@ -1550,7 +1611,7 @@ int Permutations::power_Iterative(unsigned int number, unsigned int power)
 }
 
 // recursive
-int Permutations::Raise_Number_To_Power3(unsigned int number, unsigned int power) {
+int Recursion::Power::Raise_Number_To_Power3(unsigned int number, unsigned int power) {
     if( power == 1) {
         return number;
     }
@@ -1568,7 +1629,7 @@ int Permutations::Raise_Number_To_Power3(unsigned int number, unsigned int power
 
 
 
-void Permutations::recursiveFun4(int n, int m, int o)
+void Recursion::recursiveFun4(int n, int m, int o)
 {
     if (n <= 0)
     {
@@ -1581,7 +1642,7 @@ void Permutations::recursiveFun4(int n, int m, int o)
     }
 }
 
-int Permutations::recursiveFun5(int n)
+int Recursion::recursiveFun5(int n)
 {
     if (n <= 0) {
         return 1;
@@ -1626,7 +1687,7 @@ int Permutations::recursiveFun5(int n)
          Space Complexity: O(1). As no extra space is required.
     !!!: Note: The Time Complexity of the program can be optimizedusing Dynamic Programming.
  */
-int Permutations::countWays_recursively( int total_steps )
+int Recursion::Combinations::countWays_recursively( int total_steps )
 {
     static int count = 0;
     count++;
@@ -1672,7 +1733,7 @@ int Permutations::countWays_recursively( int total_steps )
          Time Complexity : O(n). Only one traversal of the array is needed. So Time Complexity is O(n).
          Space Complexity: O(n). To store the values in a DP, n extra space is needed.
 */
-int Permutations::countWays_iteratively( int total_steps )
+int Recursion::Combinations::countWays_iteratively( int total_steps )
 {
     int result[total_steps + 1];
         result[0] = 1;
@@ -1701,7 +1762,7 @@ int Permutations::countWays_iteratively( int total_steps )
         Space Complexity: O(n). To store the values in a DP, n extra space is needed. Also, stack space
         for recursion is needed which is again O(n)
 */
-int Permutations::countWays_recursively_memoization_helper(int total_steps, vector<int>& dp)
+int Recursion::Combinations::countWays_recursively_memoization_helper(int total_steps, vector<int>& dp)
 {
     static int count = 0;
     count++;
@@ -1723,7 +1784,7 @@ int Permutations::countWays_recursively_memoization_helper(int total_steps, vect
                            + countWays_recursively_memoization_helper( total_steps - 1, dp );
 }
 
-int Permutations::countWays_recursively_memoization( int total_steps )
+int Recursion::Combinations::countWays_recursively_memoization( int total_steps )
 {
     // 1) create a memoization array with values = -1
     vector<int> dp( total_steps + 1, -1 );
@@ -1751,7 +1812,7 @@ int Permutations::countWays_recursively_memoization( int total_steps )
     2) Mark the element in the visited array.
     3) Add the element positions from left, right, down and up from the current element into the stack.
  */
-void Permutations::DFS( vector<vector<int>> grid) {
+void Recursion::DFS( vector<vector<int>> grid) {
 
     size_t ROWS = grid.size();
     if (ROWS == 0)
@@ -1813,67 +1874,6 @@ void Permutations::DFS( vector<vector<int>> grid) {
 
 
 
-// my solution: √√√ this is the same as C++ Programing...by D.S Malik
-int Permutations::largestNumber_recursively1( int array[], int left, int right )
-{
-    // base case:
-    if( left == right ) {
-        return array[right];    // or array[left]
-    }
-    
-    int thisNumber = array[left];
-    
-    // call function with the next number from left. function returns next number from left
-    int nextNumber = largestNumber_recursively1( array, left + 1, right );
-    
-    // return the bigger of this number or next number
-    if( thisNumber > nextNumber ) {
-        return thisNumber;
-    }
-    else {
-        return nextNumber;
-    }
-}
-
-// the vector version. advantage: uses 1 less variable. disadvantage: resizing the array
-int Permutations::largestNumber_recursively2( vector<int> array )
-{
-    string str = "WARNING: Array is Empty!!!";
-    // do not know what to do if array is empty
-    try {
-        if( array.empty() ) {
-            throw str;//Thread 1: signal SIGABRT
-        }
-    }
-    catch(string str) {
-        cout << str;
-        // throw excption to main
-        exit(-1);
-    }
-    
-    size_t right = array.size() - 1;
-    // base case:
-    if( right == 0 ) {   // right gets decremented until it reaches firt element
-        return array[0];    // or, array[right]
-    }
-    
-    // save current number before resizing the array
-    int currNumber = array[right];
-    
-    // remove last element in array by decreasing size array by 1.
-    array.resize( array.size() - 1 );
-    
-    // call previous number
-    int prevNumber = largestNumber_recursively2( array );
-    
-    if( currNumber > prevNumber ) {
-        return currNumber;
-    }
-    else {
-        return prevNumber;
-    }
-}
-
 /*  What is the return value of f(p, p) if the value of p is initialized to 5 before the call?
     Note that the first parameter is passed by reference, whereas the second parameter is passed by value.   */
 // !!!: VERY tricky: pass x by value and notice the difference:
@@ -1881,7 +1881,7 @@ int Permutations::largestNumber_recursively2( vector<int> array )
 // pass x by value    : f(6, 4)*6 * f(7, 3)*7 * f(8, 2)*8 * f(9,1)*9=1*9 -> 7 * 8 * 9 * 6 = 3024
 /*  Explanation: Since c is passed by value and x is passed by reference, all functions will have same copy of x,
     but different copies of c.*/
-int Permutations::recurse( int& x, int c )
+int Recursion::recurse( int& x, int c )
 {
     c  = c - 1;
     if (c == 0) return 1;
@@ -1895,12 +1895,12 @@ int Permutations::recurse( int& x, int c )
     // return f(x+1, c-1) * x;   // return f(x+1, c-1) * x;
 }
 
-int Permutations::gcd( int u, int v) {
+int Recursion::GCD( int u, int v) {
     if( v == 0 ) {
         return u;
     }
     else {
-       return gcd(v, u % v);
+       return GCD(v, u % v);
     }
 }
 

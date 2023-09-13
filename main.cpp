@@ -12,7 +12,7 @@
 #include "NumberConversions.hpp"
 #include "StringStuff.hpp"
 #include "Logic.hpp"
-#include "Permutaions.hpp"
+#include "Recursion.hpp"
 #include "Common Stuff.hpp"
 #include "Algorithms.hpp"
 #include "Vectors.hpp"
@@ -23,6 +23,8 @@
 #include <pthread.h>
 #include <algorithm>
 #include <memory>
+//#include "Algorithems"
+#include <iomanip>
 
 using std::string;
 using std::cout;
@@ -30,80 +32,18 @@ using std::map;
 
 // const int bufsize;       // Allowed in C not C++. bufsize must be initalized
 
-//void RotateMatrixLeft(int** a, int M, int N, int k);
-//int EqualSum(int* a, int len);
-//void setsOfSum(int* a, int len);
-
-//int LCSD(int* a, int n);
-
-int16_t ultimate_answer(void)
-{
-    volatile int16_t x = 6 * 9;
-    x = 42;
-    return x;
-}
-
-int global;
-int globalInit = 323;
-int staticGlobal;
-int staticGlobalInit= 54;
-
-bool Find_Number_In_SortedMatrix(int a[][3], int ROWS, int COLS, int target)
-{
-    int row = 0;;
-    int col = COLS - 1;
-
-    while (row < ROWS && col >= 0)
-    {
-        if (target == a[row][col])
-            return true;
-        if (target > a[row][col])
-            row++;
-        else    // target < a[row][col]
-            col--;
-    }
-
-    return false;
-}
-
-int* modifyArray1(int array[]) {
-    array[0] = 2;
-    return array;
-}
-
-void modifyArray2(int array[]) {
-    array[0] = 3;
-}
-
-// function check whether a number is prime or not
-bool isPrime( int n )
-{
-    // Corner case
-    if (n <= 1)
-        return false;
- 
-    // Check from 2 to square root of n
-    double root = sqrt(n);
-    for (int i = 2; i <= root; i++)
-        if (n % i == 0) {
-            return false;
-        }
- 
-    return true;
-}
-
-void foo(const char **p) { }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-#define MAX(A,B) (((A) >= (B)) ? (A) : (B))
-
-inline int MAX_FUN(int a, int b) {return a >= b ? a : b;}
-
-template <class T> inline int MAX_TMPL(T a, T b) {return a >= b ? a : b;}
+int global_uninitialized;           // unintialized global
+int static_global_uninitialized;    // static unintialized global
+int global_initialized = 323;        // initialized global
+int static_global_initialized= 54;  // static intialized global
 
 ////////////////////////////////////////////
-template <class T> void printVectorY( vector<T>& nums )
+template <class myType> myType GetMax (myType a, myType b) {
+    return (a>b?a:b);
+}
+
+//template <class T> inline int MAX_TMPL(T a, T b) {return a >= b ? a : b;}
+template<class T> void printVectorTemplate( vector<T>& nums )
 {
    int size = static_cast<T>(nums.size());
     cout << "[";
@@ -119,33 +59,426 @@ template <class T> void printVectorY( vector<T>& nums )
     cout  << endl;
 }
 
-int f1(void) { cout << 1; return 1;}
-int f2(void) { cout << 2; return 2;}
-int f3(void) { cout << 3; return 3;}
+BitManipulations        bitManipulation;
+Recursion               rec;
+Recursion::Permutation  permutation;
+CommonStuff             commonStuff;
+Logic logic;
+Recursion::Factorial    factorial;
+Recursion::Fibonacci    fibonacci;
+Recursion::Power        power;
+Recursion::Coins        coins;
+Recursion::Stars        stars;
+Recursion::Combinations combinations;
+
 
 // !!!: //////////////////////       main()      /////////////////////////
 // !!!:
 int main(int argc,  char * argv[]) {
     {
-        // an array of 3 pointers to functions that take void and return void
-        int (*func_ptr[3])(void) = {f1, f2, f3};
-        cout << func_ptr[0]() << endl;
-        cout << *func_ptr[1] << endl;       // wrong result: prints 1, instead of 22 !!!
-        cout << func_ptr[2]() << endl;
+        vector<int> cost = { 10, 1, 1, 15, 2, 30, 3 };//10, 1, 1, 15, 2, 30, 3};
+        printVector( cout << "costs : ", cost );
+
+        int result = minCost_iter1( cost );
+        cout << "1) Minimum cost to reach top: " << result;
+
+        int result2 = minCost_iter2( cost );
+        cout << "\n2) Minimum cost to reach top: " << result2;
+    }
+{
+    {
+        // NVIDIA Interview Question for Senior Software Development Engineers: I think I nailed it
+        // !!!: Given the following set of strings, write a function that stores this information.
+                // /Electronics/Computers/Graphics Cards
+                // /Electronics/Computers/Graphics Cards
+                // /Electronics/Computers/SSDs
+                // /Electronics/Computers/Graphics Cards
+                // /Electronics/Computers/SSDs
+                // /Electronics/TVs
+                // /Electronics/Computers/Graphics Cards
+                // /Electronics/TVs
+                // /Electronics/TVs
+                // /Garden
+                // /Automotive/Parts
+         // !!!: Your datastructure should be able to provide information as such:
+                 // / = 11
+                 // /Electronics = 9
+                 // /Electronics/Computers = 6
+                 // /Electronics/Computers/Graphics Cards = 4
+                 // /Electronics/TVs = 3
+                 // etc
+                 // ["/Electronics/Computers/Graphics Cards", "/Garden"]
+
+
+        string info[11] = {
+            "/Electronics/Computers/Graphics Cards",
+            "/Electronics/Computers/Graphics Cards",
+            "/Electronics/Computers/SSDs",
+            "/Electronics/Computers/Graphics Cards",
+            "/Electronics/Computers/SSDs",
+            "/Electronics/TVs",
+            "/Electronics/Computers/Graphics Cards",
+            "/Electronics/TVs",
+            "/Electronics/TVs",
+            "/Garden",
+            "/Automotive/Parts"
+
+        /*"/Electronics/Computers/Graphics Cards",
+        "/Electronics/Computers/Graphics Cards",
+        "/Electronics/Computers/SSDs",
+        "/Electronics/Computers/Graphics Cards",
+        "/Electronics/Computers/SSDs",
+        "/Electronics/TVs",
+        "/Electronics/Computers/Graphics Cards",
+        "/Electronics/TVs",
+        "/Electronics/TVs",
+        "/Garden",
+        "/Automotive/Parts",
+        "/Automotive/Parts/Engine",
+        "/Automotive/Parts/Engine",*/
+        };
+        int len =  sizeof(info)/sizeof(info[0]);
+        map<string, int> info_map = commonStuff.StoreElectronicsInfo( info, len );
+        map<string, int>::iterator itr = info_map.begin();
+        while(itr != info_map.end() ){
+            cout << " " << itr->first << " = " << itr->second << endl;
+            itr++;
+        }
+    }
+}
+
+{
+    int i = 4;
+    int& r = i;
+    int j=3;
+    r = j;
+    ++j;
+    cout << i << r << j << endl;
+}
+    
+{
+        // !!!: (NVI) !!!:
+        /*  — is known as the non-virtual interface (NVI) idiom. It's a particular manifestation of the more general design
+         pattern called Template Method (a pattern that, unfortunately, has nothing to do with C++ templates). I call the nonvirtual
+         function (e.g., healthValue) the virtual function's wrapper.
+         IMPORTANT:
+         It may have crossed your mind that the NVI idiom involves derived classes redefining private virtual functions —
+         redefining functions they can't call! There's no design contradiction here. Redefining a virtual function specifies how
+         something is to be done. Calling a virtual function specifies when it will be done. These concerns are independent. The
+         NVI idiom allows derived classes to redefine a virtual function, thus giving them control over how functionality is
+         implemented, but the base class reserves for itself the right to say when the function will be called. It may seem odd at
+         first, but C++'s rule that derived classes may redefine private inherited virtual functions is perfectly sensible. */
         
-        (*func_ptr[0])();
-        (*func_ptr[1])();
-        (*func_ptr[2])();
+        /*  The Template Method Pattern via the Non-Virtual Interface Idiom
+         We'll begin with an interesting school of thought that argues that virtual functions should almost always be private.
+         Adherents to this school would suggest that a better design would retain healthValue as a public member function
+         but make it non-virtual and have it call a private virtual function to do the real work, say, doHealthValue:   */
+        class GameCharacter {
+        public:
+            // non-virtual function: derived classes do not redefine this — see Item 36
+            int healthValue() const
+            {
+                cout << "public: BaseCharacter::healthValue() calling: \n";
+                // ... do "before" stuff — see below
+                
+                int retVal = doHealthValue(); // do the real work
+                
+                // ... do "after" stuff — see below
+                return retVal;
+            }
+
+        private:
+            // virtual private function: derived classes may redefine this
+            virtual int doHealthValue() const
+            {
+                // ... // default algorithm for calculating
+                cout << "private: BaseCharacter::doHealthValue() = 10%\n";
+                return 0; // character's health
+            }
+        };
+        
+        // !!!: taher: I added this. it is very useful to test the concept of NVI
+        class DerivedCharacter1 : public GameCharacter {
+        private:
+            virtual int doHealthValue() const {
+                cout << "private: DerivedCharacter1::doHealthValue() = 50%\n";
+                return 50;
+            }
+        };
+        class DerivedCharacter2 : public GameCharacter {
+        private:
+            virtual int doHealthValue() const {
+                cout << "private: DerivedCharacter2::doHealthValue() = 100%\n";
+                return 100;
+            }
+        };
+
+        // driver:
+        DerivedCharacter1 derivedCharacter1;
+        GameCharacter* pCharacter;
+        pCharacter = &derivedCharacter1;        // pointer to base pointing to derived
+        pCharacter->healthValue();             cout << endl;
+        
+        DerivedCharacter2 derivedCharacter2;
+        pCharacter = &derivedCharacter2;        // pointer to base pointing to derived
+        pCharacter->healthValue();             cout << endl;
+        
+        GameCharacter  Character;
+        pCharacter = &Character;                // pointer to base pointing to base
+        pCharacter->healthValue();
     }
     {
-        unsigned int number = 12345;
-        //function calling
-        extractDigits( number );
+        class B {
+        private:
+            void nonfun( void ) {}
+        public:
+            virtual void fun( void ) { cout << " In B::fun()\n"; };
+        };
+        
+        class D: public B {
+        public:
+            virtual void fun( void ) {
+                cout << " In D::fun()\n";
+            };
+        };
+        
+        // driver
+        D d;
+        // fun through derived object: no virtual function calling
+        d.fun();
+        // fun through a pointer to derived object: virtual function calling
+        D* pd = &d;
+        pd->fun();
+        // fun through a pointer to base object: virtual function calling
+        B* pb = &d;
+        pb->fun();
+        
+        // fun through base object: no virtual function calling
+        B b;
+        b.fun();
+        // fun through a pointer to base object: virtual function calling
+        pb = &b;
+        pb->fun();
+        pb = &d;
+        pb->fun();
+        
+
     }
     {
-        string student_attendance = "OLLAOOOLLO";
+        // Driver program to test methods of graph class
+        Graph g(5); // Total 5 vertices in graph
+        g.addEdge(1, 0);
+        g.addEdge(0, 2);
+        g.addEdge(2, 1);
+        g.addEdge(0, 3);
+        g.addEdge(1, 4);
+
+        cout << "Following is Depth First Traversal\n";
+        g.DFS(0);
+
+    }
+
+    {
+        map<string, int> word_count;
+        map<string, int>::iterator map_it = word_count.begin();
+        // *map_it is a reference to a pair<const string, int> object
+        cout << map_it->first; // prints the key for this element
+        cout << " " << map_it->second; // prints the value of the element
+        //map_it->first = "new key"; // error: key is const
+        ++map_it->second; // ok: we can change value through an iterator
+    }
+    {
+        multimap<string, string> authors { {"Taher","Benisa"}, {"Taher","Isa"} };;
+        // author we'll look for
+        string search_item("Taher");
+        
+        // how many entries are there for this author
+        typedef multimap<string, string>::size_type sz_type;
+        sz_type entries = authors.count( search_item );
+        multimap<string, string>::iterator itr = authors.begin();
+        
+        
+        // get iterator to the first entry for this author
+        multimap<string,string>::iterator iter = authors.find(search_item);
+        
+        // loop through the number of entries there are for this author
+        for( sz_type cnt = 0; cnt != entries; ++cnt, ++iter ) {
+            cout << iter->second << endl; // print each title
+        }
+    }
+    {
+
+      cout << endl;
+
+      cout << "C++ map: " << endl;
+      map<string,int> m { {"Dijkstra",1972}, {"Scott",1976} };
+      m["Ritchie"] = 1983;
+      cout << "    m[Ritchie]: " <<  m["Ritchie"] << "\n    ";
+      for(auto p : m) cout << '{' << p.first << ',' << p.second << '}';
+      m.erase("Scott");
+      cout << "\n    ";
+      for(auto p : m) cout << '{' << p.first << ',' << p.second << '}';
+      m.clear();
+      cout << endl;
+      cout << "    m.size(): " << m.size() << endl;
+
+        cout << std::endl;
+
+      cout << "C++11 unordered_map: " << endl;
+      unordered_map<string,int> um { {"Dijkstra",1972},{"Scott",1976} };
+        um["Ritchie"] = 1983;
+        um["Ritchie"] = 1988;
+      cout << "    um[Ritchie]: " <<  um["Ritchie"] << "\n    ";
+      for(auto p : um) cout << '{' << p.first << ',' << p.second << '}';
+      um.erase("Scott");
+      cout << "\n    ";
+      for(auto p : um) cout << '{' << p.first << ',' << p.second << '}';
+      um.clear();
+      cout << endl;
+      cout << "    um.size(): " << um.size() << std::endl;
+
+        unordered_map<int,int> um1 { {1,1979},{1,1970} };
+        for(auto p : um1) cout << '{' << p.first << ',' << p.second << '}';
+
+      cout << endl;
+
+    }
+    {
+        std::map<int,int> keyValueMap;
+
+        keyValueMap.insert(std::make_pair(0, 1));
+
+        auto ret = keyValueMap.insert(std::make_pair(0, 2));
+        if (!ret.second) ret.first->second = 2;
+
+        int index = keyValueMap.begin()->second;
+
+    }
+    {
+        /*Exercises Section 2.5
+        Exercise 2.24:  Which of the following definitions, if any, are invalid? Why? How would you correct them?*/
+        int ival = 1.01;        //  (a) Implicit conversion from 'double' to 'int' changes value from 1.01 to 1
+     // int &rval1 = 1.01;      //  (b) Non-const lvalue reference to type 'int' cannot bind to a temporary of type 'double'
+        int &rval2 = ival;      //  (c)
+        const int& rval3 = 1;   //  (d)
+        
+        /*Exercise 2.25: Given the preceeding definitions, which, if any, of the following
+        assignments are invalid? If they are valid, explain what they do. */
+        rval2 = 3.14159;        //  (a) Implicit conversion from 'double' to 'int' changes value from 3.14159 to 3
+        rval2 = rval3;          //  (b)
+        ival  = rval3;          //  (c)
+     // rval3 = ival;           //  (d) Error: Cannot assign to variable 'rval3' with const-qualified type 'const int &'
+                                //      My explaination: can't reassign to reference rval3
+        
+        /*Exercise 2.26:
+        What are the differences among the definitions in (a) and the assignments in (b)? Which, if any, are illegal?*/
+        int ival1 = 0, &ri = ival1;
+        ival1 = ri;             // (a)
+        const int &ric = 0;     // (b)
+        ri = ival1;             // (c)
+        
+        /*Exercise 2.27:
+        What does the following code print?*/
+        int i, &ri1 = i;
+        i = 5; ri1 = 10;
+        cout << i << " " << ri1 << std::endl;
+    }
+    {
+        int n = 12;
+        cout << bitManipulation.Equal_Sum_and_XOR( n ) << endl;
+    }
+    {
+
+        int n = 11;
+        cout << bitManipulation.evenbittogglenumber(n);
+    }
+{
+    int x = 10, y = 11;
+    int r = GetMax <int> (x,y);
+    
+    /*  OR: In this specific case where the generic type T is used as a parameter for GetMax the compiler can find out
+        automatically which data type has to instantiate without having to explicitly specify it within angle brackets (like we
+        have done before specifying <int> and <long>). So we could have written instead:
+        int i,j;   */
+    r = GetMax( x, y);
+    
+    vector<char> letters = {'a', 'b', 'c'};
+    printVectorTemplate( letters );
+    vector<int> numbers = {'a', 'b', 'c'};
+    printVectorTemplate( numbers ); // prints [ 97, 98 ,99]
+}
+{
+    //const int seven_segments_display[10][7] = {1,1,1,1,1,1,0}; //......
+    
+    enum class eyecolor:char{
+        blue,green,brown
+    } eye;
+}
+
+{
+    int p = 5;
+    printf("\np before = %d, recurse result = %d, p after = %d\n", p, rec.recurse(p, p), p);
+}
+{
+    vector<vector<int>> grid =  { {1,   2,  3,  4},
+                                  {5,   6,  7,  8},
+                                  {9,  10, 11, 12},
+                                  {13, 14, 15, 16}
+                                };
+    rec.DFS( grid );
+}
+    {
+        const int size = 5;
+        int array[size] = {0, 1, 1, 0, 1};
+        cout << "\nFind largest number in: {";
+        for( int i=0; i < size; ++i )
+            cout << array[i] << " ";
+        cout << "}";
+        int max = rec.largestNumber_Recursive2( array, 0, size-1 );
+        cout << "\nMax number = " << max << endl;
+        
+        vector<int> varray = {0, 1, 1, 0, 1};
+        cout << "\nFind largest number in: ";
+        printVector( varray );
+        max = rec.largestNumber_Recursive3( varray );
+        cout << "Max number = " << max;
+    }
+    {
+        int* p = (int [] ){1, 2, 3};    // Warning: Temporary whose address is used as value of local variable 'p'                                            // will be destroyed at the end of the full-expression
+        cout << endl <<  p[2] << endl;
+    }
+    {
+    }
+{
+    int total_steps = 4;
+    cout << "\n\n1) Possible ways a child can run up the stairs, recursively, is ";
+    cout << combinations.countWays_recursively( total_steps );
+
+    cout << "\n\n2) Possible ways a child can run up the stairs is ";
+    cout << combinations.countWays_iteratively( total_steps );
+    
+    cout << "\n\n3) Possible ways a child can run up the stairs is ";
+    cout << combinations.countWays_recursively_memoization( total_steps );
+}
+{
+    unsigned int number = 12345;
+    //function calling
+    commonStuff.extractDigits( number );
+}
+    {
+        // {1, 0, 0, 0, 1} = 2; { 1, 0, 0, 1, 0, 0, 0, 1 } = 2; { 1, 0, 0, 1, 0, 0, 0, 1, 0 } = 2;
+        //                  {1,0,0,1,0,0,0,1,1,1,0,0,0,0,0,0,1,0,0,0,0,0}
+        vector<int> seats = {1,0,1,1,0,0,0,1,1,1,0,0,1,1,1,0};
+        int result = maxDist_toClosestPerson( seats );
+        printVector( cout << "\n1) Given Bench:", seats ); cout << "   Maximum distance for nearest person: " << result << endl;
+
+        result = maxDist_toClosestPerson_2( seats );
+        printVector( cout << "\n2) Given Bench:", seats ); cout << "   Maximum distance for nearest person: " << result << endl;
+    }
+    {
+        string student_attendance = "OLLOAOLLO";
         cout << "\nIs Student Attendance Record \"" << student_attendance << "\" OK? ";
-        bool result = checkattendanceRecords( student_attendance );
+        bool result = checkAttendance( student_attendance );
     }
     {
         int number = 391;   // 324-->299   4321-->3999     7384-->6999     12345-->12345
@@ -158,43 +491,29 @@ int main(int argc,  char * argv[]) {
         bool result = isDivisible_byItsDigits( number );
         cout << "\n\nIs " << number << " Divisible by its Digits? " << (result? "YES" : "NO");
     }
-    {
-        int a = 1, b = 10;
-        int c = MAX (a++, b++); /* Trouble! */
-        cout << "MAX macro:" << c << endl;
+{
+    // tuple
+     tuple<int,char> foo (10,'x');
+     auto bar = make_tuple ("test", 3.1, 14, 'y');
 
-        a = 1; b = 10;
-        c = MAX_FUN (a++, b++); /* No problem! */
-        cout << "MAX function: " << c << endl;
-        
-        a = 1; b = 10;
-        c = MAX_TMPL(a, b);
-        c = MAX_TMPL<int> (a++, b++); /* No problem! */
-        cout << "MAX function: " << c << endl;
-    }
-    {
-        // tuple
-         tuple<int,char> foo (10,'x');
-         auto bar = make_tuple ("test", 3.1, 14, 'y');
+     get<2>(bar) = 100;                                 // access element
 
-         get<2>(bar) = 100;                                 // access element
+     int myint; char mychar;
 
-         int myint; char mychar;
+     tie (myint, mychar) = foo;                         // unpack elements
+     tie (ignore, ignore, myint, mychar) = bar;         // unpack (with ignore)
 
-         tie (myint, mychar) = foo;                         // unpack elements
-         tie (ignore, ignore, myint, mychar) = bar;         // unpack (with ignore)
+     mychar = get<3>(bar);
 
-         mychar = get<3>(bar);
+     get<0>(foo) = get<2>(bar);
+     get<1>(foo) = mychar;
 
-         get<0>(foo) = get<2>(bar);
-         get<1>(foo) = mychar;
-
-         cout << "foo contains: ";
-         cout << get<0>(foo) << ' ';
-         cout << get<1>(foo) << '\n';
-    }
-
-
+     cout << "foo contains: ";
+     cout << get<0>(foo) << ' ';
+     cout << get<1>(foo) << '\n';
+}
+    
+// !!!: //////////////  Assigin Vectors     ////////////////////////
 {
     vector<int> vector1 = {1, 2, 3};
     vector<int> vector2 = {4, 5, 6, 7};
@@ -205,60 +524,76 @@ int main(int argc,  char * argv[]) {
     
     printVector(cout << "After assigning B to A: ", vector1);
 }
+    
+// !!!: //////////////  Nondecreasing Array     ////////////////////////
 {
     //vector<int> array = {10, 5, 2};      // False
-    vector<int> array = {10, 5, 10};      // True
-    // vector<int> array = {4, 5, 2, 1, 7};       // False
+    //vector<int> array = {4, 5, 1, 7};      // True
+    //vector<int> array = {1,0,1,0};       // False
     //vector<int> array = {6, 5, 2, 1};       // False
     //vector<int> array = {6, 5, 7, 1};       // False
     //vector<int> array = {4, 5, 7, 1};       // True
-    //vector<int> array = {6,5,8,   10, 5, 2};       // False
+    vector<int> array = {5,3,4,4,7,3,6,11,8,5,11};       // False
     //vector<int> array = {10, 5, 2,      6,5,8};       // False
-
-    
     //vector<int> array = {4, 5, 1, 7};     // True: Change 1 to 6 or 5 or 7
-    //vector<int> array = {1, 2, 1, 5};     // True: Change 2 to 1
+    //vector<int> array = {1, 2, 1, 5};     // True: Change 2 to 1, or 1 to 2 or 1 to 3
     //vector<int> array = {1, 1, 1, 1};       // True: No Change required
-
-    printVector(cout << "\n1) Can you Make Array NonDecreasing by Modifing the Maximum of ONE Element: ", array);
-    
-    bool result1 = Convert_to_Nondecreasing_Array_with_one_change_1(array);
-    cout << "   result = " << ((result1 == true)? "true" : "false") << endl;
-    
-    
-    printVector(cout << "\n2) Can you Make Array NonDecreasing by Modifing the Maximum of ONE Element: ", array);
-    int result2 = Convert_to_Nondecreasing_Array_with_one_change_2(array);
-    cout << "   result = " << ((result2 == true)? "true" : "false") << endl;
-
     //vector<int> array1 = {5, 3, 4, 4, 7, 3, 6, 11, 8, 5, 11};
-    vector<int> array1 =  {10,1,2,3,4,5,6,1,2,3}; //{5,7,11,11,9};   {4,5,7,7,13};
+    //vector<int> array1 =  {4, 5, 2, 1, 7}; //{5,7,11,11,9};   {4,5,7,7,13};
+
+    printVector(cout << "\n1) Can you Make Array NonDecreasing by Modifing at most ONE Element: ", array);
+    
+    bool result = Convert_toNondecreasing_Array_1change_1(array);
+    cout << "   result = " << ((result == true)? "true" : "false") << endl;
+    
+    
+    printVector(cout << "\n2) Can you Make Array NonDecreasing by Modifing at most ONE Element: ", array);
+    result = Convert_to_Nondecreasing_Array_with_one_change_2(array);
+    cout << "   result = " << ((result == true)? "true" : "false") << endl;
+
+    printVector(cout << "\n3) Can you Make Array NonDecreasing by Modifing at most ONE Element: ", array);
+    result = Convert_to_Nondecreasing_Array_with_one_change_3(array);
+    cout << "   result = " << ((result == true)? "true" : "false") << endl;
+
+    printVector(cout << "\nTotal Steps to Make NonDecreasing Array: ", array);
+    result = totalSteps_toMake_NonDecreasing_Array( array );
+    cout << "   result = " << result << ":\t"; printVector(array);
+    
+    vector<int> array1 = {5,3,4,4,7,3,6,11,8,5,11};       // False
     printVector(cout << "\nTotal Steps to Make NonDecreasing Array: ", array1);
-    int result3 = totalSteps_to_Make_NonDecreasing_Array_2( array1 );
-    cout << "result: " << result3 << endl;
-    printVector(array1);
-    /*for( int i=0; i <= totalSteps; i++) {
-        cout << array1[i] << " ";
-    }*/
-
-}
-{
-    //foo(argv);  // No matching function for call to 'foo'
+    result = totalSteps_toMake_nonDecreasing_Array2( array1 );
+    cout << "   result = " << result << ":\t"; printVector(array1);
 }
 
+// !!!: ////////////////////////     Most Common Word     ////////////////////////////
 {
-    string paragraph = "ONE two three .four ONE.    ,three    ";
-    vector<string> banned_words = {"", ""};
-    //vector<string> banned = {"ONE", "three"};
-    //vector<string> banned = {"one", "TWO"};
-    //vector<string> banned = {"ONE", "TWO"};
-    cout << "\n\nMost CommonWord in \"" << paragraph << "\"" << " \nExecluding \"";
+    string paragraph = "one two three. hi one two";
+    //vector<string> banned_words = {"", ""};
+    vector<string> banned_words = {" ", " "};
+    //vector<string> banned_words = {"one", "TWO"};
+    //vector<string> banned_words = {"ONE", "TWO"};
+    cout << "\nMost CommonWord in \"" << paragraph << "\"" << ", Execluding \"";
     for( string word: banned_words) {
         cout << word << " ";
     } cout << "\" \n";
     
-    string result = mostCommonWord(paragraph, banned_words);
+    string result = mostCommon_unbannedWord( paragraph, banned_words );
     cout << "result = \"" << result << "\" \n";
+    
+    // given set of keys
+    vector<string> words =
+           { "geeks", "for", "geeks", "a", "learn", "be", "computer", "taher",
+             "science", "taher", "fire", "taher", "taher", "data", "geeks" };
+    cout << "\nMost CommonWord from Geeks:\n";
+    for( string word: words ) cout << word << " ";       cout << "\" \n";
+
+    mostCommonWord_geeks( words );
+    
+    cout << "\nMost CommonWord from Taher:\n";
+    mostCommonWord_mySol( words );
 }
+
+// !!!: ////////////////////////     Least Common Number     ////////////////////////////
 {
     vector<int> v1 = {6, 7, 10, 25, 30, 63, 64};
     vector<int> v2 = {1, 4, 5, 6, 7, 8, 50};
@@ -280,31 +615,130 @@ int main(int argc,  char * argv[]) {
     printVector(result);
 }
 
+// !!!: ///////////////////      Bits and Pieces     ///////////////////
+// !!!: ///////////////////      Swap 2 Bits         ///////////////////
+{
+    unsigned char data = 0b10100000;
+    unsigned char bit1 = 7, bit2 = 0;
+    cout << "\n\nSwap bits " << bit1 << " and " << bit2 << "       = " << bitset<8>(data) << endl;
+    unsigned char result = bitManipulation.swap2Bits(data, bit1, bit2);
+    cout << "After swapping the bits = " << hex << bitset<8>(result)  << endl << endl;
+    //cout << "After swapping the bits = " << hex << (unsigned)result << endl << endl;
+
+    cout << "My Swap bits " << bit1 << " and " << bit2 << "    = " << bitset<8>(data) << endl;
+    unsigned char result1 = bitManipulation.swap2BitsMySolution(data, bit1, bit2);
+    cout << "After swapping the bits = " << hex << bitset<8>(result1);
+    //cout << "After swapping the bits, data value is: " << hex << (unsigned)result1 << endl;
+}
+    
+// !!!: ///////////////////      Swap Nibbles in a Byte    ///////////////////
+{
+    unsigned char byte = 0xEF;
+    cout << "\n\nSwap Nibbles in Byte = 0x" << hex << static_cast<unsigned int>(byte);
+    unsigned char newbyte = bitManipulation.Swap_Nibbles_In_Byte(byte);
+    cout << "\nSwapped Nibbles      = 0x" << (unsigned int)newbyte << endl;
+}
+{
+    unsigned char c = 0xBA;
+    cout << "\n\t\t\t\t    c = " << hex << (unsigned int)(c) << endl;
+    // return value promoted from 'unsigned char' to 'int'
+    int result = bitManipulation.Swap_Nibbles_In_Byte(c);
+    cout << "Swap Nibbles in Bytes = " << result << endl;
+}
+{
+    unsigned int n = 0xABCDEF;
+    cout << "\n\t\t\t\t\t  n = " << n << endl;
+    unsigned int result = bitManipulation.Swap_Nibbles_In_Integer(n);
+    cout << "Swapped nibbles in word = " << result << endl;
+}
+{
+    byte b = byte(0b1110111);
+    cout << "\nSwap Even and Odd Bits in a Byte: " << bitset<8>(int(b)) << endl;
+    byte result = bitManipulation.Swap_EvenOdd_Bits_Byte(b);
+   // cout << int(result) << endl;
+    cout << "                          result: " << bitset<8>(int(result))  << endl;
+}
+{
+    unsigned int number = 0b111001;
+    cout << "\nn                        = " << bitset<8>(number) << endl;
+    unsigned int result1 = bitManipulation.Swap_EvenOdd_Bits_Integer(number);
+    cout << "Swaped Even and Odd Bits = " << bitset<8>(result1)  << endl << endl;
+}
+{
+    unsigned int number = 0b111001;
+    cout << "\nn                       = " << bitset<8>(number) << endl;
+    unsigned int result2 = bitManipulation.Swap_2Bits_Nibble(number);
+    cout << "Swaped 2 Bits of Nibble = " << bitset<8>(result2)  << endl << endl;
+}
+{
+    unsigned int number = 0x12ABCDEF;
+    cout << hex << "number = " << number << endl;
+    unsigned int result3 = bitManipulation.Swap_Bytes_In_Integer(number);
+    cout << "Swaped Bytes of Integer = " << result3 << endl;
+}
+{
+    unsigned int number = 0x12ABCDEF;
+    unsigned int result4 = bitManipulation.Swap_Halfword_In_Integer(number);
+    cout << "Swaped Half-Word of Integer = " << result4 << endl;
+}
+{
+    unsigned int integer = 0b00101111;
+    int fromPos          = 1;
+    int toPos            = 5;
+    int range            = 3;
+    cout << "Given a number = " << bitset<8>(integer) << ", Swap " << range << " bits from " << fromPos << " to " << toPos << endl;
+    int res = bitManipulation.SwapRangeOfBits(integer, fromPos, toPos, range);
+    cout << "        Result = " << bitset<8>(res) << endl;
+}
+{
+    int number = 0b10001;
+    bitset<32> x(number);
+    // all are legal and set bit0
+    x[0] = 1;       // ok
+    x[0] = 2;       // ok
+    x[0] = true;    // ok
+
+    cout << "\nDoes number (" << bitset<16>(number) << ") contain 2 or more consecutive 1s: ";
+    int result = bitManipulation.inspect_bits(number);
+    cout << (result? "\nYes" : "\nNo");
+}
+{
+    char character = 'A';
+    int lower_upper = bitManipulation.is_char_lower_or_upper( character );
+    cout << "\nIs '" << character << "' Lower or Upper?" << (lower_upper == 0? " Lower" : " Upper");
+}
+
+// !!!:  /////////////////     Equal Length Of Zeros Ones     ////////////////
+{
+    vector<int> nums = { 1, 1, 1, 0, 0, 0, 1, 1};
+    printVector(cout << "\n\nFind Equal Length Of Zeros and Ones: ", nums);
+    int result = bitManipulation.EqualLengths_of_Zeros_Ones_1(nums);
+    cout << "1) result = " << result << endl;
+    
+    result = bitManipulation.findEqualLengths_of_Zeros_Ones_2(nums);
+    cout << "2) result = " << result << endl;
+}
+{
+    short x = 5, y = 11;
+    long result = bitManipulation.multiplyWithShift(x, y);
+    cout << "Multiple by Shifting = " << result << endl;
+}
+
 // !!!: ////////////////////////     Compute Sign of Integer     ////////////////////////////
 {
     int number = -3;
-    int sign = Compute_Sign_of_Integer_1(number);
+    int sign = bitManipulation.Compute_Sign_of_Integer_1(number);
     cout << "\n1) Sign of Integer " << number << " is " << (sign? "Positive" : "Negative");
 
-    sign = Compute_Sign_of_Integer_2(number);
+    sign = bitManipulation.Compute_Sign_of_Integer_2(number);
     cout << "\n2) Sign of Integer " << number << " is " << (sign? "Negative" : "Positive") << endl;
 }
 
 // !!!: ////////////////////////      Check Opposite Sign      ////////////////////////////
 {
     int a = 0, b = 0;;
-    int sign = CheckOppositeSign(a, b); // check signs of a & b
+    int sign = bitManipulation.CheckOppositeSign(a, b); // check signs of a & b
     cout << "\nDo Integers " << a << " and " << b << " have the same sign? " << (sign? "No" : "Yes");
-}
-
-// !!!: ////////////////////////      Move Zeros to Left      ////////////////////////////
-{
-    vector<int> a = {1, 10, 20, 0, 59, 63, 0, 88, 0};
-    printVector(cout << "Original Array: ", a);
-      
-    move_zeros_to_left(a);
-      
-    printVector(cout << "After Moving Zeroes to Left: ", a);
 }
 
 // !!!: ////////////////////////      Ones Left Zeros Right      ////////////////////////////
@@ -325,12 +759,405 @@ int main(int argc,  char * argv[]) {
         cout << zerosones[i];
     //cout << "a[" << i << "] = " << array[i] << endl;
     
-    OnesLeftZerosRight(zerosones, arraySize);
+    bitManipulation.OnesLeftZerosRight(zerosones, arraySize);
     
     cout << endl << "\t";
     for(int i=0; i < arraySize; i++)
         cout << zerosones[i];
     
+}
+
+// !!!: /////////////////         Count Odds and Even Bits      ////////////////////////
+{
+    int number = 1103;
+    int odd_even = bitManipulation.is_number_odd_or_even(number);
+    cout << "\nIs " << number << " Odd or Even?" << (odd_even == 0? " Even" : " Odd");
+}
+{
+    unsigned int integer = 0b101;    // 0b10101010101010101010101010101010
+    //cout << "\nn                     = " << bitset<8>(number) << endl;
+
+    bool result = bitManipulation.Does_Interger_Have_Alternating_Bits_1(integer);
+    cout << "\nDoes number = " << bitset<8>(integer) << " Have Alternating Bits (1) = " << (result?"yes":"no")  << endl;
+
+    bool result1 = bitManipulation.Does_Interger_Have_Alternating_Bits_2(integer);
+    cout << "Does number = " << bitset<8>(integer) << " Have Alternating Bits (2) = " << (result1?"yes":"no")  << endl;
+}
+{
+    int number = 50;
+    cout << dec << "\n1) Generate Number Having Alt Bit Pattern My implementation: \n" << "   Number = " << number << ", Result: " << endl;
+    vector<int> result = bitManipulation.generateAlternateBits1(number);
+    for(int i : result) { cout << "\t\t\t\t\t\t" << i << "  = "; print_DecimalToBinary(i); cout << endl; }
+
+    cout << "\n2) Generate Number Having Alt Bit Pattern: \n" << "   Number = " << number << ", Result: ";
+    bitManipulation.generateAlternateBits2(number);
+    for(int i : result) {
+        cout << "\n\t\t\t\t\t\t" << i << "  = " << DecimalToBinary_mine(i);
+}
+{
+    int n = 0b01101101;
+    int result = bitManipulation.CountSetBits(n);
+    cout << "\nSetBits(" << bitset<32>(n) << ") = " << bitset<32>(result) << endl;
+}
+{
+    unsigned int number = 0b0111111110000;
+    int frombit = 7;
+    int tobit   = 7;
+
+    cout << "\nGetBits() Mine: mask from bits = "<< frombit << " to " << tobit << endl;
+    cout << " number  = " << DecimalToBinary_mine(number) << endl;
+    unsigned int r1 = bitManipulation.getBits1(number, frombit, tobit);
+    cout << " result = " <<  DecimalToBinary_mine(r1) << endl;
+    
+    cout << "\nGetBits() Ritchi: needs work" << endl;
+    unsigned int r = bitManipulation.getBits2(number, frombit, tobit);
+    cout << " result = " <<  DecimalToBinary_mine(r) << endl;
+}
+
+// !!!:  /////////////////     Set Odd and Even Bits     ////////////////
+{
+    unsigned int number = 0b00001010;    // Try 0b01010101, ob11
+    cout << "\nSet EVEN Bits: n = " << bitset<32>(number);
+    int res  = bitManipulation.setEvenBits_mine(number);
+    cout << "\n       My result = " << bitset<32>(res);
+    
+    cout << "\n\nSet ODD Bits:  n = " << bitset<32>(number);
+    res = bitManipulation. SetOddBits_mine(number);
+    cout << "\n       My result = " << bitset<32>(res);
+    res  = bitManipulation.SetOddBits_geek(number);
+    cout << "\n     Geek result = " << bitset<32>(res);
+
+    cout << "\n\nOdd & Even        = " << (bitset<32>(bitManipulation.SetOddBits_mine(number)) & bitset<32>(bitManipulation.setEvenBits_mine(number)) ) << endl;
+}
+
+// !!!: ////////////////////////   Square Wave Pattern   //////////////////////////////
+//
+{
+    string str = "0101010";   // 1001010001, 3
+    cout << "\n\nDrawing the pattern " << str << "\n\t\t\t\t\t";
+    bitManipulation.DrawPattern( str );
+    
+    int result = bitManipulation.CountNegativePulses( str );
+    cout << "\n\tNegative Pulses = " << result;
+
+    result = bitManipulation.CountPositivePulses( str );
+    cout << "\n\tPositive Pulses = " << result;
+
+    vector<int> edges = bitManipulation.PulsesEdges( str );
+    cout << "\n\tNegative Edges  = " << edges[0] << "\n\tPositive Edges  = " << edges[1] << endl;
+}
+
+// !!!: ////////////////  Longest Substring Of 1s After Removing One Element (0)  ////////////////
+{
+    // 110111000111111100 = 7 // 11110111111 = 10 // 1111000111111 = 6 (tricky)
+    // [1,1,1] = 2             // [1,1,0,1] = 3    // [0,1,1,1,0,1,1,0,1] = 5 //  [1,1,0,0,1,1,1,0,1] = 4
+    // [0,0,0] = 0
+    string str = "110011101"; // "11101101"; 1101 = 3, 110011101 = 4, 011101101 = 5
+    cout << "\n\n1) Longest Substring of 1's After Removing 1 Element in string = \"" << str << "\":" << endl;
+    int max_bit_count = bitManipulation.longestSubstringOf1s_afterRemoving_1bit_1(str);
+    cout << dec << "     my result = " << max_bit_count;
+
+    cout << "\n2) Longest Substring of 1's After Removing 1 Element in string = \"" << str << "\":" << endl;
+    max_bit_count = bitManipulation.longestSubstringOf1s_afterRemoving_1bit_2(str);
+    cout << dec << "     my result = " << max_bit_count << endl;
+
+// !!!: ////////////////  Longest Subsequence Of 1s After Flipping 0 to 1   ////////////////
+    // needs serious work
+    int integer = 0b11111;//0xFFFFFFFF ;
+    cout << "\n1) Longest Subsequence Of 1s After Flipping 1 Element in integer = " << integer << ":\n     my result = " << bitset<32>(integer);
+    // makes use of longestSubstringOf1s_AfterRemoving1Element( str ) above
+    max_bit_count = bitManipulation.longestSubsequenceOf1s_afterFlipping_1bit( integer );
+    cout<< " = " << max_bit_count;
+
+    // from Cracking the Interview Code. !!!: does not work with 2 or more consicutavie 0s
+    cout << "\n2) Flip a Bit to Win, from wiki:\n     wiki result = " << bitset<32>(integer);
+    max_bit_count = bitManipulation.flipBit_to_Win( integer );
+    cout<< " = " << max_bit_count;
+}
+    
+// !!!: /////////////////////////      Clear Bits From MSB To ithBit    ////////////////////
+{
+    unsigned char byte = 0b10011101;
+    int pos = 4;
+    cout << "\nClear Bits From MSB to ith-bit " << pos <<" for number = " << bitset<8>(byte) << endl;
+    unsigned char result = bitManipulation.Clear_Bits_From_MSB_To_ithBit(byte, pos);
+    cout << bitset<8>( result) << endl;
+}
+    
+// !!!: ///////////////////////////   XOR   ///////////////////////////////////////
+{
+    unsigned int number = 6;
+    cout << "Number        = " << bitset<32>(number) << endl;
+    int XORres = bitManipulation.computeXOR1(number);
+    cout << "computeXOR1() = " << bitset<32>(XORres) << endl;
+    
+    XORres = bitManipulation.computeXOR2(number);
+    cout << "computeXOR2() = " << XORres << endl << endl;
+}
+    
+// !!!: ////////////////////////////      Update Bits     //////////////////////////
+{
+    int n = 0b11110101111;
+    int m = 0b0;
+    int beginBit = 4;
+    int endBit   = 6;
+    cout << "Update Bits with Range positions: " << beginBit << ", " << endBit << endl;
+    cout << "Original bits      = " << bitset<11>(n) << endl;
+    cout << "Insert bits        = " << bitset<3>(m);
+
+    int newbits = bitManipulation.Update_Bits_1(n, m, beginBit, endBit);
+    cout << "\nUpdateBitsVersion1 = " << bitset<11>(newbits);
+
+    int newbits1 = bitManipulation.Update_Bits_2(n, m, beginBit, endBit);
+    cout << "\nUpdateBitsVersion2 = " << bitset<11>(newbits1);
+}
+    
+// !!!: /////////////////////      Divide Without Using Division Operator       ///////////////////
+{
+    int dividend = INT_MIN;     // INT_MIN = -2147483648
+    int divisor  = -1;     // INT_MIN = -INT_MIN
+    long int div1 = bitManipulation.DivideWithoutUsingDivision_1( dividend, divisor );
+    cout << "\n\n1) Divide Without Using Division " << dividend << "/" << divisor << " = " << div1;
+
+    int div2 = bitManipulation.DivideWithoutUsingDivision_2( dividend, divisor );
+    cout << "\n2) Divide Without Using Division " << dividend << "/" << divisor << " = " << div2;
+}
+
+// !!!: ////////////////////////      Big Indian Little Indian       ////////////////////////////
+{
+    bool big_little_indian = bitManipulation.BigIndianLittleIndian();
+    cout << "\nIs System LITTLE_INDIAN or BIG_INDIAN? \nresult: " << ((big_little_indian)? "LITTLE_INDIAN" : "BIG_INDIAN") << endl;
+}
+
+// !!!: ////////////////////////      Change End Ianness       ////////////////////////////
+{
+    uint32_t u32CheckData  = 0x11223344;
+    uint32_t u32ResultData =0;
+    u32ResultData = bitManipulation.ChangeEndianness_1(u32CheckData);  //swap the data
+    printf("\nOriginal Integer = 0x%x\n",u32ResultData);
+    u32CheckData = u32ResultData;
+    u32ResultData = bitManipulation.ChangeEndianness_1(u32CheckData);//again swap the data
+    printf("1) Afetr Changing Endianness = 0x%x\n",u32ResultData);
+    
+    u32ResultData = bitManipulation.ChangeEndianness_2(u32CheckData);//again swap the data
+    printf("2) Afetr Changing Endianness = 0x%x\n",u32ResultData);
+}
+    
+// !!!: ////////////////////////      Reverse Bits       ////////////////////////////
+{
+    //unsigned int bits = 0x1;
+    //unsigned int bits = 0b00000000000000000000000000000001;
+    unsigned int bits = 0b00000001000000001111111111111111;
+    //unsigned int bits = 0b11110000000011110000111111110000;
+    cout << "ReverseBits1(): Before reversing " << bitset<32>(bits) << endl;
+    unsigned int revbits = bitManipulation.ReverseBits1(bits);
+    cout << "ReverseBits1(): After reversing  " << bitset<32>(revbits) << endl << endl;
+
+    cout << "ReverseBits2(): Before reversing " << bitset<32>(bits) << endl;
+    bitManipulation.ReverseBits2(bits);
+    cout << "ReverseBits2(): After reversing  "  << bitset<32>(bits) << endl << endl;
+
+    cout << "ReverseBits3(): Before reversing " << bitset<32>(bits) << endl;
+    unsigned int result = bitManipulation.ReverseBits3(bits);
+    cout << "ReverseBits3(): Before reversing " << bitset<32>(result) << dec ;
+}
+
+// !!!: ////////////////////////      Rotate Bits Left       ////////////////////////////
+{
+    //int bits = 0b11111111000000000000000000000000;
+    int bits = 0xFF00FF;
+    int no_of_left_rotations = 15;
+    
+    cout << "\n\nRotate Bits    \"" << bitset<32>(bits) << "\" Left by " << no_of_left_rotations;
+    int result = bitManipulation.RotateBitsLeft_1(bits, no_of_left_rotations);
+    cout << "\n1) Rotated Bits " << bitset<32>(result);
+
+    bitManipulation.RotateBitsLeft_2(bits, no_of_left_rotations);
+    cout << "\n2) Rotated Bits " << bitset<32>(result);
+
+    unsigned int ubits = 0xFF0000FF;
+    bitManipulation.rotateBitsLeft_3(ubits, no_of_left_rotations);
+    cout << "\n3) Rotated Bits " << bitset<32>(result);
+}
+{
+    int x = 5;
+    int y = 7;
+    cout << "Before SwapNumbers(): " << x << " and " << y <<endl;
+    bitManipulation.SwapNumbers_NotUsingtemp(x, y);
+    cout << "After SwapNumbers(): " << x << " and " << y <<endl<< endl;
+}
+// !!!: /////////////////         Count Trailing ZEROS       ////////////////////////
+{
+    int number = 0b00000010;
+    int count = bitManipulation.trailingZeros_1( number );
+    cout << "\nTrailing ZEROS for Number " << bitset<8> (number) << ", is " << count;
+    
+    count = bitManipulation.trailingZeros_2( number );
+    cout << "\nTrailing ZEROS for Number " << bitset<8> (number) << ", is " << count;
+}
+
+{
+    int number = 2, _power = 3;
+    int result1 = power.power_recursive1( number, _power );
+    cout << "\n1) Raise " << number << " to the power of " << _power << " = " << result1 << endl;
+    
+    int result2 = power.power_Iterative( number, _power );
+    cout << "2) Raise " << number << " to the power of " << _power << " = " << result2 << endl;
+    
+    int result3 = power.Raise_Number_To_Power3( number, _power );
+    cout << "3) Raise " << number << " to the power of " << _power << " = " << dec << result3 << endl;
+}
+
+// !!!: ////////////////////////      Print Stars      ////////////////////////////
+{
+    int _stars = 4;
+    string str = "" ;
+    cout << "\nPrint 4, 3, 2, 1 stars";
+    cout << "\nVersion 1:\n";
+    stars.printStars_Recursive1( _stars );
+    
+    cout << "Version 2:\n";
+    stars.printStars_Recursive2( _stars );
+    
+    cout << "Version 3:\n";
+    stars.printStars_Recursive3( _stars );
+    cout << "Version 4:\n";
+    
+    stars.printStars_Recursive4( _stars, str );
+    cout << "Version 5:\n";
+    stars.printStars_Recursive5( _stars, str);
+    
+    cout << "Version 6:\n";
+    stars.printStars_Recursive6( _stars );
+    
+    // printStars13() and printStars14() are the same
+    cout << "Version 7:\n";
+    stars.printStars_Recursive7( _stars );
+    
+    cout << "Version 8:\n";
+    stars.printStars_Recursive8( _stars, str );
+    
+    cout << "Non Recursive Version 1:\n";
+    stars.printStars_Iterative1( _stars );
+    
+    cout << "Non Recursive Version 1.1:\n";
+    stars.printStars_Iterative11( _stars );
+    
+    cout << "Non Recursive Version 2:\n";
+    stars.printStars_Iterative2( _stars );
+    
+    cout << "Non Recursive Version 3:\n";
+    stars.printStars_Iterative3( _stars );
+}
+
+
+    {
+// !!!: ///////////     Recursion Functions     ///////////
+        int n = 25;
+        cout << "\n\nRecursive Fun1 for n = " << n << endl;
+        int result = rec.increment_recursive(n);
+        cout << "Result = " << result;
+
+        cout << "\n\nNumber of hops to reach the bottom of stairs with " << n << " steps" << endl;
+        result = rec.fiveStep_Jumps(n);
+        cout << "Result = " << result;
+
+        cout << "\n\nIterative Fun2 for n = " << n << endl;
+        result = rec.which_bin_iterative( n );
+        cout << "Result = " << result << endl;
+
+        for(int n=0; n <= 25; n++) {
+            // divide n by 5: n/5
+            result = rec.which_bin_recursive_2(n); // 1-4=4, 5-24=20, 25-125=100, 125-625=500, 625-3125=2500, 3125-15625 = 12500
+            cout << "\nRecursive Fun3 for n = " << n;
+            cout << "\tResult = " << result;
+        }
+
+// !!!: ///////////     Power of 2      //////////
+        cout << endl << endl;
+        n = 3;
+        cout << "\nPower of 2 for " << n << " is: ";
+        power.printPowersOf2( n );
+
+        bool bresult = power.isPowerOf2_recursive( n );
+        cout << "\n\nIs " << n << " Power of 2 recursively? ";
+        cout << (bresult? "YES" : "NO");
+
+        bresult = power.isPowerOf2_iterative( n );
+        cout << "\nIs " << n << " Power of 2 iteratively? ";
+        cout << (bresult? "YES" : "NO");
+
+        int  a = 3, b = 3;
+        result = power.power_recursive( a, b);
+        cout << "\n\nPower Recursive for " << a << " to power " << b << " = " << result;
+
+        n = 4;
+        int m = 2;
+        int o = 3;
+        cout << "\n\nRecursive Fun4 for n = " << n << ", m = " << m << ", o = " << o << endl;
+        rec.recursiveFun4(n, m , o);
+
+        n = 15;
+        cout << "\nRecursive Fun5 for n = " << n << endl;
+        result = rec.recursiveFun5(n);
+        cout << "n = " << n << " result = "<< result << endl;
+        /*while( n < 16 ) {
+            result = recursiveFun5(n++);
+            cout << "n = " << n << " result = "<< result << endl;
+        }*/
+    }
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+{
+    bool result = commonStuff.isHappy(18);
+    cout << result;
+}
+    
+    
+// !!!: /////////////////         Logic OR AND      ////////////////////////
+{
+    bool A = true, B = true;
+    cout << "\nLogic A || B: \n";
+    bool result = logic.LogicOR(A, B);
+    cout << "Logic " << A << " || " << B << " = " << result << endl;
+
+    cout << "\nLogic A && B: \n";
+    result = logic.LogicAND(A, B);
+    cout << "Logic " << A << " && " << B << " = " << result << endl;
+}
+{
+    int digit = 10;
+    char c = digit_to_hex_char(digit);
+    cout << "\ndigit_to_hex_char(" << digit << ") = " << c;
+}
+        
+
+// !!!: ////////////////////////      Move Zeros to Left      ////////////////////////////
+{
+    vector<int> a = {1, 10, 20, 0, 59, 63, 0, 88, 0};
+    printVector(cout << "Original Array: ", a);
+      
+    move_zeros_to_left(a);
+      
+    printVector(cout << "After Moving Zeroes to Left: ", a);
 }
 
 // !!!: ////////////////////////      Rearrange Array Max_Min Alternatively      ////////////////////////////
@@ -371,16 +1198,16 @@ int main(int argc,  char * argv[]) {
 }
 
 // !!!: ///////////////////      Pivot Array     ////////////////////
-    {
-        vector<int> a = {9,12,5,10,14,3,10};
-        int pivot = 10;
-        printVector(cout << "\nOriginal Array:                   ", a);
-        vector<int> result = pivotArray_1(a, pivot);
-        printVector(cout << "1) Array Around Pivot value = " << pivot << ": ", result);
+{
+    vector<int> a = {9,12,5,10,14,3,10};
+    int pivot = 10;
+    printVector(cout << "\nOriginal Array:                   ", a);
+    vector<int> result = pivotArray_1(a, pivot);
+    printVector(cout << "1) Array Around Pivot value = " << pivot << ": ", result);
 
-        result = pivotArray_2(a, pivot);
-        printVector(cout << "2) Array Around Pivot value = " << pivot << ": ", result);
-    }
+    result = pivotArray_2(a, pivot);
+    printVector(cout << "2) Array Around Pivot value = " << pivot << ": ", result);
+}
 
 // !!!: ///////////////////      Unique Names     ////////////////////
     {
@@ -452,296 +1279,69 @@ int main(int argc,  char * argv[]) {
         cout << "\nAre The Two Arrays Equal CPP? " << (result?"YES":"NO") << endl;
     }
     {
-        isPrime(5) ? cout << " true\n" : cout << " false\n";
-    }
-    {
-        int number = 5, power = 5;
-        int result1 = Raise_Number_To_Power_Recursive(number, power);
-        cout << "Raise " << number << " to the power of " << power << " = " << result1 << endl;
-        int result2 = Raise_Number_To_Power_Iterative(number, power);
-        cout << "Raise " << number << " to the power of " << power << " = " << result2 << endl;
-        int result3 = Raise_Number_To_Power3(number, power);
-        cout << "Raise " << number << " to the power of " << power << " = " << result3 << dec << endl;
+        commonStuff.isPrime(5) ? cout << " true\n" : cout << " false\n";
     }
 
-// !!!: ////////////////////////      Print Stars      ////////////////////////////
-    {
-        int stars = 4;
-        string str = "" ;
-        cout << "\nPrint 4, 3, 2, 1 stars";
-        cout << "\nVersion 1:\n";
-        printStars_1(stars);
-        
-        cout << "Version 2:\n";
-        printStars_2(stars);
-        
-        cout << "Version 3:\n";
-        printStars_3(stars);
-        cout << "Version 4:\n";
-        
-        printStars_4(stars, str);
-        cout << "Version 5:\n";
-        printStars_5(stars, str);
-        
-        cout << "Version 6:\n";
-        printStars_6(stars);
-        
-        // printStars13() and printStars14() are the same
-        cout << "Version 7:\n";
-        printStars_7(stars);
-        
-        cout << "Version 8:\n";
-        printStars_8(stars, str);
-        
-        cout << "Non Recursive Version 1:\n";
-        printStarsNonRecursive_1(stars);
-        
-        cout << "Non Recursive Version 1.1:\n";
-        printStarsNonRecursive_11(stars);
-        
-        cout << "Non Recursive Version 2:\n";
-        printStarsNonRecursive_2(stars);
-        
-        cout << "Non Recursive Version 3:\n";
-        printStarsNonRecursive_3(stars); cout << endl;
-    }
-    {
-        char  buffer1[5] = {'a', 'b', 'c', 'd', '\0'};
-        char* buffer2 = "abcd";
-        cout << buffer1 << endl << buffer2;
-    }
-    {
-        int n = 3;
-        int result = recursiveFun1(n);
-        cout << "\nRecursive Fun1 for n = " << n;
-        cout << "\n\tResult = " << result;
-
-        result = recursiveFun2(n);
-        cout << "\nRecursive Fun2 for n = " << n;
-        cout << "\n\tResult = " << result;
-
-        result = recursiveFun3(n);
-        cout << "\nRecursive Fun3 for n = " << n;
-        cout << "\n\tResult = " << result;
-
-        int m = 2;
-        int o = 3;
-        cout << "\nRecursive Fun4 for n = " << n << ", m = " << m << ", o = " << o << endl;
-        recursiveFun4(n, m , o);
-    }
-    {
-        // Where variable stored in memory
-        int local;
-        cout << "\nstack address           = " << &local << endl;
-        
-        int* iq = new int;
-        cout << "heap: new int           = " << iq << endl;
-        int* iw = (int*) malloc(sizeof(int));
-        cout << "heap: malloc()          = " << iw << endl;
-
-        static int staicLocal;
-        cout << "global address          = " << &global << endl;
-        cout << "static local address    = " << &staicLocal << endl;
-        cout << "static global address   = " << &staticGlobal << endl;
-        
-        // intialized static and globals
-        static int staicLocalInit = 23;
-        cout << "global intialzed        = " << &globalInit << endl;
-        cout << "static local initlized  = " << &staicLocalInit << endl;
-        cout << "static global initlized = " << &staticGlobalInit << endl;
-    }
-    {
-        // !!!: Find size of struct without using sizeof(). Memeory is accessed at byte address or at boundary of WORD size address,
-        // !!!: which is 4 bytes for my system
-        // class s {short int f;} x;       // 2 bytes
-        //class s {char c1; char c2; short int short1;} x;       // 4 bytes
-        //class s {char c1; char c2; char c3; short int s;} x;       // 6 bytes
-        //      {1 byte; 4 bytes    ; 1 byte }
-        //class s {char c; short int f; char t;} x;         // 6 bytes
-        //      {                                 }
-        class s {char c; short int f; short int t;} x;    // 6 bytes
-        s* ps = &x;
-        //ps++;
-        cout << endl << ps+1 << " - " <<  ps <<  "  = " << ps+1 - ps << endl;
-        cout << "Size of struct s using pointers  = " << (char*)(ps+1) - (char*)ps  << " bytes" << endl;
-        cout << "Size of struct s using sizeof(s) = " << sizeof(s) << " byte" << endl;
-    }
-    {
-        int x = 0;
-        int a[x];   // Variable 'x' is uninitialized when used here
-        int size = (int )sizeof(a)/sizeof(a[0]);
-        cout << "\na[" << x << "] = " << a[x] << "\tsize = " << size << endl;
-    }
-    {
-        const int SIZE = 250;
-        // Make a vector and set
-        std::vector<int> v;
-        std::set<int> s;
-        // Populate the vector and set with the first SIZE integers
-        for (int i = 0; i < SIZE; i++) {
-            v.push_back(i);
-        }
-        for (int i = 0; i < SIZE; i++) {
-            s.insert(i);
-        }
-        // Make a vector that contains random numbers in the range
-        // stored within the vector and set
-        // UniformRandomGenerator gen(0, SIZE - 1);
-        int gen = rand();
-        std::vector<int> search_values;
-        for (int i = 0; i < SIZE; i++)
-        search_values.push_back(gen);
-        clock_t start_time, stop_time;
-
-        // Search each data structure for the integers 0 to 1,000,000
-        start_time = clock();
-        for (int i = 0; i < SIZE; i++) {
-            int seek = search_values[i];
-            std::find(std::begin(v), std::end(v), seek);
-        }
-        stop_time = clock();
-        std::cout << "Vector time: " << stop_time - start_time << '\n';
-        
-        start_time = clock();
-        for (int i = 0; i < SIZE; i++) {
-            int seek = search_values[i];
-            s.find(seek);
-        }
-        stop_time = clock();
-        std::cout << "Set time: " << stop_time - start_time << '\n';
-    }
-    {
-        vector<int> nums {2,2,2};
-        
-        int totalsum = 0;
-        int actualsum = 0;
-        
-        for(int num : nums) {
-            actualsum += num;
-        }
-        for(int i=1; i < nums.size(); i++) {
-            totalsum += i;
-        }
-
-        int diff = actualsum - totalsum;
-        cout << endl << "actualsum - totalsum = " << diff << endl;
-    }
-    {
-        // Function pointer
-        void (*p)(void);
-        int (*p1[100])(int, int);
-        //(int (*arr1[100])(int, int)) arr[100]; // NOT OK
-
-        //void arr2[100];   // NOT OK, array of
-        void* array[100];   // OK, array of pointers
-    }
-    {
-        struct ABC {int i;};
-        size_t size = sizeof(ABC);
-        struct ABC *ptr = (struct ABC *)0;
-        struct ABC *ptr1;
-        ptr++;ptr++;
-        // !!!:  Warning: Format specifies type 'int' but the argument has type 'struct ABC *'
-        //printf("\n\nSize of structure is: %d", ptr);
-
-        cout << endl;
-    }
-    
-// !!!: ////////////////    Removing constantnce    ///////////////////
-    {
-        const int n = 4;
-        int const &const_ref = n;
-        cout << "\nBefor Removing Constantance from 'Const Ref' to n = " << const_ref << endl;
-        //++const_ref;    // Error: Cannot assign to variable 'const_ref' with const-qualified type 'const int &'
-        int& nonconst_ref1 = const_cast<int&>(const_ref);
-        ++nonconst_ref1 ;
-        cout << "After Modiying 'Const Ref': " << "nonconst_ref1 = " << nonconst_ref1 << ", nonconst_ref = " << const_ref << ", n = " << n;
- 
-        const int const_int = n;
-        cout << "\nBefor Removing Constantance from 'Const int' to n = " << const_ref << endl;
-        // Error: Const_cast to 'int', which is not a reference, pointer-to-object, or pointer-to-data-member
-        //int nonconst_ref2 = const_cast<int>(const_int);
-    }
 
 // !!!: ////////////////////////      Find Largest Number Recursively      ////////////////////////////
     {
         const int array[] = {-5, -10, -1, -8, -9, -2};
         int left = 0;
         int right = sizeof(array)/sizeof(array[0]) - 1;
-        int result = Find_LargestNumberRecursively(array, left, right);
+        int result = rec.largestNumber_Recursive1(array, left, right);
         cout << dec << "\nLargest Number Recursive " << result << endl << endl;
-    }
-
-// !!!: ////////////////////////      Modify Array In A Function      ////////////////////////////
-    {
-        cout << "Befor Modifing Array:    ";
-        int array[] = {1,2,3};
-        for( int i=0; i<3; ++i ) {
-            cout << array[i] << ", ";
-        }
-        int* ptest = modifyArray1(array);
-        cout << "\nAfter Modifing Array[0]: ";
-        for( int i=0; i<3; ++i ) {
-            cout << array[i] << ", ";
-        }
- 
-        modifyArray2(array);
-        cout << array[0] << endl;       // Prints 3
     }
 
 // !!!: ////////////////////////      Coin Change      ////////////////////////////
     {
-        int coins[] = { 2, 5, 3, 6 };
-        int size = sizeof(coins) / sizeof(coins[0]);
-        int amount = 6;
-        cout << "\nAmount = " << amount << ", coin={2, 5, 3, 6 }" << endl;
-        int result1 = coinChangeRecursive1(coins, size, amount);
-        cout << "\n1) Recursive Coin Change = " << result1 << endl;
+        int _coins[] = { 1, 2, 3};
+        int size = sizeof( _coins ) / sizeof(_coins[0]);
+        int amount = 4;
+        cout << "\n1) Recursive Ways to Make Change for Amount = " << amount << ", coin = {1, 2, 3}" << endl;
+        int result1 = coins.Change_Recursive1( _coins, size, amount );
+        cout << "   Number of Coin Changes = " << result1 << endl;
 
-        int index = 0;
-        vector<int> vcoins = {2, 5, 3, 6};
-        int result2 = coinChangeRecursive2(vcoins, index, amount);
-        cout << "\n2) Recursive Coin Change = " << result1 << endl << endl;
+        int index{0};
+        vector<int> vcoins = {1, 2, 3};
+        cout << "\n2) Recursive Ways to Make Change for Amount = " << amount << ", coin = {1, 2, 3}" << endl;
+        int result2 = coins.Change_Recursive2( vcoins, index=0, amount );
+        cout << "   Number of Coin Changes = " << result2 << endl;
+        
+        // !!!: my solution: hope it works
+        cout << "\n3) Recursive Ways to Make Change for Amount = " << amount << ", coin = {1, 2, 3}" << endl; // {2, 5, 3, 6}
+        int result3 = coins.Change_Recursive3( vcoins, amount );
+        cout << "   Number of Coin Changes = " << result3 << endl << endl;
     }
     {
         int amount = 10;
-        vector<int> coins = {2, 5, 3, 6};
-        int numberOfCoinChanges1 = coinChangeIterative1(coins, amount);
-        cout << "Coin Changes Iterative1 = " << numberOfCoinChanges1 << " for Amount = " << amount << " and Coins: ";
-        printVector(coins);
+        vector<int> _coins = {2, 5, 3, 6};
+        int numberOfCoinChanges1 = coins.Change_Iterative1( _coins, amount );
+        cout << "3) Coin Changes Iterative1 = " << numberOfCoinChanges1 << " for Amount = " << amount << " and Coins: ";
+        printVector( _coins );
 
         int array[] = {2, 5, 3, 6};
-        int numberOfCoinChanges2 = coinChangeIterative2(array, 4, amount);
-        cout << "Coin Changes Iterative2 = " << numberOfCoinChanges2 << " for Amount = " << amount << " and Coins: ";
+        int numberOfCoinChanges2 = coins.Change_Iterative2(array, 4, amount);
+        cout << "4) Coin Changes Iterative2 = " << numberOfCoinChanges2 << " for Amount = " << amount << " and Coins: ";
         for(int i : array)
             cout << i << " ";
 
-        int numberOfCoinChanges3 = coinChangeIterative3(array, 4, amount);
-        cout << "\nCoin Changes Iterative3 = " << numberOfCoinChanges3 << " for Amount = " << amount << " and Coins: ";
+        int numberOfCoinChanges3 = coins.Change_Iterative3(array, 4, amount);
+        cout << "\n5) Coin Changes Iterative3 = " << numberOfCoinChanges3 << " for Amount = " << amount << " and Coins: ";
         for(int i : array)
             cout << i << " ";
     
-        long int myNumberOfCoinChanges = myCoinChange(coins, amount);
-        cout << myNumberOfCoinChanges << endl;
+        // !!!: Does not work. wrong answer = 8, for {2, 5, 3, 9}
+        long int myNumberOfCoinChanges = coins.myChange( _coins, amount );
+        cout << endl << myNumberOfCoinChanges << endl;
     }
     {
-        int amount = 13;
-        int coin[4] = {9, 6, 5, 1};
-        int result = minCoinRecursive(coin, 4, amount);
-        cout << result << endl;
-    }
-    {
-        int coin[] = {2,5,3,6};
-        int K = 10;
-        int result = minCoinNonRecursive(coin, 4, K);
-        cout << "minCoin() = " << result;
-    }
-    {
-        int arr[] = {3,4,5,6};
-        int size = 4;
-        int target = 7;
-        int result = Search_Binary_2(arr, size, target);
-        cout << "Binary Search = " << result << endl;
+        int _coins[4] = {2, 5, 3, 6};
+        int amount = 10;
+        int result = coins.Minimum_Recursive( _coins, 4, amount );
+        cout << "minCoin 1 Recursive= " << result << endl;
+
+        result = coins.Minimum_Iterative( _coins, 4, amount );
+        cout << "minCoin 2 Iterative = " << result;
     }
 
 // !!!: /////////////////////////       String Permutations     //////////////////////////
@@ -751,31 +1351,31 @@ int main(int argc,  char * argv[]) {
         int right = (int)str.size();
         cout << endl << "String Permutations Recursive(ABCD, 0, 3): " << endl;
         
-        printPermutation_Recursively1(str, left, right-1);
+        permutation.printPermutation_Recursively1(str, left, right-1);
         
         // not ready
         // stringPermutationMysolution(str, right);            //stringPermutationMysolution(str, 0);
         
         cout << "\nstringPermutation4() of " << str << " is: " <<endl;
-        Print_StringPermutation_Iteratively(str);
+        permutation.Print_StringPermutation_Iteratively(str);
     }
 
 // !!!: //////////////////////////       Keypad Combinations     ////////////////////////////
     {
         vector<int> phoneNumber {2,3,9};
         cout << endl << "KeypadC Combinations My Solution:   Iterative Solution " << endl;
-        Print_keypadCombinations_MySolution(phoneNumber);
+        permutation.Print_keypadCombinations_MySolution(phoneNumber);
         
         cout << endl << "Keypad Combinations Geeks Solution: Iterative Solution. Breadth First Search" << endl;
         // !!!: Breadth First Search
-        vector<string> strings = Print_keypadCombinations_GeeksSolution(phoneNumber);
+        vector<string> strings = permutation.Print_keypadCombinations_GeeksSolution(phoneNumber);
         cout << "Keypad Combinations Geeks Solution = " << strings.size() << endl;
         for(string s: strings) cout << s << endl;
         
         cout << endl << "Keypad Combinations Recursively (1): Depth First Search: " << endl;
         printVector(cout << "Phone number = ", phoneNumber);
         // !!!: Depth First Search
-        keypadCombinations_Recursively1(phoneNumber);
+        permutation.keypadCombinations_Recursively1(phoneNumber);
 
         cout << endl << "Keypad Combinations Recursively (2): Depth First Search" << endl;
         // Given mobile keypad
@@ -796,11 +1396,11 @@ int main(int argc,  char * argv[]) {
         int size = (int )phoneNumber.size();
 
         // !!!: Depth First Search
-        Print_keypadCombinations_Recursively_2(keypad, phoneNumber);
+        permutation.Print_keypadCombinations_Recursively_2(keypad, phoneNumber);
         
         cout << "\n3) Print keypad Combinations Recursively for Phone Number ";
         printVector(phoneNumber);
-        Print_keypadCombinations_Recursively_3(phoneNumber);
+        permutation.Print_keypadCombinations_Recursively_3(phoneNumber);
 
         // It works. it is just a long list, so i do not want to cluter screen
         //PrintAllCombinationsOfPhonePadLetters();
@@ -812,12 +1412,12 @@ int main(int argc,  char * argv[]) {
 
     // ///////////////////////////////////////       Rotate 1D Array     //////////////////////////////////////////
     {
-        vector<int> array = {17, 23, 13, 4, 5, -1};
+        vector<int> array = {17, 23, 13, -4, -5, -1};
         int rotations = 3;
         
         cout << endl << "(1) Rotate Array " << rotations << " right: ";
         printVector(array);
-        Rotate_Array_Right_1(array, rotations);
+        rotateArray_Right_1(array, rotations);
         printVector(::cout << "Array After " << rotations << " Rotations = ", array);
 
         // !!!: Does not work quite well
@@ -826,7 +1426,7 @@ int main(int argc,  char * argv[]) {
         cout << "Array after Rotation :"; printVector(array);*/
 
         cout << endl << "(3) Rotate Array " << rotations << " right:" << endl;
-        Rotate_Array_Right_3(array, rotations);
+        rotateArray_Right_3(array, rotations);
         cout << "    Array after Rotation: "; printVector(array);
     }
 
@@ -840,10 +1440,10 @@ int main(int argc,  char * argv[]) {
         cout << "\nBefore rotating Matrix:" << endl;
         printVectors(matrix);
         
-        Rotate_Matrix_90DegCC(matrix);
-        Rotate_Matrix_90DegCC(matrix);
-        Rotate_Matrix_90DegCC(matrix);
-        Rotate_Matrix_90DegCC(matrix);
+        rotateMatrix_90DegCW(matrix);
+        rotateMatrix_90DegCW(matrix);
+        rotateMatrix_90DegCW(matrix);
+        rotateMatrix_90DegCW(matrix);
         cout << "\nAfter rotating Matrix:" << endl;
         printVectors(matrix);
     }
@@ -866,7 +1466,7 @@ int main(int argc,  char * argv[]) {
         }
         
         cout << "After Rotating Matrix Left by " << rotateleft << ": " << endl;
-        Rotate_MatrixLeft(matrix1, ROWS, COLS, rotateleft);
+        rotateMatrix_Left(matrix1, ROWS, COLS, rotateleft);
         for (int i = 0; i < ROWS; i++)
         {
             for (int j = 0; j < COLS; j++)
@@ -880,7 +1480,7 @@ int main(int argc,  char * argv[]) {
         vector<int> sortedarray = {5,5,5,5,5,7,7,8,9,11,33,33};
         cout << "\nRemove Duplicates From Soreted Array:";
         printVector(cout << "\n Original Array: ", sortedarray);
-        int newarraysize = Remove_Duplicates_From_SoretedArray(sortedarray);
+        int newarraysize = removeDuplicates_fromSoretedArray(sortedarray);
         printVector(cout << " New array:      ", sortedarray);
     }
 
@@ -895,32 +1495,14 @@ int main(int argc,  char * argv[]) {
 // !!!:  /////////////////     Common Chars     ////////////////
     {
         vector<string> words = {"bella","label","roller"};//{"cool","lock","cook"}; //;//;
-        vector<string>  result = commonChars(words);
+        cout << endl; for( string s: words ) { cout << s << " "; }
+        vector<string>  result = commonChars_inStrings(words);
         for(string str : result) {
             cout << str << ", " ;
         }
         
     }
 
-// !!!:  /////////////////     Equal Length Of Zeros Ones     ////////////////
-    {
-        vector<int> nums = { 1, 1, 1, 0, 0, 0, 1, 1};
-        printVector(cout << "\n\nFind Equal Length Of Zeros and Ones: ", nums);
-        int result = findEqualLengths_of_Zeros_Ones_1(nums);
-        cout << "1) result = " << result << endl;
-        
-        result = findEqualLengths_of_Zeros_Ones_2(nums);
-        cout << "2) result = " << result << endl;
-    }
-    {
-        short x = 5, y = 11;
-        long result = multiplyWithShift(x, y);
-        cout << "Multiple by Shifting = " << result << endl;
-    }
-    {
-        bool result = isHappy(18);
-        cout << result;
-    }
 
 // !!!:  /////////////////     Is Array Contiguous     ////////////////
     {
@@ -954,7 +1536,7 @@ int main(int argc,  char * argv[]) {
             {1, 0, 0, 1}
         };
         
-        vector<int> result = Find_ExitPoint_In_Matrix(matrix);
+        vector<int> result = commonStuff.Find_ExitPoint_In_Matrix(matrix);
         cout << "Matrix exit point: row = " << result[0] << ", col = " << result[1] << endl;
     }
     {
@@ -963,140 +1545,268 @@ int main(int argc,  char * argv[]) {
         vector<int> result = flattenedMatrix(matrix, ROWS, COLS);
     }
     
-// !!!: //////////////////      Closest Elements    ////////////////////////
+    
+    
+    
+    
+    
+cout << "\n==========================*************===========================\n";
+    
+    
+    
+    
+    
+// !!!: //////////////////      Find Closest K Elements to Target   ////////////////////////
+
     {
+        vector<int> numbers{ -10,-1,0,2,10, 12, 15, 17, 18, 20, 25 };  //{ -15, 3, 8, 2, 1, 6 , 8, 7, -25, 18};
+        //{0,4,5,7,8,9,10}; //{0,1,1,1,10,10,10};  // {1, 2, 3, 4, 5, 6, 15, 20};
         // {0,1, 1, 1, 2, 3, 6, 7 ,8, 9}, k=4, x=-2;
         // {0,1, 1, 1, 2, 3, 6, 7 ,8, 9}, k=9, x=4
         // Speial case??? vector<int> array{0, 1, 1, 1, 2, 3, 6, 7, 8, 9}; numberOfElements = 1, target = 5;
         
-        vector<int> numbers{-3, -2, -1, 5, 1, 2, 3}; //{0,4,5,7,8,9,10}; //{0,1,1,1,10,10,10};  // {1, 2, 3, 4, 5, 6, 15, 20};
-        int numberOfElements = 4;
-        int target = 0;
-        cout <<  "\nFind Closest " << numberOfElements << " Elements to " << target << " in: ";
-        for(int i : numbers) cout << i << ", " ;
+        int k = 5;
+        int target = 6;
+        cout <<  "\nFind CLOSEST " << k << " numbers to " << target << " in: ";
+        printVector( numbers );
 
-        vector<int> result1 = findClosest_kNumbers_toTarget1(numbers, numberOfElements, target);
-        cout << "\n1) Closest Elements To Target = ";
-        for(int i : result1) cout << i << ", " ;
-        
-        vector<int> result2 = Find_ClosestElementsToTarget2(numbers, numberOfElements, target);
-        cout << "\n2) Closest Elements To Target = ";
-        for(int i : result2) cout << i << ", " ;
-        
-        // best one and correct
-        cout << "\n3) Closest Elements To Target = ";
-        vector<int> result3 = Find_ClosestElementsToTarget3(numbers, numberOfElements, target);
-        for(int i : result3) cout << i << ", " ;
-        
-        cout << "\n4) Closest Elements To Target = ";
-        vector<int> result4 = Find_ClosestElementsToTarget_4(numbers, numberOfElements, target);
-        for(int i : result4) cout << i << ", " ;
-        
-        cout << "\n\nFind a Pair Whose Sum is CLOSEST to Zero: ";
-        //vector<int> numbers1 = {0, 1, -1, 0, -1, 1, 0, 0};
-        //vector<int> numbers1 = {0, 1, -1, 0, -1, 1, 0, 0};
-        vector<int> numbers1 = {-1, -1, 0};
-        //vector<int> numbers1 = {38, -44, 39, -51, -35, -1, 0};
-        //vector<int> numbers1  = {-INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX};
-        printVector(numbers1);
+        vector<int> result1 = kClosest_toTarget_1( numbers, k, target );
+        printVector( cout << "  1) Result" << " = ", result1 );
 
-        // My function
-        vector<int> pairs = findOnePair_withSum_closestToZero(numbers1);
-        printVector(cout << "\t\t\tresult: ", pairs); cout << endl;
- 
-// !!!: //////////////////////////     Find A Pair With a Given Sum        ///////////////////////////
+        // !!!: my implementation:
+        vector<int> result2 = kClosest_toTarget_2(numbers, k, target);
+        printVector( cout << "  2) Result" << " = ", result1 );
+        
+        vector<int> result3 = kClosest_toTarget_3( numbers, k, target );
+        printVector( cout << "  3) Result" << " = ", result1 );
+        
+        vector<int> result4 =  kClosest_toTarget_4( numbers, target, k );
+        printVector( cout << "  4) Result" << " = ", result4 );   // result not sorted
+        
+        // From https://www.techiedelight.com/find-k-closest-elements-to-given-value-array/
+        // Works with SORTED array Only:
+        vector<int> result5 =  kClosest_toTarget_5( numbers, target, k );
+        printVector( cout << "  5) Result" << " = ", result5 );   // result not sorted
+
+// !!!: //////////////////      Find 1 Pair Whose Sum is CLOSEST to Zero   ////////////////////////
         {
-            vector<int> numbers = {5, 9, 0, 5, 1, -1};  // {5, 5}, sum=10
-            int sum = 10;
-            // returns indices of the numbers that add up to target sum
-            vector<int> pairs = findOnePair_withGiven_Sum(numbers, sum);
-            printVector(cout << "Find INDICES of Pair(S) With Sum EQUAL to " << sum << ": ", numbers);
-            cout << "result: ";
-            for(int i : pairs) {
-                if(i>=0)
-                    cout << numbers[i] << " at index " << i << " and ";
-                else {
-                    cout << "Sum Not Found" << endl;
-                    break;
+            cout << "\n\nFind 1 Pair whose Sum is CLOSEST to Zero: ";
+            // unsorted numbers
+            // vector<int> numbers = {1,-1,-1,2,-2};
+            // vector<int> numbers = {0, 1, -1, 0, -1, 1, 0, 0};
+            // vector<int> numbers = {-1, 0};
+            // vector<int> numbers = {38, -44, 39, -51, -35, -1, 0};
+            // vector<int> numbers  = {-INT_MAX, -INT_MAX, -INT_MAX, -INT_MAX};
+            // vector<int> numbers  = {5, 5, 8};
+            //        vector<int> numbers  = {-5, 5, 8, -8};
+            //vector<int> numbers  = {-5, 3, -8, 2, 0, 6, 8, -6};
+            printVector( numbers );
+            
+            // My function: !!!: O(n^2)
+            vector<int> pairs;
+            pairs = onePair_Closest_toZero_1( numbers );
+            cout << "  1) Result = " << pairs[0] + pairs[1] << " : ";
+            printVector( pairs );
+            
+            //cout << "\n2) Find 2 Numbers whose Sum is CLOSEST to Zero: \n";
+            // returns a vector: !!!: O(nlogn)
+            pairs = onePair_Closest_toZero_2( numbers );
+            cout << "  2) Result = " << pairs[0] + pairs[1] << " : ";
+            printVector( pairs );
+            
+            //cout << "\n3) Find 2 Numbers whose Sum is CLOSEST to Zero: \n";
+            // returns int: !!!: O(nlogn)
+            int sum  = onePair_Closest_toZero_3( numbers );
+            cout << "  3) Result = " << pairs[0] + pairs[1] << " : ";
+            printVector( pairs );
+            
+// !!!: /////////     Find 1 Pair EQUAL to a Target Sum        /////////////////////////////////////
+            {
+                // vector<int> numbers = {3, 5, 4, 2, 6, 5, 7, 4, 4, 8, 9, 0, -1};  // {5, 5}, sum=10
+                int targetSum = 10;
+                // returns INDICIES of the numbers that add up to target sum
+                vector<int> pair = onePair_Equal_targetSum( numbers, targetSum );
+                printVector(cout << "\n\nFind INDICES of 1 Pair With Sum EQUAL to " << targetSum << ": ", numbers);
+                if( pair[0] == -1 )
+                    cout << "   Target Sum '" << targetSum << "' Not Found\n";
+                else
+                    cout << "  Result: [" << numbers[pair[0]] << ", " << numbers[pair[1]] << "] = " << numbers[pair[0]] + numbers[pair[1]];
+                
+                // 2) print ALL pairs of equal sum
+                //vector<int> array = {5, 9, 0, 5, 1, -1}; // {3, 5, 4, 2, 6, 5, 7, 4, 4, 8, 9, 0, -1};
+                //sum = 8;
+                printVector(cout << "\n\nPrint ALL Pairs With Sum EQUAL to " << targetSum << ": ", numbers);
+                bool printed = print_allPairs_Equal_targetSum( numbers, targetSum );
+                if( !printed )
+                    cout << "   Target Sum '" << targetSum << "' Not Printed\n";
+            }
+            
+// !!!: /////////     Find All Pairs EQUAL to a Target Difference        /////////////////////////////////////
+            {
+                //vector<int> numbers = {1, 7, 5, 9, 1, 2, 12, 3, -1, 11, -2, 15, 5, 20, 10}; // {3,1,3}; //
+                int targetDiff = 10;
+                printVector( cout << "\n\nFind ALL Pair(S) With DIFFERENCE Equal to " << targetDiff << ": ", numbers );
+                vector<vector<int>> diff_matrix = allPairs_Equal_targetDifference( numbers, targetDiff );
+                if( diff_matrix.empty() ) {
+                    cout << "   Target Sum '" << targetDiff << "' Not Found\n";
+                }
+                else
+                printVectors( diff_matrix );
+            }
+            
+// !!!: //////////////////      3 Numbers Whose Sum is CLOSEST to Zero   ////////////////////////
+            
+            cout << "\n\nFind 3 Numbers whose Sum is CLOSEST to Zero: ";
+            //vector<int> a = {-1, 4, -2, 5, 10, -5}; // {-1, 0, 1, 2, -1, -4}
+            // cout << "\n\nMinimum Sum with Three Elements: ";
+            printVector(cout << "\n\t", numbers);
+            sum = find_3Sum_Closest_toZero( numbers );
+            cout << "\tResult = " << sum;   // << " is Minimum Sum with three elements = ";
+            
+// !!!: //////////////////      3 Numbers Whose Sum is EQUAL to Zero   ////////////////////////!!!!!!!!!
+            
+            cout << "\n\nFind 3 Numbers whose Sum is EQUAL to Zero: ";
+            // !!!: Notice result is 2D[][]
+            printVector(cout << "\n\t", numbers);
+            vector<vector<int>> equal_matrix = find_3Sum_Equal_toZero( numbers );
+            if( equal_matrix.empty() ) {
+                cout << "  None is Found \n";
+            }
+            sum = 0;
+            for( vector<int> v : equal_matrix ) {
+                for( int i : v ) {
+                    sum += i;
                 }
             }
+            cout << "\tResult = " << sum << ":";
+            printVectors(equal_matrix);
         }
-        {
-            vector<int> a = {1, 7, 5, 9, 1, 2, 12, 3, -1, 11, -2, 15, 5, 20, 10}; // {3,1,3}; //
-            int diff = 10;
-            printVector( cout << "\n\nFind Pair(S) With Difference Equal to " << diff << ": ", a);
-            vector<vector<int>> result = findPairs_withGiven_Difference(a, diff);
-            cout << "result: "; printVectors(result);
-        }
-
-// !!!: //////////////       Equilibrium Point    ///////////////
-        //vector<int> array = { 3, 2, 11, 5, 5, 4, 2, 8, 12 };
-        //vector<int> array = { 4, 3, 2, 1, 5, 1, 7, 8 };
-        //vector<int> array = { 5,5 };
-        vector<int> array = { -1, -2, 2, -4, -1, 2, -2}; // left and right of index 5 sum is 26
-
-        cout << "\n\nFind Equal-Sum Or Missing number to make Equa-Sum for array: ";
-        printVector(array);
-        int equalsum = Find_Equal_Sum(array);
-        //cout << equalsum << endl << endl;
         
-        // size = 42
-        /*  vector<int> posints1 = {4, 42, 27, 16, 28, 3, 4, 5, 9, 3, 31, 5, 5, 29, 10, 18, 35, 35, 33, 19, 41, 23, 8, 32, 9, 5, 8, 18, 35, 13, 6, 7, 6, 10, 11, 13, 37, 2, 25, 7, 28, 43};
-            printVector(posints); */
+        
+        
+// !!!:  /////////////////     Find Subarray with a Target Sum     ////////////////
+        //
+        {
+            // Given an unsorted array A of size N that contains only "NON-NEGATIVE" integers
+            //vector<int> numbers = {1,3,4,1,4};//{2,4,3,1,5,7};//{1,3,3,4,5,6,7,8,9,10};// {1,2,3,7,5};
+            //vector<int> array = {1,5,6,7,8,9,10};
+            vector<int> array = {6,8,11,10,1,3,2,1,4,5,6};
+            int targetSum = 1;
+            printVector(::cout <<  "\n\nContiguous Subarray with Sum = " << targetSum << ":\n Input:  " , array);
+            vector<int> result = subarraySum(array, targetSum);
+            
+            int start = result[0];
+            int end   = result[1];
+            if( start == -1 ) {
+                cout << " Result: Contiguous Sum " << targetSum << " Not Found" ;
+            }
+            else {
+                cout << " Result: [";
+                for( int i=start; i <= end; ++i) {
+                    if( i != end )
+                        cout << array[i] << ", ";
+                    else
+                        cout << array[i] ;
+                }
+                cout << "]";
+            }
+        }
+        
+        // !!!: ///////////////////////   Find SubArray with Maximum Sum  ///////////////////////////
+        // array can have negative numbers
+        {
+            //vector<int> array = { -2 };
+            //vector<int> array = { -2, -3 };
+            //vector<int> array = { 0 };
+            vector<int> array = {-12, -2, 3, 4, 7, 10, -20 };
+            //vector<int> array = { -2, -3, 4, -1, -2, 1, 5, -3, 11 };
+            //vector<int> array = { 1, 2, -3, 3, 4,5 , -1, -2, -3, -4, -5 };
+            //vector<int> array = { 1, 2, -3, 3, 4, 5, -1, -2, -3, -4, -5, 13 };
+            //vector<int> array = { 1, 2, 3, 4, -5, 15 };
+            //vector<int> array = { -2, -3, -4, -5, -14 };
+            //vector<int> array = { 12, 2, -3, -14, -5, 14 };
+            
+            printVector(cout<<"\n\nFind largest contiguous subarray: ", array);
+            
+            int max_sum = maxSum_subArray_geeks(array);
+            cout << "1) Geek: Maximum contiguous sum is " << max_sum;
+            
+            max_sum = maxSum_subArray_wiki(array);
+            cout << "\n2) Wiki: Maximum contiguous sum is " << max_sum;
+            
+            // My solution. Perefect √√√. rturns indexes to start and end of contiguous suarray
+            vector<int> maxSum_indices = maxSum_subArray_mine(array);
+            printVector(cout << "\n3) Mine: ", maxSum_indices);
+            cout << "   Mine: Maximum contiguous sum = " << maxSum_indices[0];
+            cout << "\n                          start = "  << maxSum_indices[1];
+            cout << "\n                            end = "    << maxSum_indices[2];
+        }
+    }
+
+cout << "\n\n===================******   Pivot Point *******====================\n";
+        {
+// !!!: //////////////       Find Pivot (Equilibrium) Point in Array   ///////////////
+        // array MUST have all POSITIVE number
+        //vector<int> array = { 3, 2, 11, 5, 5, 4, 2, 8, 12 };
+     //       vector<int> array = { 4, 2, -5, 1, 3, -5, 5, 7, 8 };
+            //vector<int> array = { -1, 2, -5, 1, 3, -5, 5, 7, 8, 8 };
+           // vector<int> array = { -2, -2, -1, 0, 0, -1, -4};    // ans: 4
+        vector<int> array = { 4, 3, 2, 1,5, 5, 8, 7 };  // lsum == rsum = 15 at pivot point = '11111'
+        //vector<int> array = { 5, 5 };
+            //array = { 0,0,0,0 };                     // ans = 2
+            //array = { 2, 1, 2, 1 };               // Not Found
+            //array = { 3, 1, 0, -1, 4};               // ans = 3
+            // array = { -2, -2, 1, -4};               // ans = 2
+            //array = { -2, -2, -1, 0, 0, -1, -4};    // ans: 4
+            //array = { 2, 2, 1, 0, 1, 4};             // ans = 3
+            //array = { 2, 1, 2, 1, 1, 1, 2, 2};       // Not Found
+            //array = { 2, 1, 2, 0, 0, 1, 2, 2};         // ans: 4
+            //array = { 2, 1, 2, 1, 1, 1, 2, 2};         // Not Found
+           //array = { 10, -17, 4, -15, 8 };
+            // size = 42
+        //    vector<int> array = {4, 42, 27, 16, 28, 3, 4, 5, 9, 3, 31, 5, 5, 29, 10, 18, 35, 35, 33, 19, 41, 23, 8, 32, 9, 5, 8, 18, 35, 13, 6, 7, 6, 10, 11, 13, 37, 2, 25, 7, 28, 43};
+            
+
+        cout << "\n1) Find Equal-Sum Or Missing POSITIVE number to make Equa-Sum for array: ";
+        printVector(array);
+        int equalsum = PivoitPoint_1( array );
+        if(equalsum != -1)
+            cout << "   Result: Equilibrium Point FOUND at Location = " << equalsum;
+        else
+            cout << "   Result: Equilibrium Point NOT_FOUND";
+
         
         // !!!: EquilibriumPoint1() is sligtly different
-        //array = { 0,0,0,0 };                     // ans = 2
-        //array = { 2, 1, 2, 1 };               // Not Found
-        //array = { 3, 1, 0, -1, 4};               // ans = 3
-        // array = { -2, -2, 1, -4};               // ans = 2
-        //array = { -2, -2, -1, 0, 0, -1, -4};    // ans: 4
-        //array = { 2, 2, 1, 0, 1, 4};             // ans = 3
-        //array = { 2, 1, 2, 1, 1, 1, 2, 2};       // Not Found
-        //array = { 2, 1, 2, 0, 0, 1, 2, 2};         // ans: 4
-        //array = { 2, 1, 2, 1, 1, 1, 2, 2};         // Not Found
-       //array = { 10, -17, 4, -15, 8 };
-        cout << "\n\nFind Equilibrium Point, Sum Left = Sum Right from Equilibrium Point for Array \n ";
+        cout << "\n\n2) Find Equilibrium Point for ";
         printVector(array);
-        int equalsum1 = findEquilibriumPoint_1(array);
-        if(equalsum1 != -1)
-            cout << "\n1) Equilibrium Point Occurs at Location = " << equalsum1;
+        equalsum = PivoitPoint_2( array );
+        if(equalsum != -1)
+            cout << "\n   Result: Equilibrium Point FOUND at Location = " << equalsum;
         else
-            cout << "\n1) Equilibrium Point Not Found";
- 
-        equalsum1 = findEquilibriumPoint_2( array );
-        if(equalsum1 != -1)
-            cout << "\n2) Equilibrium Point Occurs at Location = " << equalsum1;
+            cout << "\n   Result: Equilibrium Point NOT_FOUND";
+
+        cout << "\n\n3) Find Equilibrium Point for ";
+        printVector(array);
+        equalsum = PivoitPoint_3( array );
+        if(equalsum != -1)
+            cout << "\n   Result: Equilibrium Point FOUND at Location = " << equalsum;
         else
-            cout << "\n2) Equilibrium Point Not Found";
-    }
-
-// !!!: //////////////       Three Sum qual To Zero    ///////////////
-    {
-        vector<int> input = {-1, 0, 1, 2, -1, -4};  // {-1, 4, -2, 5, 10, -5};
-        printVector(cout << "\n\nthreesum(): \n input  = ", input);
-        vector<vector<int>> result = threeSum_Equal_To_Zero(input);
-        cout << " Result =";
-        printVectors(result);
-    }
-
-// !!!: /////////////////         Find Sum Closest To Zero       ////////////////////////
-    {
-        vector<int> a = {-1, 4, -2, 5, 10, -5}; // {-1, 0, 1, 2, -1, -4}
-        cout << "\n\nMinimum Sum with Three Elements: ";
-        printVector(cout << "\n Input: ", a);
-        int result = findSumClosestToZero(a);
-        cout << " Minimum Sum with three elements is " << result;
+            cout << "\n   Result: Equilibrium Point NOT_FOUND";
+            
+        cout << "\n\n4) Find EquilibriumIndex_Optomized, for ";
+        printVector(array);
+        findEquilibriumIndex_Optomized( array );
     }
     {
         int target = 5;
-        int startIndex  = 1;
+        int startIndex  = 4;
         cout << "\n\nGet Min Distance to target = " << target << ", starting at index = " << startIndex << ", and \n";
         vector<int> numbers = {1,5,3,4,-1,5,5};// 1,9=0 //{1,5,3,4,5} 5,2
                                                    //{1,5,3,4,5,5} 5,3 //{5,3,6} 5,2 //{1,2,3,4,5} 5,3
                                                    //{1,2,7,3,11,5,5,4,5} 5,2 //{1,5,5,4,5} 5,2=0
         cout << "   Array = "; printVector(numbers);
-        int res = Find_MinDistance(numbers, target, startIndex);
-        cout << "   Result: Min Distance to " << target << " and starting at index " << startIndex << " is = " << res << endl ;
+        int res = Find_MinDistance_toTarget_fromStart(numbers, target, startIndex);
+        cout << "   Result: Min Distance to " << target << ", starting at index " << startIndex << ", is = " << res << endl ;
     }
     {
         vector<int> nums = {4,2,3,1,1,88,17,22}; // output: [2,4,1,3], and [4,2,1,3] ;
@@ -1130,182 +1840,30 @@ int main(int argc,  char * argv[]) {
         string str = Convert_Number_To_Excell_Headers(number);
         cout << "ExcellAlphaBet() for " << number << " = " << str << endl;
     }
+    
+// !!!: /////////////////         Find Longest Substring Without Repeating Characters       ////////////////////////
     {
         // Given a string s, find the length of the longest substring without repeating characters
-        string s = "pwwkewsspabcdefg";    // "abcabcbb", "bbbbb"
-        cout << "\nLongest substring without repeating letters for \"" << s << "\" is " << endl;
-        string max_str = longestSubstring_Without_Repeating_Letter(s);
+        string s = "abcabcbb";    // "abcabcbb"=abc, "bbbbb"=b, "pwwkewsspabcdefg"=spabcdefg
+        cout << "\n1) Longest substring without repeating letters for \"" << s << "\" is " << endl;
+        string max_str = longestSubstring_Without_Repeating_Characters_1(s);
         cout << "\"" << max_str << "\" with length of " << max_str.size() << endl;
-    }
-    {
-        /*
-        string paragraph = "Bob hit a ball, the hit BALL flew far after it was hit.";
-        vector<string> banned = {};
-        string res;
-        res = mostCommonWord(paragraph, banned);
-        cout << "Most Common Word: " << res << endl;
-         */
-    }
-    {
-        int16_t x = ultimate_answer();
-        cout << x << endl;
-        volatile int v =23;
+/*
+        cout << "\n2) Longest substring without repeating letters for \"" << s << "\" is " << endl;
+        max_str = longestSubstring_Without_Repeating_Characters_2(s);
+        cout << "\"" << max_str << "\" with length of " << max_str.size() << endl;*/
     }
     
-// !!!: ///////////////////      Bits and Pieces     ///////////////////
-//
-    // !!!: ///////////////////      Swap 2 Bits     ///////////////////
-    {
-        unsigned char data = 0b10100000;
-        unsigned char bit1 = 7, bit2 = 0;
-        cout << "\n\nSwap bits " << bit1 << " and " << bit2 << "       = " << bitset<8>(data) << endl;
-        unsigned char result = swap2Bits(data, bit1, bit2);
-        cout << "After swapping the bits = " << hex << bitset<8>(result)  << endl << endl;
-        //cout << "After swapping the bits = " << hex << (unsigned)result << endl << endl;
+{
+    int low  = 7;
+    int high = 9;
+    int odds = CountOdds_1(low, high);
+    cout << "\n\n1) Odd numbers between " << low << " and " << high << " is " << odds;
 
-        cout << "My Swap bits " << bit1 << " and " << bit2 << "    = " << bitset<8>(data) << endl;
-        unsigned char result1 = swap2BitsMySolution(data, bit1, bit2);
-        cout << "After swapping the bits = " << hex << bitset<8>(result1);
-        //cout << "After swapping the bits, data value is: " << hex << (unsigned)result1 << endl;
-    }
-    // !!!: ///////////////////      Swap Nibbles in a Byte    ///////////////////
-    {
-        unsigned char byte = 0xEF;
-        cout << "\n\nSwap Nibbles in Byte = 0x" << hex << static_cast<unsigned int>(byte);
-        unsigned char newbyte = Swap_Nibbles_In_Byte(byte);
-        cout << "\nSwapped Nibbles      = 0x" << (unsigned int)newbyte << endl;
-    }
-    {
-        unsigned char c = 0xBA;
-        cout << "\n\t\t\t\t    c = " << hex << (unsigned int)(c) << endl;
-        // return value promoted from 'unsigned char' to 'int'
-        int result = Swap_Nibbles_In_Byte(c);
-        cout << "Swap Nibbles in Bytes = " << result << endl;
-    }
-    {
-        unsigned int n = 0xABCDEF;
-        cout << "\n\t\t\t\t\t  n = " << n << endl;
-        unsigned int result = Swap_Nibbles_In_Integer(n);
-        cout << "Swapped nibbles in word = " << result << endl;
-    }
-    {
-        byte b = byte(0b1110111);
-        cout << "\nSwap Even and Odd Bits in a Byte: " << bitset<8>(int(b)) << endl;
-        byte result =  Swap_EvenOdd_Bits_Byte(b);
-       // cout << int(result) << endl;
-        cout << "                          result: " << bitset<8>(int(result))  << endl;
-    }
-    {
-        unsigned int number = 0b111001;
-        cout << "\nn                        = " << bitset<8>(number) << endl;
-        unsigned int result1 = Swap_EvenOdd_Bits_Integer(number);
-        cout << "Swaped Even and Odd Bits = " << bitset<8>(result1)  << endl << endl;
-    }
-    {
-        unsigned int number = 0b111001;
-        cout << "\nn                       = " << bitset<8>(number) << endl;
-        unsigned int result2 = Swap_2Bits_Nibble(number);
-        cout << "Swaped 2 Bits of Nibble = " << bitset<8>(result2)  << endl << endl;
-    }
-    {
-        unsigned int number = 0x12ABCDEF;
-        cout << hex << "number = " << number << endl;
-        unsigned int result3 = Swap_Bytes_In_Integer(number);
-        cout << "Swaped Bytes of Integer = " << result3 << endl;
-    }
-    {
-        unsigned int number = 0x12ABCDEF;
-        unsigned int result4 = Swap_Halfword_In_Integer(number);
-        cout << "Swaped Half-Word of Integer = " << result4 << endl;
-    }
-    {
-        unsigned int integer = 0b00101111;
-        int fromPos          = 1;
-        int toPos            = 5;
-        int range            = 3;
-        cout << "Given a number = " << bitset<8>(integer) << ", Swap " << range << " bits from " << fromPos << " to " << toPos << endl;
-        int res = SwapRangeOfBits(integer, fromPos, toPos, range);
-        cout << "        Result = " << bitset<8>(res) << endl;
-    }
-    {
-        int number = 0b10001;
-        bitset<32> x(number);
-        // all are legal and set bit0
-        x[0] = 1;       // ok
-        x[0] = 2;       // ok
-        x[0] = true;    // ok
-
-        cout << "\nDoes number (" << bitset<16>(number) << ") contain 2 or more consecutive 1s: ";
-        int result = inspect_bits(number);
-        cout << (result? "\nYes" : "\nNo");
-    }
-
-    // !!!: /////////////////         Logic OR AND      ////////////////////////
-        {
-            bool A = true, B = true;
-            cout << "\nLogic A || B: \n";
-            bool result = LogicOR(A, B);
-            cout << "Logic " << A << " || " << B << " = " << result << endl;
-
-            cout << "\nLogic A && B: \n";
-            result = LogicAND(A, B);
-            cout << "Logic " << A << " && " << B << " = " << result << endl;
-        }
-
-
-        {
-            int digit = 10;
-            char c = digit_to_hex_char(digit);
-            cout << "\ndigit_to_hex_char(" << digit << ") = " << c;
-        }
-        {
-            char character = 'A';
-            int lower_upper = is_char_lower_or_upper( character );
-            cout << "\nIs '" << character << "' Lower or Upper?" << (lower_upper == 0? " Lower" : " Upper");
-        }
-    
-// !!!: /////////////////         Count Odds and Even Bits      ////////////////////////
-        {
-            int number = 1103;
-            int odd_even = is_number_odd_or_even(number);
-            cout << "\nIs " << number << " Odd or Even?" << (odd_even == 0? " Even" : " Odd");
-        }
-        {
-            int low  = 6;
-            int high = 9;
-            int odds = countOdds_1(low, high);
-            cout << "\n\n1) Odd numbers between " << low << " and " << high << " is " << odds;
-
-            odds = countOdds_2(low, high);
-            cout << "\n2) Odd numbers between " << low << " and " << high << " is " << odds;
-
-            // does not work for all cases
-            odds = countOdds_3(low, high);
-            cout << "\n3) Odd numbers between " << low << " and " << high << " is " << odds << endl;
-        }
+    odds = countOdds_2(low, high);
+    cout << "\n2) Odd numbers between " << low << " and " << high << " is " << odds;
+}
         
-    {
-        unsigned int integer = 0b100;    // 0b10101010101010101010101010101010
-        //cout << "\nn                     = " << bitset<8>(number) << endl;
-        
-        bool result = Does_Interger_Have_Alternating_Bits_1(integer);
-        cout << "\nDoes number = " << bitset<8>(integer) << " Have Alternating Bits (1) = " << (result?"yes":"no")  << endl;
-
-        bool result1 = Does_Interger_Have_Alternating_Bits_2(integer);
-        cout << "Does number = " << bitset<8>(integer) << " Have Alternating Bits (2) = " << (result1?"yes":"no")  << endl;
-    }
-    {
-        int number = 50;
-        cout << dec << "\n1) Generate Number Having Alt Bit Pattern My implementation: \n" << "   Number = " << number << ", Result: " << endl;
-        vector<int> result = generateAlternateBits1(number);
-        for(int i : result) { cout << "\t\t\t\t\t\t" << i << "  = "; print_DecimalToBinary(i); cout << endl; }
-        
-        cout << "\n2) Generate Number Having Alt Bit Pattern: \n" << "   Number = " << number << ", Result: ";
-        generateAlternateBits2(number);
-        for(int i : result) {
-            cout << "\n\t\t\t\t\t\t" << i << "  = " << DecimalToBinary_mine(i);
-        }
-
 // !!!: ////////////////////////   Decimal to Binary   //////////////////////////////
 //
         int decimal = 0b11011011000001;
@@ -1329,45 +1887,8 @@ int main(int argc,  char * argv[]) {
         decimal = Convert_BinaryToDecimal(binary);
         cout << "\n\nBinary to Decimal for " << binary << " = " <<Convert_BinaryToDecimal(binary) << endl;
     }
-    {
-        int n = 0b01101101;
-        int result = CountSetBits(n);
-        cout << "\nSetBits(" << bitset<32>(n) << ") = " << bitset<32>(result) << endl;
-    }
 
-    {
-        unsigned int number = 0b0111111110000;
-        int frombit = 7;
-        int tobit   = 7;
-
-        cout << "\nGetBits() Mine: mask from bits = "<< frombit << " to " << tobit << endl;
-        cout << " number  = " << DecimalToBinary_mine(number) << endl;
-        unsigned int r1 = getBits1(number, frombit, tobit);
-        cout << " result = " <<  DecimalToBinary_mine(r1) << endl;
-        
-        cout << "\nGetBits() Ritchi: needs work" << endl;
-        unsigned int r = getBits2(number, frombit, tobit);
-        cout << " result = " <<  DecimalToBinary_mine(r) << endl;
-    }
-
-// !!!:  /////////////////     Set Odd and Even Bits     ////////////////
-//
-    {
-        unsigned int number = 0b00001010;    // Try 0b01010101, ob11
-        cout << "\nSet EVEN Bits: n = " << bitset<32>(number);
-        int res  = setEvenBits_mine(number);
-        cout << "\n       My result = " << bitset<32>(res);
-        
-        cout << "\n\nSet ODD Bits:  n = " << bitset<32>(number);
-        res = SetOddBits_mine(number);
-        cout << "\n       My result = " << bitset<32>(res);
-        res  = SetOddBits_geek(number);
-        cout << "\n     Geek result = " << bitset<32>(res);
-
-        cout << "\n\nOdd & Even        = " << (bitset<32>(SetOddBits_mine(number)) & bitset<32>(setEvenBits_mine(number)) ) << endl;
-    }
-
-// !!!:  /////////////////     Find Longest Consecutive Integers     ////////////////
+    // !!!:  /////////////////     Find Longest Consecutive Integers     ////////////////
 //
     {
         // Big set of numbers
@@ -1384,174 +1905,64 @@ int main(int argc,  char * argv[]) {
     }
 
 
-// !!!: ////////////////////////   Pattern Count   //////////////////////////////
-//
-    {
-        string str = "00011100000011001";   // 1001010001, 3
-        int result = PatternCount_1(str);
-        cout << "\n\n1) Pattern Count for \"" << str << "\" is " << result;
-    }
-
-
 // !!!:  /////////////////     Print Subarrays     ////////////////
 //
     {
         vector<int> array = {1, 2, 3, 4};
         cout << "\n\n1) Print All Non-empty SUBARRAYS:";
         printVector(cout << "\n   Input = ", array);
-        printAllSubarrays_1(array);
+        printSubarrays_1(array);
         
         cout << "\n2) Print All Non-empty SUBARRAYS:\n";
-        printAllSubarrays_2(array);
+        printSubarrays_2(array);
 
         cout << "\nPrint All Non-empty SUBSETS:\n";
         printVector(cout << "   Input = ", array);
-        PrintSubsets(array);
+        printSubsets(array);
     }
 
-// !!!:  /////////////////     Find Subarray with a Target Sum     ////////////////
-//
-    {
-        // Given an unsorted array A of size N that contains only "NON-NEGATIVE" integers
-        //vector<int> numbers = {1,3,4,1,4};//{2,4,3,1,5,7};//{1,3,3,4,5,6,7,8,9,10};// {1,2,3,7,5};
-        //vector<int> array = {1,5,6,7,8,9,10};
-        vector<int> array = {6,8,9,10,1,3,2,1,4,5,6};
-        int targetSum = 7;
-        printVector(::cout <<  "\nContiguous Subarray with Sum = " << targetSum << ":\n Input:  " , array);
-        vector<int> result = targetSum_Subarray(array, targetSum);
-        
-        int start = result[0];
-        int end   = result[1];
-        if( start == -1 ) {
-            cout << " Result: Sum " << targetSum << " Not Found" ;
-        }
-        else {
-            cout << " Result: [";
-            for( int i=start; i <= end; ++i) {
-                if( i != end )
-                    cout << array[i] << ", ";
-                else
-                    cout << array[i] ;
-            }
-            cout << "]";
-        }
-
-    }
-
-// !!!: ///////////////////////   Find SubArray with Maximum Sum  ///////////////////////////
-// array can have negative numbers
-    {
-        //vector<int> array = { -2 };
-        //vector<int> array = { -2, -3 };
-        //vector<int> array = { 0 };
-        vector<int> array = {-12, -2, 3, 4, 7, 10, -20 };
-        //vector<int> array = { -2, -3, 4, -1, -2, 1, 5, -3, 11 };
-        //vector<int> array = { 1, 2, -3, 3, 4,5 , -1, -2, -3, -4, -5 };
-        //vector<int> array = { 1, 2, -3, 3, 4, 5, -1, -2, -3, -4, -5, 13 };
-        //vector<int> array = { 1, 2, 3, 4, -5, 15 };
-        //vector<int> array = { -2, -3, -4, -5, -14 };  
-        //vector<int> array = { 12, 2, -3, -14, -5, 14 };
-
-        printVector(cout<<"\n\nFind largest contiguous subarray: ", array);
-        
-        int max_sum = maxSum_subArray_geeks(array);
-        cout << "1) Geek: Maximum contiguous sum is " << max_sum;
-        
-        max_sum = maxSum_subArray_wiki(array);
-        cout << "\n2) Wiki: Maximum contiguous sum is " << max_sum;
-        
-        // My solution. Perefect √√√. rturns indexes to start and end of contiguous suarray
-        vector<int> maxSum_indices = maxSum_subArray_mine(array);
-        printVector(cout << "\n3) Mine: ", maxSum_indices);
-        cout << "   Mine: Maximum contiguous sum = " << maxSum_indices[0];
-        cout << "\n                          start = "  << maxSum_indices[1];
-        cout << "\n                            end = "    << maxSum_indices[2];
-    }
-    
-// !!!: ////////   Longest Substring Of 1s After Removing One Element   /////////
-//
-    {
-        // 110111000111111100 = 7 // 11110111111 = 10 // 1111000111111 = 6 (tricky)
-        // [1,1,1] = 2             // [1,1,0,1] = 3    // [0,1,1,1,0,1,1,0,1] = 5 //  [1,1,0,0,1,1,1,0,1] = 4
-        // [0,0,0] = 0
-        string str = "1111"; // "11101101"; 1101 = 3, 110011101 = 4, 011101101 = 5
-        cout << "\n\nLongest Substring of 1's After Removing 1 Element in string = \"" << str << "\"" << endl;
-        int max_bit_count = longestSubstringOf1s_afterRemoving_1bit(str);
-        cout << dec << "     my reult = " << max_bit_count << endl;
-    
-        cout << "\n\nLongest Substring of 1's After Removing 1 Element in string = \"" << str << "\"" << endl;
-        max_bit_count = longestSubstringOf1s_afterRemoving_1bit_2(str);
-        cout << dec << "     my reult = " << max_bit_count << endl;
-    
-// !!!: ////////  Longest Subsequence Of 1s After Flipping 0 to 1   /////////
-//
-        // needs serious work
-        int integer = 0b1001110101;//0xFFFFFFFF ;
-        cout << "\n1) Longest Subsequence Of 1s After Flipping 1 Element in integer:\n     my result = " << bitset<32>(integer);
-        // makes use of longestSubstringOf1s_AfterRemoving1Element( str ) above
-        max_bit_count = longestSubsequenceOf1s_afterFlipping_1bit( integer );
-        cout<< " = " << max_bit_count;
-
-        // from Cracking the Interview Code. !!!: does not work with 2 or more consicutavie 0s
-        cout << "\n2) Flip a Bit to Win, wiki:\n   wiki result = " << bitset<32>(integer);
-        max_bit_count = flipBit_to_Win( integer );
-        cout<< " = " << max_bit_count;
-    }
 
 // !!!: /////////////////         Minimum Increments      ////////////////////////
-//
-    {
-        cout << "\n\nMinimum Increments to make all SORTED Array Elements Unique:\n";
-        // vector must be SORTED
-        // vector<int> a = {1, 1, 1, 1, 2, 2, 2}; // {2, 3, 4, 5, 6, 7}; // {2, 2, 3, 5, 6, 6};
-        //vector<int> a = {2, 3, 4, 5, 5, 7};
-         vector<int> a = {2, 3, 3, 5, 7, 7};
-        printVector(cout << "1) Mine, Orignal Sorted Array:           ", a);
-        int result = minIncrements_to_uniqueArray_mine( a );
-        printVector(cout << "   Array After Minimum Increments: ", a);
-        cout << "   Minimum Increments = " << result;
+// !!!: :
+{
+    cout << "\n\nMinimum Increments to make all SORTED Array Elements Unique:\n";
+    // vector must be SORTED
+    // vector<int> a = {1, 1, 1, 1, 2, 2, 2}; // {2, 3, 4, 5, 6, 7}; // {2, 2, 3, 5, 6, 6};
+    //vector<int> a = {2, 3, 4, 5, 5, 7};
+     vector<int> a = {2, 3, 3, 5, 7, 7};
+    printVector(cout << "1) Mine, Orignal Sorted Array:           ", a);
+    int result = minIncrements_to_uniqueArray_mine( a );
+    printVector(cout << "   Array After Minimum Increments: ", a);
+    cout << "   Minimum Increments = " << result;
 
-         a = {2, 3, 3, 5, 7, 7}; // {2, 3, 4, 5, 6, 7}; // {2, 2, 3, 5, 6, 6};
-        printVector(cout << "\n\n2) Geeks, Orignal Sorted Array:           ", a);
-        result = minIncrements_to_uniqueArray_geek( a );
-        printVector(cout << "   Array After Minimum Increments: ", a);
-        cout << "   Minimum Increments = " << result << endl;
-        }
-    
-// !!!: /////////////////////////      Clear Bits From MSB To ithBit    ////////////////////
-    {
-        unsigned char byte = 0b11110011;
-        int pos = 4;
-        cout << "\nClear Bits From MSB to ith-bit " << pos <<" for number = " << bitset<8>(byte) << endl;
-        unsigned char result = Clear_Bits_From_MSB_To_ithBit(byte, pos);
-        cout << bitset<8>( result) << endl;
-    }
+     a = {2, 3, 3, 5, 7, 7}; // {2, 3, 4, 5, 6, 7}; // {2, 2, 3, 5, 6, 6};
+    printVector(cout << "\n\n2) Geeks, Orignal Sorted Array:           ", a);
+    result = minIncrements_to_uniqueArray_geek( a );
+    printVector(cout << "   Array After Minimum Increments: ", a);
+    cout << "   Minimum Increments = " << result << endl;
+}
 
-    {
-        int x = -2;
-        x = x << 1;
-        printf("%d\n", x);
-    }
 
 // !!!: ////////////////////////////      Factorial     ////////////////////
     {
-        int result = Factorial_Recursively(4);
+        int result = factorial.Factorial_Recursively(4);
         cout << result << endl;
 
-        int result1 = Factorial(4);
+        int result1 = factorial.Factorial1(4);
         cout << result1;
     }
     
 // !!!: ////////////////////////////      Fibonacci     ////////////////////
     {
-        int n = 7;
-        cout << "\n\n\nFibonacci Recursively(" << dec << n << "):";
-        int result = Fibonacci_Recursively(n);
-        cout << "Fibonacci Recursively = " << result;
+        int number = 13;
+        int result = fibonacci.Fibonacci_Recursively( number );
+        cout << "\n\n\nFibonacci Recursively(" << dec << number << ")                  = " << result;
         
-        cout << "Fibonacci Iteratively(" << dec << n << ")";
-        result = Fibonacci_Iteratively(n);
-        cout << "\nFibonacci Iteratively for " << n << " is " << result << endl;
+        result = fibonacci.Fibonacci_Recursively_Memoization_Utl( number );
+        cout << "\n\nFibonacci Recursively with Memoization(" << dec << number << ") = " << result;
+
+        result = fibonacci.Fibonacci_Iteratively( number );
+        cout << "\n\nFibonacci Iteratively(" << dec << number << ") = " << result << endl;
     }
     
 // !!!: ////////////////////////////      Where Do They Meet on Circle      ////////////////////
@@ -1570,10 +1981,10 @@ int main(int argc,  char * argv[]) {
     {
         int ROWS = 1, COLS = 8; // possible paths 1, 2, 6, 20, 70, 252
         cout << "Number of Paths for Matrix: " << ROWS << "x" << COLS << endl;
-        long long   paths = numberOfPaths_recursively1( ROWS, COLS );
+        long long   paths = commonStuff.numberOfPaths_recursively1( ROWS, COLS );
         cout<< "paths (1) = " << paths << " Recursive: " << endl;
 
-        long long   paths1 = numberOfPaths_recursively2( ROWS, COLS );
+        long long   paths1 = commonStuff.numberOfPaths_recursively2( ROWS, COLS );
         cout<< "\npaths (2) = " << paths1 << " Recursive MY Solution" << endl;
 
         // !!!: numberOfPathsRecursive3() Not a good solution. it assumes paths=4x4=16
@@ -1583,11 +1994,11 @@ int main(int argc,  char * argv[]) {
         int         pathsX = numberOfPathsRecursiveX(ROWS, COLS, paths);
         cout<< "paths (3) = " << pathsX << " Recursive" << endl;*/
 
-        int         paths3 = numberOfPaths_iteratively1( ROWS, COLS );
+        int         paths3 = commonStuff.numberOfPaths_iteratively1( ROWS, COLS );
         cout<< "paths (3) = " << paths3 << " Iterative" << endl;
         
         // !!!: Iterative Solution. Butter than all above functions
-        int         paths5 = numberOfPaths_iteratively2( ROWS, COLS );
+        int         paths5 = commonStuff.numberOfPaths_iteratively2( ROWS, COLS );
         cout<< "paths (4) = " << paths5 << " Iterative" << endl << endl;
     }
     
@@ -1624,7 +2035,7 @@ int main(int argc,  char * argv[]) {
         vector<int> nums = {1,2,3};
         printVector(cout<<"\n\nPermute array: ", nums);
         
-        printPermutation_Recursively2( nums, 0, nums.size()-1 );
+        permutation.printPermutation_Recursively2( nums, 0, nums.size()-1 );
     }
 
 // !!!: //////////////////    Find MIN In Rotated Sorted Array (Douplectes Allowed)   //////////////////
@@ -1851,11 +2262,11 @@ int main(int argc,  char * argv[]) {
         //vector<int> nums = {INT_MAX,INT_MAX,INT_MAX};
         printVector(cout << "\n\nSmallest Missing Positive Number in: ", nums);
         
-        int result = Find_FirstMissingPositive_In_UnsortedArray_1(nums);
+        int result = firstMissingPositive_inUnsortedArray_1(nums);
         cout << "1) Smallest Missing Positive Number = " << result;
-        result = Find_FirstMissingPositive_In_UnsortedArray_2(nums);
+        result = firstMissingPositive_inUnsortedArray_2(nums);
         cout << "\n2) Smallest Missing Positive Number = " << result;
-        result = Find_FirstMissingPositive_In_UnsortedArray_3(nums);
+        result = firstMissingPositive_inUnsortedArray_3(nums);
         cout << "\n3) Smallest Missing Positive Number = " << result << endl << endl;
     }
 
@@ -1947,13 +2358,13 @@ int main(int argc,  char * argv[]) {
 
 // !!!: //////////////////////////////    Get Max Occuring Char    ///////////////////////////////////
     char str[] = "ABCA\\\\\\";
-    char letter = GetMaxOccuringChar_1(str);
+    char letter = commonStuff.GetMaxOccuringChar_1(str);
     if( letter != '\0')
         cout << "1) Get Max Occuring Letter in string: " << str << " is " << letter << endl;
     else
         cout << "Empty string" << endl;
 
-    char letter2 = GetMaxOccuringChar_2(str);
+    char letter2 = commonStuff.GetMaxOccuringChar_2(str);
     if(letter2 != '\0') {
         cout << "2) Get Max Occuring Letter in string: " << str << " is " << letter2 << endl;
     }
@@ -1972,43 +2383,6 @@ int main(int argc,  char * argv[]) {
         bool res2 = Anagrams2(str1, str2);
         cout << "Anagrams2() of " << str1 << " and " << str2 << (res1? " is True" : " is False") << endl;
     }
-    
-// !!!: ///////////////////////////   XOR   ///////////////////////////////////////
-    {
-        unsigned int number = 6;
-        cout << "Number        = " << bitset<32>(number) << endl;
-        int XORres = computeXOR1(number);
-        cout << "computeXOR1() = " << bitset<32>(XORres) << endl;
-        
-        XORres = computeXOR2(number);
-        cout << "computeXOR2() = " << XORres << endl << endl;
-    }
-    
-// !!!: ////////////////////////////      Update Bits     //////////////////////////
-    {
-        int n = 0b11110101111;
-        int m = 0b0;
-        int beginBit = 4;
-        int endBit   = 6;
-        cout << "Update Bits with Range positions: " << beginBit << ", " << endBit << endl;
-        cout << "Original bits      = " << bitset<11>(n) << endl;
-        cout << "Insert bits        = " << bitset<3>(m);
-
-        int newbits = Update_Bits_1(n, m, beginBit, endBit);
-        cout << "\nUpdateBitsVersion1 = " << bitset<11>(newbits);
-
-        int newbits1 = Update_Bits_2(n, m, beginBit, endBit);
-        cout << "\nUpdateBitsVersion2 = " << bitset<11>(newbits1);
-    }
-    
-// !!!: /////////////////////      Divide Without Using Division Operator       ///////////////////
-    {
-        int dividend = INT_MIN;     // INT_MIN = -2147483648
-        int divisor  = -1;     // INT_MIN = -INT_MIN
-        long int div = DivideWithoutUsingDivision( dividend, divisor );
-        cout << "\n\nDivide Without Using Division " << dividend << "/" << divisor << " = " << div;
-    }
-    
 // !!!: //////////////////////        Get Last Kth Element       //////////////////////////////////
     {
         list<int> list = {1, 2, 3, 4, 5, 6, 7};
@@ -2018,7 +2392,7 @@ int main(int argc,  char * argv[]) {
             cout << i << ", ";
         }
         
-        int kthToLast = getLastKthElement(list, K);
+        int kthToLast = commonStuff.getLastKthElement(list, K);
         cout << "\nis " << kthToLast << endl;
     }
     
@@ -2054,39 +2428,19 @@ int main(int argc,  char * argv[]) {
         printVector(result);
     }
     
-// !!!: ////////////////////////      Big Indian Little Indian       ////////////////////////////
-    {
-        bool big_little_indian = BigIndianLittleIndian();
-        cout << "\nIs System LITTLE_INDIAN or BIG_INDIAN? \nresult: " << ((big_little_indian)? "LITTLE_INDIAN" : "BIG_INDIAN") << endl;
-    }
-    
-// !!!: ////////////////////////      Change End Ianness       ////////////////////////////
-    {
-        uint32_t u32CheckData  = 0x11223344;
-        uint32_t u32ResultData =0;
-        u32ResultData = ChangeEndianness_1(u32CheckData);  //swap the data
-        printf("\nOriginal Integer = 0x%x\n",u32ResultData);
-        u32CheckData = u32ResultData;
-        u32ResultData = ChangeEndianness_1(u32CheckData);//again swap the data
-        printf("1) Afetr Changing Endianness = 0x%x\n",u32ResultData);
-        
-        u32ResultData = ChangeEndianness_2(u32CheckData);//again swap the data
-        printf("2) Afetr Changing Endianness = 0x%x\n",u32ResultData);
-    }
-    
 // !!!: ////////////////////////      Find Zero-to-One Transition Point in SORTED Array       ////////////////////////////
     {
         // array must be Sorted
         vector<int> binaryArray = { 0,1}; //{1,1,1,1,1}; {0,0,0,0,0};
         cout << "\nOriginal array = ";
         printVector(binaryArray);
-        int transpoint = transitionPoint_SortedArray_1( binaryArray );
+        int transpoint =commonStuff.transitionPoint_SortedArray_1( binaryArray );
         if( transpoint != -1)
             cout << "1) Transition Point Occured at index " << transpoint;
         else
             cout << "1) Transition Point was not found ";
 
-        transpoint = transitionPoint_SortedArray_2( binaryArray );
+        transpoint = commonStuff.transitionPoint_SortedArray_2( binaryArray );
         if( transpoint >= 0 ) {
            cout<<"\n2) Transition Point Occured at index "<< transpoint;
         }
@@ -2100,68 +2454,30 @@ int main(int argc,  char * argv[]) {
         int rows = 7;
         int cols = 8;
 
-        create_pattern_1 (rows, cols);
+        commonStuff.create_pattern_1 (rows, cols);
         cout << endl;
-        create_pattern_2 (rows, cols);
+        commonStuff.create_pattern_2 (rows, cols);
         cout << endl;
 
         rows = 7; cols = 7; // rows must be equal to columns
-        create_pattern_Diagonally (rows, cols);
+        commonStuff.create_pattern_Diagonally (rows, cols);
         cout << endl;
         
-        create_pattern_Diagonally_Recursuvilly (rows, cols);
+        commonStuff. create_pattern_Diagonally_Recursuvilly (rows, cols);
     }
     
 // !!!: ////////////////////////      Add Two Strings       ////////////////////////////
     {
-        string s1 = "99999999999999999999";     // handle corner cases: s1="1" and s2="". s1="1" ans s2="-1"
-        string s2 = "1";
+        string s1 = "-1";     // handle corner cases: s1="1" and s2="". s1="1" ans s2="-1"
+        string s2 = "-1";
         string result = addTwoStrings1(s1, s2);
-        cout << "result of adding numbers in 2 strings ( \"" << s1 << "\" + \"" << s2 << "\") = " << "\"" << result << "\"" <<endl<<endl;
+        cout << "\nMethod 1: result of adding numbers in 2 strings ( \"" << s1 << "\" + \"" << s2 << "\") = " << "\"" << result << "\"\n";
        
         // This is better solution
         result = addTwoStrings2( s1, s2);
         cout << "Method 2: result of adding numbers in 2 strings ( \"" << s1 << "\" + \"" << s2 << "\") = " << "\"" << result << "\"" <<endl<<endl;
     }
-    
-// !!!: ////////////////////////      Reverse Bits       ////////////////////////////
-    {
-        //unsigned int bits = 0x1;
-        //unsigned int bits = 0b00000000000000000000000000000001;
-        unsigned int bits = 0b00000001000000001111111111111111;
-        //unsigned int bits = 0b11110000000011110000111111110000;
-        cout << "ReverseBits1(): Before reversing " << bitset<32>(bits) << endl;
-        unsigned int revbits = ReverseBits1(bits);
-        cout << "ReverseBits1(): After reversing  " << bitset<32>(revbits) << endl << endl;
-
-        cout << "ReverseBits2(): Before reversing " << bitset<32>(bits) << endl;
-        ReverseBits2(bits);
-        cout << "ReverseBits2(): After reversing  "  << bitset<32>(bits) << endl << endl;
-
-        cout << "ReverseBits3(): Before reversing " << bitset<32>(bits) << endl;
-        unsigned int result = ReverseBits3(bits);
-        cout << "ReverseBits3(): Before reversing " << bitset<32>(result) << dec ;
-    }
-    
-// !!!: ////////////////////////      Rotate Bits Left       ////////////////////////////
-    {
-        //int bits = 0b11111111000000000000000000000000;
-        int bits = 0xFF00FF;
-        int no_of_left_rotations = 15;
-        
-        cout << "\n\nRotate Bits    \"" << bitset<32>(bits) << "\" Left by " << no_of_left_rotations;
-        int result = RotateBitsLeft_1(bits, no_of_left_rotations);
-        cout << "\n1) Rotated Bits " << bitset<32>(result);
-
-        RotateBitsLeft_2(bits, no_of_left_rotations);
-        cout << "\n2) Rotated Bits " << bitset<32>(result);
-
-        unsigned int ubits = 0xFF0000FF;
-        rotateBitsLeft_3(ubits, no_of_left_rotations);
-        cout << "\n3) Rotated Bits " << bitset<32>(result);
-    }
-    
-
+ 
 // !!!: /////////////////      Translate AB to C      ///////////////////////
     {
         string s = "AABfghABsdfABysuAB";
@@ -2169,14 +2485,6 @@ int main(int argc,  char * argv[]) {
         translateABtoC(s);
         cout << (s + '\n');
     }
-    {
-        int x = 5;
-        int y = 7;
-        cout << "Before SwapNumbers(): " << x << " and " << y <<endl;
-        SwapNumbers_NotUsingtemp(x, y);
-        cout << "After SwapNumbers(): " << x << " and " << y <<endl<< endl;
-    }
-    
 // !!!: /////////////////////        Reverse Number      ///////////////////////////
     {
         int number = 1534236462; // !!!: 1534236461 = 0x5B72972D = max nuber that can be reversed;
@@ -2217,7 +2525,7 @@ int main(int argc,  char * argv[]) {
         vector<int> numbers = {1,2,15,3,4,5,15};
         int element = 15;
         printVector(::cout << "Remove " << element << " from Array = " , numbers);
-        deleteValue(numbers, element);
+        commonStuff.deleteValue(numbers, element);
         printVector(::cout << "Array after removing " << element << " = " , numbers);
     }
 
@@ -2248,20 +2556,18 @@ int main(int argc,  char * argv[]) {
         cout << "s1 after  removing " << s2 << " : " << s1 << endl;
     }
 
-    // !!!: /////////////////         Count Trailing ZEROS       ////////////////////////
-    {
-        int number = 0b00000010;
-        int count = trailingZeros_1( number );
-        cout << "\nTrailing ZEROS for Number " << bitset<8> (number) << ", is " << count;
-        
-        count = trailingZeros_2( number );
-        cout << "\nTrailing ZEROS for Number " << bitset<8> (number) << ", is " << count;
-    }
     {
         int number = 58;
         string str = intToRoman(number);
     }
-    
+    {
+        int arr[] = {3, 4, 5, 6};
+        int size = 4;
+        int target = 7;
+        int result = Search_Binary_2(arr, size, target);
+        cout << "Binary Search = " << result << endl;
+    }
+
     
     
     
@@ -2278,7 +2584,305 @@ int main(int argc,  char * argv[]) {
         ConstTypes();
     }
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 // !!!: /////////////////         Expermental Stuff      ////////////////////////
+    {
+        const int SIZE = 1;
+        // Make a vector and set
+        std::vector<int> v;
+        std::set<int> s;
+        // Populate the vector and set with the first SIZE integers
+        for (int i = 0; i < SIZE; i++) {
+            v.push_back(i);
+        }
+        for (int i = 0; i < SIZE; i++) {
+            s.insert(i);
+        }
+        // Make a vector that contains random numbers in the range
+        // stored within the vector and set
+        // UniformRandomGenerator gen(0, SIZE - 1);
+        int gen = rand();
+        std::vector<int> search_values;
+        for (int i = 0; i < SIZE; i++)
+        search_values.push_back(gen);
+        clock_t start_time, stop_time;
+
+        // Search each data structure for the integers 0 to 1,000,000
+        start_time = clock();
+        for (int i = 0; i < SIZE; i++) {
+            int seek = search_values[i];
+            std::find(std::begin(v), std::end(v), seek);
+        }
+        stop_time = clock();
+        std::cout << "Vector time: " << stop_time - start_time << '\n';
+        
+        start_time = clock();
+        for (int i = 0; i < SIZE; i++) {
+            int seek = search_values[i];
+            s.find(seek);
+        }
+        stop_time = clock();
+        std::cout << "Set time: " << stop_time - start_time << '\n';
+    }
+    {
+        vector<int> nums {2,2,2};
+        
+        int totalsum = 0;
+        int actualsum = 0;
+        
+        for(int num : nums) {
+            actualsum += num;
+        }
+        for(int i=1; i < nums.size(); i++) {
+            totalsum += i;
+        }
+
+        int diff = actualsum - totalsum;
+        cout << endl << "actualsum - totalsum = " << diff << endl;
+    }
+    {
+        // Function pointer
+        void (*p)(void);
+        int (*p1[100])(int, int);
+        //(int (*arr1[100])(int, int)) arr[100]; // NOT OK
+
+        //void arr2[100];   // NOT OK, array of
+        void* array[100];   // OK, array of pointers
+    }
+    {
+        struct ABC {int i;};
+        size_t size = sizeof(ABC);
+        struct ABC *ptr = (struct ABC *)0;
+        struct ABC *ptr1;
+        ptr++;ptr++;
+        // !!!:  Warning: Format specifies type 'int' but the argument has type 'struct ABC *'
+        //printf("\n\nSize of structure is: %d", ptr);
+
+        cout << endl;
+    }
+    
+// !!!: ////////////////    Removing constantnce    ///////////////////
+    {
+        const int n = 4;
+        int const &const_ref = n;
+        cout << "\nBefor Removing Constantance from 'Const Ref' to n = " << const_ref << endl;
+        //++const_ref;    // Error: Cannot assign to variable 'const_ref' with const-qualified type 'const int &'
+        int& nonconst_ref1 = const_cast<int&>(const_ref);
+        ++nonconst_ref1 ;
+        cout << "After Modiying 'Const Ref': " << "nonconst_ref1 = " << nonconst_ref1 << ", nonconst_ref = " << const_ref << ", n = " << n;
+ 
+        const int const_int = n;
+        cout << "\nBefor Removing Constantance from 'Const int' to n = " << const_ref << endl;
+        // Error: Const_cast to 'int', which is not a reference, pointer-to-object, or pointer-to-data-member
+        //int nonconst_ref2 = const_cast<int>(const_int);
+    }
+
+
+    {
+        int x = -2;
+        x = x << 1;
+        printf("%d\n", x);  // print x = -4
+    }
+    {
+        // !!!: Find size of struct without using sizeof(). Memeory is accessed at byte address or at boundary of WORD size address,
+        // !!!: which is 4 bytes for my system
+        // class s {short int f;} x;       // 2 bytes
+        //class s {char c1; char c2; short int short1;} x;       // 4 bytes
+        //class s {char c1; char c2; char c3; short int s;} x;       // 6 bytes
+        //      {1 byte; 4 bytes    ; 1 byte }
+        //class s {char c; short int f; char t;} x;         // 6 bytes
+        //      {                                 }
+        class s {char c; short int f; short int t;} x;    // 6 bytes
+        s* ps = &x;
+        //ps++;
+        cout << endl << ps+1 << " - " <<  ps <<  "  = " << ps+1 - ps << endl;
+        cout << "Size of struct s using pointers  = " << (char*)(ps+1) - (char*)ps  << " bytes" << endl;
+        cout << "Size of struct s using sizeof(s) = " << sizeof(s) << " byte" << endl;
+    }
+    {
+        int x = 0;
+        int a[x];   // Variable 'x' is uninitialized when used here
+        int size = (int )sizeof(a)/sizeof(a[0]);
+        cout << "\na[" << x << "] = " << a[x] << "\tsize = " << size << endl;
+    }
+    {
+        char  buffer1[5] = {'a', 'b', 'c', 'd', '\0'};
+        const char* buffer2 = "abcd";
+        cout << buffer1 << endl << buffer2 << endl << endl;
+    }
+    {
+        // 0x10011cbe8
+        // Where variable stored in memory
+        int local;
+        cout << "\nstack address               = " << &local;
+        
+        int* iq = new int;
+        cout << "\n\nheap: new int               = " << iq;
+        int* iw = (int*) malloc(sizeof(int));
+        cout << "\nheap: malloc(int)           = " << iw << endl;
+
+        static int staicLocal_uninitialized;
+        cout << "\nglobal uninitialized        = " << &global_uninitialized;
+        cout << "\nstatic global uninitialized = " << &static_global_uninitialized;
+        cout << "\nstatic local uninitialized  = " << &staicLocal_uninitialized;
+
+        // intialized static and globals
+        static int staicLocalInit = 23;
+        cout << "\n\nglobal intialzed            = " << &global_initialized;
+        cout << "\nstatic global initlized     = " << &static_global_initialized;
+        cout << "\nstatic local initlized      = " << &staicLocalInit << endl;
+    }
+    {
+        // !!!: mixing signed and unsigned ints in logical decsion statments: 'if', 'while and 'for
+        char i = -1;
+        cout << endl << endl;
+        while( i > 0 ) {
+            printf( "T minues %d and counting \n", i--);
+        }
+        
+        // pay attention to the the following code. it is not the same as above loop
+        i = -128;
+        while( i ) {    // !!!: i is evaluated as 'unsigned'. i=-128=0xFF which is >0 and evaluated to true
+            printf( "T minues %d and counting \n", i--);    // -128, 127, 127...3, 2, 1, 0
+        }
+
+        cout << endl;
+        if( 0 > -1 ) {
+            cout << "expected: 0 > -1" << endl;
+        }
+        
+        // now
+        int si = -1;
+        unsigned int ui = 0;
+        // si is converted to unsigned type and compare it to ui.
+        // since, we are comparing ui==0 and si=-1=0xFFFFFFFF, results in 0 < -1
+        if( ui > si ) {     // or, if( si < ui ) same result.
+            cout << "expected: 0 > -1" << endl;
+        }
+        else if( ui < si ) {
+            cout << "not expected!!!: 0 < -1" << endl;
+        }
+        else{
+            cout << "ui == si" << endl;
+        }
+
+
+    }
+
+    {
+        // Shallow Copy
+        int* p = new int{77};
+        int* q = p;     // copy the pointer p
+        *p = 88;        // change the value of the int pointed to by p and q    }
+        
+        // Deep Copy
+        int* p1 = new int{77};
+        int* q1 = new int{*p1}; // allocate a new int, then copy the value pointed to by p
+        *p1 = 88;               // change the value of the int pointed to by p
+        
+        cout << endl;
+    }
+    {
+        bitset<128> flags = 0xb;
+        size_t size = sizeof(flags);
+        cout << size << endl;
+        
+        struct PPN {                    // R6000 Physical Page Number
+            unsigned int PFN : 22 ;     // Page Frame Number
+            int : 3 ;                   // unused
+            unsigned int CCA : 3 ;      // Cache Coherency Algorithm
+            bool nonreachable : 1 ;
+            bool dirty : 1 ;
+            bool valid : 1 ;
+            bool global : 1 ;
+        };                              // total bits = 32 which can fit in 4 bytes
+        
+        PPN ppn;
+        size_t size1 = sizeof(PPN);
+        cout << size1 << endl;
+    }
+    {
+        // !!!: PRECEDENCE: pre post fix ++
+        int a = 42;
+        int b = ++(++a);    // ok: b = 44
+        //  b = ++(a++);    // error: Expression is not assignable. Notice, slight difference from above
+            b = ++++a;      // ok: b = 46
+        //  b = ++a++;      // error: Expression is not assignable
+        
+        // !!!: PRECEDENCE: ++ and *
+        int array[3] = {10, 20, 30};
+        int* parray = array;
+        // READING array through pointer using prefix, postfix ++ and *
+        // pre increment
+        int i0 = ++*parray;         // ok, i0 == 11: increment array value at parr and store it in i0
+                                    // !!!: pay attention to this statement. it modifies array value at parray
+        int i1 = *++parray;         // ok, i1 == 20: increment array pointer and store its value in i1
+        // post increment
+        int i2 = *parray++;         // ok, i2 == 20: store array value at parr in i2 and increment array pointer
+        int i3 = (*parray)++;       // ok, i3 == 30: store array value at parr in i3, and increment array value at parray
+                                    // !!!: pay attention to this statement. it modifies array value at parray
+        int i4 = ++*parray++;       // ok: i4 == 32: get value and increment it, and increment pointer
+
+        // now, WRITING array through pointer and prefix, postfix ++ and *
+        parray = array;             // arr[] = 11, 20, 32
+        ++*parray = 44;             // arr[] = 44, 20, 32. !!!: Notice: ++ has no effect. increment value at parray and store 44 at parray
+        *++parray = 55;             // arr[] = 44, 55, 32
+        
+        // (*parray)++ = 99;        // error: Expression is not assignable. !!!: my explaination: (*parr)++ doesn't produce lvalue
+        ++(*parray) = 99;           // !!!: ok, increment value at parray and store 99 at parray. result: 99 is stored at parray
+                                    // arr[] = 44, 99, 32
+        *parray++ = 55;             // also ok, arr[] = 44, 55, 32
+        
+        // (++*parray)++ = 66;        // error: Expression is not assignable
+        ++*parray++ = 66;           // ok, arr[] = 44, 55, 66
+        
+        cout << endl;
+    }
+    {
+        // !!!: CORVERSIONS
+        double dbl1 = 3 * 5 / 2;    // dbl1 = 7. * and /: left to right
+        double dbl2 = 3 / 5 * 2;    // dbl2 = 0. * and /: left to right
+        cout << "dbl = " << dbl1 << "\tdb2 = " << dbl2 << endl;
+        
+        double d = 2.5;
+        int i = 2;
+        double d2 = d/i;    // d2 == 1.25
+        int i2 = d/i;       // i2 == 1. Warning: Implicit conversion turns floating-point number into integer: 'double' to 'int'
+        // int i3 {d/i};       // error: double -> int conversion may narrow (§3.9.2)
+                            // Type 'double' cannot be narrowed to 'int' in initializer list
+
+        i2 = d/i; // i2 == 1
+    }
+    {
+        // !!!: for loop vs while loop
+        int max_length = 10;
+        int quest_count = 0;
+        char input_line[max_length];
+        input_line[4] = '?';
+        
+        for (int i=0; i != max_length; i++) {
+            if (input_line[i] == '?') {
+                quest_count++;
+            }
+        }
+        cout << quest_count << "\t";;
+        
+        // using while loop:
+        int i = 0;
+        while( i < max_length && input_line[i] == '?' ) {
+            quest_count++;
+        }
+        cout << quest_count << endl;
+    }
     {
         int a[3] = {1,5,7};
         //  int i = *a++;   // ERROR: Cannot increment value of type 'int[3]'
@@ -2348,20 +2952,30 @@ int main(int argc,  char * argv[]) {
     }
     {
         long i = -1;
-        size_t sz = sizeof(i);
-
-        if (i < sizeof(i)) {
-             printf("OK\n");
+        // !!!: sizeof(i) returns 'unsigned int', 'i' is promoted to 'unsigned int' and compare it to sizeof(i)
+        if(i < sizeof(i) ) {
+             printf("\nOK\n");
         }
         else {
-             printf("error\n");
+             printf("\nERROR\n");
+        }
+         
+        // 2π rad = 360º -> rad = 360º / 2*π rad ≈ 57.295779513082321 º/rad.
+        // for angle = 90º -> 90º/(57.30 º/rad) ≈ 1.570796 rad
+        cout << "\nSineWave(90º) = " << sin( 1.570796326794897 ) << endl;
+        
+        // 1) create sinewave array
+        double angles[10];
+        for( int angle=0; angle < 360; angle+=10 ) {
+            double magnitude = 10 * sin( angle / (360/(2*M_PI)) );
+            cout << "angle = " << angle << "º, magnitude = " << magnitude << endl ;
+
+            angles[angle] = magnitude;
         }
         
-        int wordSize = __WORDSIZE;
-        int sa = WORD_BIT;
+        // 2) dispaly sinewave array
         
-        double ds = sin(1.57);   // 1 rad ~= 57 degree. (90 deg / 57 deg/rad) = 90/57 rad = ~= 1.57 rad
-        cout << ds << endl;
+        cout << endl;
     }
     
     {

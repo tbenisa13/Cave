@@ -49,9 +49,10 @@ void translateABtoC(std::string &s);
 
 std::string compressString(std::string str);
 
-std::string longestSubstring_Without_Repeating_Letter(std::string s);
+std::string longestSubstring_Without_Repeating_Characters_1(std::string s);
+std::string longestSubstring_withoutRepeating_Characters_2( std::string str );
 
-std::string mostCommonWord(std::string paragraph, std::vector<std::string>& banned_words);
+std::string mostCommon_unbannedWord(std::string paragraph, std::vector<std::string>& banned_words);
 
 // Move to CommonStuff
 int  sumOfDigits(int x);
@@ -62,11 +63,14 @@ std::string addTwoStrings2(std::string s1, std::string s2);
 
 std::string multiplyTwoStrings(std::string num1, std::string num2);
 
-std::vector<std::string> commonChars(std::vector<std::string>& words);
+std::vector<std::string> commonChars_inStrings(std::vector<std::string>& words);
 
 std::vector<std::string> unique_names(std::vector<std::string> names1, std::vector<std::string> names2);
 
 char digit_to_hex_char( int digit);
 
+void mostCommonWord_geeks(std::vector<std::string> array);
+
+void mostCommonWord_mySol(std::vector<std::string> words);
 
 #endif /* StringStuff_hpp */

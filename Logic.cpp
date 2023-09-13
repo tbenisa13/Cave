@@ -20,7 +20,7 @@ using std::ostream;
 extern const int cintGlobal;    // Experiment
 const int xx = cintGlobal;
 
-bool LogicOR(bool A, bool B)
+bool Logic::LogicOR(bool A, bool B)
 {
     {
         bool A = 0;
@@ -39,14 +39,10 @@ bool LogicOR(bool A, bool B)
     bool result = false;
     
     if(A || B){
-        // either:
-        // 1. both A and B are true, or
-        // 2. A is true and B is not, or 
-        // 3. B is true and A is not 
         if(A && B) {
             cout << "Both A and B are True: A = " << A << ", " << "B = " << B << endl;
         }
-        else if(A) { // A && !B 
+        else if(A) { // A && !B
             cout << "A is True: A = " << A << ", " << "B = " << B << endl;
         }
         else {      // B && !A
@@ -56,41 +52,49 @@ bool LogicOR(bool A, bool B)
         result = true;
     }
     
-    // After executing "if(A || B)" above, the only condition left is:
-    // cout << "A = False && B = False" << endl;
+    // After executing "if(A || B)" above
+    //cout << "A = False && B = False" << endl;
     if(!A && !B) {
         cout << "Both A and B are False: A = " << A << ", " << "B = " << B << endl;
         result = false;
     }
-    
+    else if(!A) {
+        cout << "A is Fale: A = " << A << ", " << "B = " << B << endl;
+        result = true;
+    }
+    else if(!B) {
+        cout << "B is False: A = " << A << ", " << "B = " << B << endl;
+        result = true;
+    }
+
     return result;
 }
 
-bool LogicAND(bool A, bool B)
+bool Logic::LogicAND(bool A, bool B)
 {
     bool result = false;
     
     if(A && B) {
         cout << "A = " << A << ", " << "B = " << B << endl;
-        // take some actions
+        // do some actions
         result = true;
     }
     
-    // at this point either !A, or !B, or !A && !B
+    //at this point either !A, or !B, or !A && !B
     // filter out what you need
     if(!A && !B) {    // A and B are false
         cout << "Both A and B are Fasle: A = " << A << ", " << "B = " << B << endl;
-        // take some actions
+        // do some actions
         result = false;
     }
     else if(!A) {       // A is Fasle
         cout << "A is Fasle: A = " << A << ", " << "B = " << B << endl;
-        // take some actions
+        // do some actions
         result = false;
     }
     else if(!B){        // B is Fasle
         cout << "Both B is Fasle: A = " << A << ", " << "B = " << B << endl;
-        // take some actions
+        // do some actions
         result = false;
     }
     

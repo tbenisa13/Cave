@@ -11,6 +11,9 @@ using std::string;
 using std::cout;
 using std::vector;
 using std::map;
+using std::list;
+using std::stack;
+using std::min;
 //using std::set;
 
 
@@ -320,6 +323,102 @@ bool isHappy(int n) {
     }
 
     return false;
+}
+
+
+// An Iterative C++ program to do DFS traversal from
+// a given source vertex. DFS(int s) traverses vertices
+// reachable from s.
+
+
+Graph::Graph(int V)
+{
+    this->V = V;
+    adj = new list<int>[V];
+}
+
+void Graph::addEdge(int v, int w)
+{
+    adj[v].push_back(w); // Add w to v’s list.
+}
+
+// prints all not yet visited vertices reachable from s
+void Graph::DFS(int s)
+{
+    // Initially mark all vertices as not visited
+    vector<bool> visited(V, false);
+
+    // Create a stack for DFS
+    stack<int> stack;
+
+    // Push the current source node.
+    stack.push(s);
+
+    while (!stack.empty())
+    {
+        // Pop a vertex from stack and print it
+        int s = stack.top();
+        stack.pop();
+
+        // Stack may contain same vertex twice. So
+        // we need to print the popped item only
+        // if it is not visited.
+        if (!visited[s])
+        {
+            cout << s << " ";
+            visited[s] = true;
+        }
+
+        // Get all adjacent vertices of the popped vertex s
+        // If a adjacent has not been visited, then push it
+        // to the stack.
+        for (auto i = adj[s].begin(); i != adj[s].end(); ++i)
+            if (!visited[*i])
+                stack.push(*i);
+    }
+}
+
+/*  Example:
+        costs = [10, 12, 14, 20, 7]
+        minimum cost = 31
+        10 -- 14 -- 7
+
+        costs = [10, 1, 1, 15, 2, 30, 3]
+        minimum cost = 7
+        1 -- 1-- 2 -- 3    */
+int minCost_iter1( vector<int> cost )
+{
+     size_t len = cost.size();
+     vector<int>  dp( len );
+     dp[0] = cost[0];
+     dp[1] = cost[1];
+
+     for (int i = 2; i < len ; i++) {
+         dp[i]  = min( dp[i-1], dp[i-2] ) + cost[i];
+     }
+
+     int result = min( dp[len-1], dp[len-2] );
+    
+     return result;
+}
+
+// !!!: My idea based on Fabaincci algorithem i have developed before.
+// !!!: more efficient than version 1, no array is needed, instead just need
+// !!!: 2 variables first and second to hold the last 2 costs.
+int minCost_iter2( vector<int> cost )
+{
+     size_t len = cost.size();
+     int first  = cost[0];
+     int second = cost[1];
+
+    int result = 0;
+    for (int i = 2; i < len ; i++) {
+        result = min( first, second ) + cost[i];
+        first = second;
+        second = result;
+     }
+    
+     return result;
 }
 
 

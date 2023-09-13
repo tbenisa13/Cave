@@ -429,12 +429,13 @@ void reverseWords( string& words )
           word = "";                // clear word string
       }
     }
-    stackOfwords.push (word); // add the final word to stack
+    
+    // add the word to stack
+    stackOfwords.push (word);
 
-    words = "";
+    words = ""; // intitalize the words string to empty
 
-    while (!stackOfwords.empty ())
-    {
+    while( !stackOfwords.empty () ) {
       // pop word from stack and put back in string of words
       string s = stackOfwords.top (); // get a word from top of stack
       stackOfwords.pop ();            // required by stack operations
@@ -527,203 +528,291 @@ void removeSubstrs( string &str, const string &substr )
 
 // Given a string s, find the length of the longest substring without repeating
 // characters. Almost ~O(N2)
-string longestSubstring_Without_Repeating_Letter( string str )
+string longestSubstring_Without_Repeating_Characters_1( string name )
 {
     // map<string, int> Map; "pwwkew"
-    string temp_str = "";
-    string max_str = "";
+    string longest_substr = "";
+    
     int i = 0;
-
     // watch for empty string s = ""
-    while( i < str.length () - 1 ) { // Consider using maxlength for optimization here
+    while( i < name.length () - 1 ) { // Consider using maxlength for optimization here
         int j = i;
-        int length = 0;
-        int maxlength = 0;
+        string str = "";
 
         // Build string until a repeated letter is found
-        while( j < str.length () ) {
-            auto found = temp_str.find(str[j]);
-            if( temp_str.find (str[j]) != string::npos ) {        // npos == Not Found
+        while( j < name.length () ) {
+            if( str.find( (char )toupper(name[j]) ) != string::npos ||
+                str.find( (char )tolower(name[j]) ) != string::npos ) {      // npos == Not Found
                 break; // letter is in result string, break from while loop
             }
-            
-            temp_str += str[j]; // Found non-repeating letter, Add it to result
-            j++;
-            length++;
+
+            str += name[j++]; // Found non-repeating letter, Add it to result
         }
 
-        if( length > maxlength ) {
-          maxlength = length;
-          max_str = temp_str;
+        if( str.size() > longest_substr.size() ) {
+            longest_substr = str;
+            cout << longest_substr << endl;
         }
 
-      temp_str = "";
-      length = 0;
-      i++;
-        
+        i++;
     }
 
-    return max_str;
+    return longest_substr;
 }
 
-/*  Given a string paragraph and a string array of the banned words banned,
-   return the most frequent word that is not banned. It is guaranteed there is
-   at least one word that is not banned, and that the answer is unique. The
-   words in paragraph are case-insensitive and the answer should be returned in
-   lowercase. */
-// Not tested
-string mostCommonWord( string paragraph, vector<string>& banned_words )
+// !!!: trying to do  O(N). still not working
+string longestSubstring_withoutRepeating_Characters_2( string str )
+{
+    //map<string, int> m;
+    string curr_substr = {str[0]};
+    string longest_substr = {str[0]};
+    longest_substr = str[0];
+
+    int i = 1;
+    while( i < str.size() ) {
+        // std::string::iterator it = longest_substr.begin();
+        size_t index = str.find( str[i] );
+        cout << "char = " << str[i] << " at index = " << index << endl;
+        //str.find(
+        if( curr_substr.find( (char )toupper(str[i]) ) == string::npos &&
+            curr_substr.find( (char )tolower(str[i]) ) == string::npos) {
+            // since, surr char is not in the longest substring, we need to add it to the longest substring
+            curr_substr += str[i];
+        }
+        else {
+            // char is in the longest substring, start a longest substring seach at curr index
+            if( curr_substr.size() > longest_substr.size() ) {
+                longest_substr = curr_substr;
+                cout << longest_substr << endl;
+            }
+
+            curr_substr = "";
+            longest_substr = str[index+1];
+            i = index + 1;
+        }
+        i++;
+    }
+    
+    return longest_substr;
+    
+    /*
+     A short holds numbers too. As does a signed char.
+     But none of those types are guaranteed to be large enough to represent the sizes of any strings.
+     string::size_type guarantees just that. It is a type that is big enough to represent the size of a string, no matter how big that string is.
+     For a simple example of why this is necessary, consider 64-bit platforms. An int is typically still 32 bit on those, but you have far more than 2^32 bytes of memory.
+     So if a (signed) int was used, you'd be unable to create strings larger than 2^31 characters. size_type will be a 64-bit value on those platforms however, so it can represent larger strings without a problem.
+     */
+}
+
+/*  Given a string paragraph and a string array of the banned words banned, return the most frequent word
+    that is not banned. It is guaranteed there is at least one word that is not banned, and that the answer
+    is unique. The words in paragraph are case-insensitive and the answer should be returned in lowercase. */
+// mostCommon_unbannedWord() is a special case of mostCommon_Word()
+string mostCommon_unbannedWord( string paragraph, vector<string>& banned_words )
 {
     string result = "";
-    string word = "";
-    // Create a map for words and their occurance counts
-    // <word, count>
-    map<string, int> Map;
-
-    // !!!: Commented out following code, since words in paragraph are case-insensitive
-    // Convert paragraph string to upper case
-    /*for( int i = 0; i < paragraph.length (); i++ ) {
-        paragraph[i] = (char)toupper(paragraph[i]);
-    }
-
-    // Convert banned string(s) to upper case
-    for( int i = 0; i < banned[i].length (); i++ ) {
-        for( int j = 0; j < banned[i][j]; j++ ) {
-            banned[i][j] = (char)toupper (banned[i][j]);
-        }
-    }*/
+    // Create a map for word counts
+    // <"word", count>
+    map<string, int> word_count;
 
     // Find words in parapraph and check it is not in banned
-    for( int i=0, j=0, max=0; i < paragraph.length (); i = j + 1 ) {
+    int max_word_count = 0;
+    
+    int i = 0;
+    while( i < paragraph.size () ) {
+        // start with empty word
+        string word = "";
+
+        // 1) find a word in the paragraph
+        int j = i;
+        while( j < paragraph.length() && paragraph[j] != ' ' && paragraph[j] != ',' && paragraph[j] != '.' ) {
+            word += paragraph[j++];
+        }
         
-        // find a word in the paragraph
-        j = i;
-        while( j < paragraph.length () && paragraph[j] != ' '
-                  && paragraph[j] != ',' && paragraph[j] != '.' ) {
-          word += paragraph[j++];
+        // if you have ' ' or ',' or '.' in the paragraph, you end up with empty word => "".
+        // ignore current word and move to the next word index
+        if( word == "" ) {
+            i = j + 1;  // continue searching for the next word
+            continue;
+        }
+        
+        // 2) check if the word is banned
+        bool banned = false;
+        for( string banned_word : banned_words ) {
+            if( word == banned_word ) {
+                // word is banned, ignore it and go to the next word
+                banned = true;
+                break;
+            }
         }
 
-        // find a word i banned words
-        for( string banned_word : banned_words ) {
-          if(word != banned_word ) {
-              Map[word]++;
-              if( Map[word] > max ) {
-                  max = Map[word];
-                  result = word;
-              }
+        // 3) check if the word is not banned
+        if( !banned ) {
+            // word not banned, add it to word count map and update its count
+            word_count[word]++;
+            if( word_count[word] > max_word_count ) {
+                max_word_count = word_count[word];
+                result = word;      // at this point, this is the most occured word
             }
         }
         
-        word = "";
+        i = j + 1;
     }
     
-    for( int i = 0; i < result.length (); i++ ) {
-        result[i] = (char )tolower(result[i]);  // cast from int to char
+    return result;
+}
+
+// https://www.geeksforgeeks.org/frequent-word-array-strings/
+// !!!: a bug in Geeks code. should return (max_wordcount +1) !!! O(N2)
+void mostCommonWord_geeks( vector<string> words )
+{
+    // freq to store the freq of the most occurring variable
+    int max_wordcount = 0;
+    // most_commonword is used to store the most occurring string in the array of strings
+    string most_commonword;
+ 
+    // my idea to figure out O()
+    // for number of words = 15: = N-1 + N-2 + N-3 ...1 = (14*15)/2 = (N*N+1)/2 = (N2+1)/2 = O(~N2)
+    int test_count = 0;
+
+    // running nested for loops to find the most occurring word in the array of strings
+    for( int left = 0; left < words.size(); left++ ) {
+        int wordcount = 0;
+        // count the occurance of a word
+        for( int right = left + 1; right < words.size(); right++ ) {
+            test_count++;
+            // compare right word with left word, and move to the next (right) word
+            if( words[right] == words[left] ) { // comparing 2 strings
+                wordcount++;
+            }
+        }
+        
+        // updating our max freq of occurred word in the array of words
+        if( wordcount >= max_wordcount ) {
+            most_commonword = words[left];
+            max_wordcount   = wordcount;
+        }
     }
+ 
+    cout << "\tThe word that occurs most is : " << most_commonword;
+    cout << ",\tNo of times: " << max_wordcount << endl;
+}
+
+// my solution: faster than Geeks, O(N words)
+void mostCommonWord_mySol( vector<string> words )
+{
+    map<string, int> wordcount_map;
+    int max_wordcount = 0;
+    string most_commonword;
+    
+    // word: ["string", count]. [first, second]. [first] == second
+    for( string word: words ) {
+        wordcount_map[word]++;
+        if( wordcount_map[word] >= max_wordcount ) {
+            most_commonword = word;
+            max_wordcount   = wordcount_map[word];
+        }
+    }
+    
+    /*// word: ["string", count]. [first, second]
+    for( auto word: wordcount_map ) {
+        if( word.second >= max_wordcount ) {
+            most_commonword = word.first;
+            max_wordcount   = word.second;
+        }
+    }*/
+    
+    cout << "\tThe word that occurs most is : " << most_commonword;
+    cout << ",\tNo of times: " << max_wordcount << endl;
+}
+
+// First try, it is OK, See next version
+string addTwoStrings1( string str1, string str2 )
+{
+    string result = "";
+
+    // !!!: str1size & str2size traverse s1 & s2 from END to START
+    int digit1 = 0, digit2 = 0, sum = 0, carry = 0;
+
+    long int str1size = str1.length () - 1;
+    long int str2size = str2.length () - 1;
+    
+    while ( str1size >= 0 ) {
+        digit1 = str1[str1size] - '0'; // convert s1's char to int -> digit1
+        sum = digit1 + carry; // INITIALIZE sum with digit1 + carry
+        if (str2size >= 0 ) {          // we have not reached end of s2
+          digit2 = str2[str2size] - '0'; // convert s2's char to int -> digit2
+          sum += digit2;        // Notice +=, add digit2 to sum
+            str2size--;
+        }
+
+        carry = sum / 10;
+        result += (sum % 10) + '0'; // Notice +=
+        str1size--;
+    }
+
+    // s2 > s1: add rest of digits in s2, if any left
+    while ( str2size >= 0 ) {
+        digit2 = str2[str2size] - '0'; // convert s2's char to int -> digit2
+        sum = digit2 + carry; // INITIALIZE sum with digit2 + carry
+
+        carry = sum / 10;
+        result += (sum % 10) + '0';
+        str2size--;
+    }
+
+    // if there is a carry add to final result
+    if( carry > 0 ) {
+        result += char (carry + '0');
+    }
+
+    reverse (result.begin (), result.end ());
 
     return result;
 }
 
-// First try, it is OK, See next version
-string addTwoStrings1( string s1, string s2 )
-{
-  string result = "";
-
-  long int s1length = s1.length ();
-  long int s2length = s2.length ();
-  int digit1 = 0;
-  int digit2 = 0;
-  int carry = 0;
-  int sum = 0;
-
-  // i & j traverse s1 & s2 from end to start
-  long int i = s1length - 1;
-  long int j = s2length - 1;
-  for (; i >= 0; i--, j--)
-    {
-      digit1 = s1[i] - '0'; // convert s1's char to int -> digit1
-      sum = digit1 + carry; // INITIALIZE sum with digit1 + carry
-      if (j >= 0)           // we have not reached end of s2
-        {
-          digit2 = s2[j] - '0'; // convert s2's char to int -> digit2
-          sum += digit2;        // Notice +=, add digit2 to sum
-        }
-
-      carry = sum / 10;
-      result += (sum % 10) + '0'; // Notice +=
-    }
-
-  // s2 > s1: add rest of digits in s2, if any left
-  while (j >= 0)
-    {
-      digit2 = s2[j] - '0'; // convert s2's char to int -> digit2
-      sum = digit2 + carry; // INITIALIZE sum with digit2 + carry
-
-      carry = sum / 10;
-      result += (sum % 10) + '0';
-      j--;
-    }
-
-  // if there is a carry add to final result
-  if (carry > 0)
-    {
-      result += char (carry + '0');
-    }
-
-  reverse (result.begin (), result.end ());
-
-  return result;
-}
-
-// !!!: Execellent work by ME. Best version. Much cleaner
+// !!!: Execellent work by ME. Best version. Much cleaner.
+// does not work for negative numbers
 string addTwoStrings2 (string str1, string str2)
 {
     string result = "";
     int carry = 0;
-    // √√√: i & j traverse s1 & s2 from end to start
-    long int i = str1.length () - 1;
-    long int j = str2.length () - 1;
+    // !!!: str1size & str2size traverse s1 & s2 from END to START
+    long int str1size = str1.size () - 1;
+    long int str2size = str2.size () - 1;
 
-    while (i >= 0 || j >= 0) {
-        int digit1 = 0, digit2 = 0, digit_sum = 0;
+    while( str1size >= 0 || str2size >= 0 ) {
+        int digit1 = 0, digit2 = 0, sum = 0;
 
-        // 1. both strings have digits.
-        //    then, add both digits to sum
-        if (i >= 0 && j >= 0) {
-          digit1 = str1[i] - '0';          // convert s1's char to int -> digit1
-          digit2 = str2[j] - '0';          // convert s2's char to int -> digit2
-          digit_sum = digit1 + digit2 + carry; // INITIALIZE sum with digit1 + carry
+        // 1. check that we have not reached the end of both strings, then, add both digits to sum
+        if( str1size >= 0 && str2size >= 0 ) {
+            digit1 = str1[str1size] - '0';        // convert s1's char to int -> digit1
+            digit2 = str2[str2size] - '0';        // convert s2's char to int -> digit2
+            sum = digit1 + digit2 + carry;        // INITIALIZE sum with digit1 + carry
         }
-        
-        // 2) no more digits in string 2 to add to sum.
-        //    then, just add all digits from string 1 to sum
-        else if (i >= 0) {
-            digit1 = str1[i] - '0';
-            digit_sum = digit1 + carry;
+        // 2) no more digits in string 2 to add to sum, then, just add all digits from string 1 to sum
+        else if (str1size >= 0) {
+            digit1 = str1[str1size] - '0';
+            sum = digit1 + carry;
         }
-        
-        // 3) no more digits in string 1 to add to sum.
-        //    then, just add all digits from string 2 to sum
-        else
-        {
-            digit2 = str2[j] - '0';
-            digit_sum = digit2 + carry;
+        // 3) no more digits in string 1 to add to sum, then, just add all digits from string 2 to sum
+        else {
+            digit2 = str2[str2size] - '0';
+            sum = digit2 + carry;
         }
 
-        carry = digit_sum / 10;           // carry is a whole number
-        result += (digit_sum % 10) + '0'; // !!!: Notice +=. store remainder in result
+        carry = sum / 10;           // carry over a whole number
+        result += (sum % 10) + '0'; // !!!: Notice +=. store remainder in result
 
-        i--;
-        j--;
+        str1size--;
+        str2size--;
     }
 
     // if there is a carry at this point, add it to the final result
-    if (carry > 0)
-    {
+    if (carry > 0) {
         result += char (carry + '0');
     }
 
-    // result data was entered in reverse order. reoder it.
     reverse (result.begin (), result.end ());
 
     return result;
@@ -789,32 +878,28 @@ string multiplyTwoStrings ( string number1, string number2 )
   return result;
 }
 
-vector<string> commonChars (vector<string> &words)
+vector<string> commonChars_inStrings (vector<string> &words)
 {
-  vector<string> result;
-  size_t size = words.size ();
-  if (size == 0)
-    {
+    vector<string> result;
+    size_t size = words.size ();
+    if (size == 0) {
       return result;
     }
 
-  // Map of key=char and value=char count
-  map<char, int> charCount;
-  for (string word : words)
-    {
-      for (char c : word)
-        {
+    // Map of key=char and value=char count
+    map<char, int> charCount;
+    for (string word : words) {
+      for (char c : word) {
           charCount[c]++;
         }
     }
 
-  map<char, int>::iterator itr;
-  for (itr = charCount.begin (); itr != charCount.end (); itr++)
-    {
-      int count = itr->second;
-      int whole = count / size;
-      int i = 0;
-      while (i < whole)
+    map<char, int>::iterator itr;
+    for (itr = charCount.begin (); itr != charCount.end (); itr++) {
+        int count = itr->second;
+        int whole = count / size;
+        int i = 0;
+        while (i < whole)
         {
           string str;
           str = itr->first;
@@ -823,16 +908,16 @@ vector<string> commonChars (vector<string> &words)
         }
     }
 
-  return result;
+    return result;
 }
 
 vector<string> unique_names (vector<string> names1, vector<string> names2)
 {
     vector<string> result (names1);
 
-    for (string str : names2) {
-        if( find(begin(names1), end(names1), str) == end(names1) ) {
-          result.push_back (str);
+    for (string str2 : names2) {
+        if( find(begin(names1), end(names1), str2) == end(names1) ) {
+          result.push_back (str2);
         }
     }
     
